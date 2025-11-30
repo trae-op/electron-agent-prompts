@@ -1,0 +1,24 @@
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./docs/typescript.md"
+    },
+    {
+      "file": "./docs/main-process-architecture.md"
+    },
+    {
+      "file": "./docs/renderer-process-architecture.md"
+    },
+    {
+      "file": "./docs/main-process-unit-tests.md"
+    },
+    {
+      "file": "./docs/renderer-process-unit-tests.md"
+    }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": "./docs/git-commit-instructions.md"
+    }
+  ]
+}

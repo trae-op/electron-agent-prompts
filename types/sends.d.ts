@@ -1,0 +1,25 @@
+type TEventPayloadSend = {
+  restart: undefined;
+  windowClosePreload: undefined;
+  user: undefined;
+  logout: undefined;
+  checkAuth: undefined;
+  windowAuth: {
+    provider: TProviders;
+  };
+  openLatestVersion: TOpenLatestVersion;
+  openUpdate: {
+    id: string;
+  };
+};
+
+type TSend = {
+  restart: () => void;
+  windowClosePreload: () => void;
+  user: () => void;
+  checkAuth: () => void;
+  logout: () => void;
+  windowAuth: (payload: TEventPayloadSend["windowAuth"]) => void;
+  openLatestVersion: (payload: TEventPayloadSend["openLatestVersion"]) => void;
+  windowOpenUpdate: (payload: TEventPayloadSend["openUpdate"]) => void;
+};
