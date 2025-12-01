@@ -72,6 +72,7 @@ export const restApi = {
       base: "/auth",
       google: "/google",
       facebook: "/facebook",
+      github: "/github",
     },
     user: {
       base: "/user",
