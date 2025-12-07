@@ -1,14 +1,18 @@
 import { forwardRef } from "react";
-import { useVersionSelector } from "../../context/useSelectors";
+import {
+  useVersionSelector,
+  useStatusSelector,
+} from "../../context/useSelectors";
 import { useUpdateDownloaded } from "../../hooks";
 import type { TComponentGenericForwardRef } from "./types";
 
 export const DownloadedButton = forwardRef(
   ({ component: Component, children, ...otherProps }, ref) => {
     const version = useVersionSelector();
+    const status = useStatusSelector();
     const { handleUpdate } = useUpdateDownloaded();
 
-    if (version !== "update-downloaded") {
+    if (status !== "update-downloaded" && version == undefined) {
       return null;
     }
 

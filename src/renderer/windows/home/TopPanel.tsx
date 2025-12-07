@@ -4,7 +4,9 @@ import ListItemButton, {
   ListItemButtonProps,
 } from "@mui/material/ListItemButton";
 import { grey } from "@mui/material/colors";
-import { UserPopover, PopoverProvider } from "@conceptions/User";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import { UserPopover } from "@conceptions/User";
 import { LogoutButton } from "@conceptions/Auth";
 import { useStatusSelector, DownloadedButton } from "@conceptions/Updater";
 import { TopPanel } from "@layouts/TopPanel";
@@ -14,21 +16,23 @@ const ContainerPopover = memo(() => {
   const status = useStatusSelector();
 
   return (
-    <PopoverProvider
+    <UserPopover
       isNewVersionApp={status === "update-downloaded"}
-      renderButtonLogout={
-        <LogoutButton<ListItemButtonProps> component={ListItemButton}>
-          Logout
-        </LogoutButton>
+      nav={
+        <List>
+          <ListItem disablePadding>
+            <DownloadedButton<ListItemButtonProps> component={ListItemButton}>
+              Update
+            </DownloadedButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <LogoutButton<ListItemButtonProps> component={ListItemButton}>
+              Logout
+            </LogoutButton>
+          </ListItem>
+        </List>
       }
-      renderButtonUpdateApp={
-        <DownloadedButton<ListItemButtonProps> component={ListItemButton}>
-          Update
-        </DownloadedButton>
-      }
-    >
-      <UserPopover />
-    </PopoverProvider>
+    />
   );
 });
 

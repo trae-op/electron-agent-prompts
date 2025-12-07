@@ -7,3 +7,8 @@ export type TProviderProps = {
 export type TProviderProfileProps = {
   children: ReactNode;
 };
+
+export type TUserPopoverProps = {
+  nav: ReactNode;
+  isNewVersionApp?: boolean;
+};

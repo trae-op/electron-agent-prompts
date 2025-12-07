@@ -10,7 +10,6 @@ import { initNotification } from "./@shared/notification.js";
 import { destroyTray, getTrayMenu, buildTray } from "./@shared/tray/tray.js";
 import { setFeedURL } from "./updater/services/win/setFeedURL.js";
 import { controlUpdater } from "./updater/services/win/controlUpdater.js";
-import { checkForUpdates } from "./updater/services/checkForUpdates.js";
 import { registerIpc as registerIpcAppVersion } from "./app-version/ipc.js";
 import { registerIpc as registerIpcUpdater } from "./updater/ipc.js";
 import { registerIpc as registerIpcPreload } from "./app-preload/ipc.js";
@@ -112,10 +111,6 @@ function handleCloseEvents(mainWindow: BrowserWindow) {
   mainWindow.on("show", () => {
     setStore("/", mainWindow);
     isWillClose = false;
-  });
-
-  mainWindow.webContents.on("did-finish-load", () => {
-    checkForUpdates();
   });
 }
 

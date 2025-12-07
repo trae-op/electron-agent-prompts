@@ -6,7 +6,7 @@ export const useEntityContext = () => {
   const entityContext = useContext(Context);
 
   if (!entityContext)
-    throw new Error("useControlContext must be used inside Provider");
+    throw new Error("Updater useEntityContext must be used inside Provider");
 
   return entityContext;
 };

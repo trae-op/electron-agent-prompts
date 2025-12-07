@@ -5,6 +5,7 @@ import { buildTray, destroyTray, getTrayMenu } from "../@shared/tray/tray.js";
 import { ipcMainOn } from "../@shared/utils.js";
 import { openLatestVersion } from "./services/mac/openLatestVersion.js";
 import { openWindow } from "./window.js";
+import { checkForUpdates } from "./services/checkForUpdates.js";
 
 const { autoUpdater } = pkg;
 
@@ -25,6 +26,10 @@ export function registerIpc(): void {
 
   ipcMainOn("restart", () => {
     autoUpdater.quitAndInstall();
+  });
+
+  ipcMainOn("checkForUpdates", () => {
+    checkForUpdates();
   });
 
   ipcMainOn("openLatestVersion", (_, { updateFile }) => {

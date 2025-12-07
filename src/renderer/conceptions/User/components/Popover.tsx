@@ -1,15 +1,18 @@
 import IconButton from "@mui/material/IconButton";
-import { styled } from "@mui/material/styles";
+import { styled, type SxProps, type Theme } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import Popover from "@mui/material/Popover";
+
 import { useControl } from "../hooks/useControl";
-import {
-  useUserSelector,
-  useNewVersionAppSelector,
-} from "../context/useSelectors";
+import { useUserSelector } from "../context/useSelectors";
 import { useIpc } from "../hooks";
-import { Content } from "./Content";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import { TUserPopoverProps } from "./types";
+import { memo } from "react";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -40,15 +43,47 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-export const UserPopover = () => {
-  useIpc();
-  const isNewVersionApp = useNewVersionAppSelector();
-  const { handleClick, handleClose, id, isOpen, anchorEl } = useControl();
+const UserAvatar = memo(({ sx }: { sx?: SxProps<Theme> }) => {
   const user = useUserSelector();
 
   if (user === undefined) {
     return null;
   }
+
+  return <Avatar sx={sx} alt="profile" src={user.picture || ""} />;
+});
+
+const DisplayName = () => {
+  const user = useUserSelector();
+
+  if (user?.displayName === undefined) {
+    return null;
+  }
+
+  return (
+    <Typography variant="body2" color="text.secondary">
+      {user.displayName}
+    </Typography>
+  );
+};
+
+const DisplayEmail = () => {
+  const user = useUserSelector();
+
+  if (user?.email === undefined) {
+    return null;
+  }
+
+  return (
+    <Typography variant="body2" color="text.secondary">
+      {user.email}
+    </Typography>
+  );
+};
+
+export const UserPopover = ({ nav, isNewVersionApp }: TUserPopoverProps) => {
+  useIpc();
+  const { handleClick, handleClose, id, isOpen, anchorEl } = useControl();
 
   return (
     <>
@@ -66,11 +101,7 @@ export const UserPopover = () => {
           }}
           variant={isNewVersionApp ? "dot" : "standard"}
         >
-          <Avatar
-            sx={{ width: 28, height: 28 }}
-            alt="profile"
-            src={user.picture || ""}
-          />
+          <UserAvatar sx={{ width: 28, height: 28 }} />
         </StyledBadge>
       </IconButton>
 
@@ -88,7 +119,16 @@ export const UserPopover = () => {
           horizontal: "center",
         }}
       >
-        <Content />
+        <Box sx={{ width: 200 }}>
+          <Stack sx={{ mt: 2, mb: 2 }} spacing={1} alignItems="center">
+            <UserAvatar sx={{ width: 80, height: 80 }} />
+            <DisplayName />
+            <DisplayEmail />
+          </Stack>
+          <Divider />
+
+          <nav aria-label="secondary mailbox folders">{nav}</nav>
+        </Box>
       </Popover>
     </>
   );

@@ -34,6 +34,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     user: () => {
       ipcSend("user");
     },
+    checkForUpdates: () => {
+      ipcSend("checkForUpdates");
+    },
     checkAuth: () => {
       ipcSend("checkAuth");
     },
