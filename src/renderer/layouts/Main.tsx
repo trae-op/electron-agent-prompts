@@ -36,16 +36,14 @@ export const MainLayout = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <Outlet />
-        </Box>
-      </Container>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Outlet />
+      </Box>
     </ThemeProvider>
   );
 };
