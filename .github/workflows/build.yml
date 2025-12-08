@@ -9,6 +9,7 @@ on:
       - "package.json"
       - "docs/**"
       - ".vscode/**"
+      - ".gitignore"
   pull_request:
     branches:
       - main
