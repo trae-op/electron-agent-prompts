@@ -3,7 +3,6 @@ import Stack from "@mui/material/Stack";
 import ListItemButton, {
   ListItemButtonProps,
 } from "@mui/material/ListItemButton";
-import { grey } from "@mui/material/colors";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import { UserPopover } from "@conceptions/User";
@@ -11,6 +10,7 @@ import { LogoutButton } from "@conceptions/Auth";
 import { useStatusSelector, DownloadedButton } from "@conceptions/Updater";
 import { TopPanel } from "@layouts/TopPanel";
 import { Container as ContainerAppVersion } from "@composites/AppVersion";
+import { Toggle as LightDarkModeToggle } from "@composites/LightDarkMode";
 
 const ContainerPopover = memo(() => {
   const status = useStatusSelector();
@@ -48,7 +48,7 @@ const ContainerTopPanel = () => {
         paddingBottom: 0.5,
         paddingRight: 1,
         paddingLeft: 1,
-        backgroundColor: grey[900],
+        backgroundColor: (theme) => theme.palette.background.paper,
       }}
     >
       <ContainerAppVersion sx={{ width: "100%" }} variant="caption" />
@@ -59,6 +59,7 @@ const ContainerTopPanel = () => {
         alignItems="center"
         sx={{ width: "100%" }}
       >
+        <LightDarkModeToggle />
         <ContainerPopover />
       </Stack>
     </TopPanel>
