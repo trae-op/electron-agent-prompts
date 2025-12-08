@@ -44,6 +44,14 @@ src/renderer/
   - `components/`: UI components specific to this domain.
 - **Usage**: Wrap the application (or part of it) with the domain's Provider in `App.tsx`.
 
+### Context Pattern
+
+- **State container**: Follow the pattern from `src/renderer/conceptions/Updater/context/Context.tsx`. Keep mutable values in `useRef` containers, expose typed getter/setter pairs, and collect subscribers in a `Set<TSubscriberCallback>` so updates do not trigger full-provider renders.
+- **Selectors**: Implement selectors with `useSyncExternalStore` (`useSelectors.ts`) that read through the getters. This keeps consuming components in sync while avoiding unnecessary re-renders or stale reads.
+- **Dispatch helpers**: Export setter hooks alongside selectors so components interact through a stable API (`useSetStatusDispatch`, etc.). Do not expose raw context values.
+- **Type safety**: Declare the shared context contract in `types.ts` and use explicit domain types (`TUpdateData`) for each getter/setter. Consumers should import from the context index barrel.
+- **Provider usage**: Export the provider and selectors from `context/index.ts`, and mount the provider at the domain composition boundary (e.g., the updater window) before calling selectors in child components.
+
 ## 4. IPC Integration
 
 - **Access**: IPC is accessed via `window.electron` (exposed by preload script).
