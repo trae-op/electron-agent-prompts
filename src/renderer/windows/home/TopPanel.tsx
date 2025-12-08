@@ -48,7 +48,16 @@ const ContainerTopPanel = () => {
         paddingBottom: 0.5,
         paddingRight: 1,
         paddingLeft: 1,
-        backgroundColor: (theme) => theme.palette.background.paper,
+        backgroundColor: (theme) =>
+          theme.palette.mode === "dark"
+            ? theme.palette.grey[900]
+            : theme.palette.grey[100],
+        borderBottom: (theme) =>
+          `1px solid ${
+            theme.palette.mode === "dark"
+              ? theme.palette.grey[800]
+              : theme.palette.grey[200]
+          }`,
       }}
     >
       <ContainerAppVersion sx={{ width: "100%" }} variant="caption" />
