@@ -6,7 +6,6 @@ import { Provider as ProviderUser } from "@conceptions/User";
 import {
   Provider as ProviderProjects,
   ProjectsOverview,
-  ProjectsHeader,
 } from "@conceptions/Projects";
 import {
   Provider as ProviderCreateProject,
@@ -16,6 +15,7 @@ import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
 } from "@conceptions/Updater";
+import { ProjectsHeader } from "./ProjectsHeader";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
