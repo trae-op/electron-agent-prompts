@@ -40,7 +40,7 @@ src/renderer/
 
 - **Structure**: A conception folder should contain everything related to that domain:
   - `context/`: Providers for global state (e.g., `AuthProvider`).
-  - `hooks/`: Hooks to access state or perform actions (e.g., `useAuth`, `useLogin`).
+  - `hooks/`: Hooks to access perform actions (e.g., `useCreateProjectActions`). There must be event handlers (e.g., `handleCreateProject`, `handleUpdateProject`, `handleDeleteProject`)
   - `components/`: UI components specific to this domain.
 - **Usage**: Wrap the application (or part of it) with the domain's Provider in `App.tsx`.
 
