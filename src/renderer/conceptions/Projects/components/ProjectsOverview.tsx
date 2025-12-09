@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import Stack from "@mui/material/Stack";
 
 import { useProjectsActions } from "../hooks";
@@ -5,9 +6,8 @@ import { ProjectsGrid } from "./ProjectsGrid";
 import { ProjectsEmptyState } from "./ProjectsEmptyState";
 import { useProjectsSelector } from "../context";
 import { formatProjectDate } from "../utils";
-import { useMemo } from "react";
 
-export const ProjectsOverview = () => {
+export const ProjectsOverview = memo(() => {
   const projects = useProjectsSelector();
   const overviewProjects = useMemo(
     () =>
@@ -41,4 +41,6 @@ export const ProjectsOverview = () => {
       )}
     </Stack>
   );
-};
+});
+
+ProjectsOverview.displayName = "ProjectsOverview";

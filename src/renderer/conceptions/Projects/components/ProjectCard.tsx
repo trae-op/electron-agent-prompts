@@ -1,3 +1,5 @@
+import { memo, useCallback, useMemo } from "react";
+import type { MouseEvent } from "react";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
@@ -11,45 +13,44 @@ import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import type {
+  TProjectCardDetailsProps,
+  TProjectCardFooterProps,
+  TProjectCardMetaRowProps,
+  TProjectCardProps,
+} from "./types";
 
-import type { TProjectCardProps } from "./types";
-
-export const ProjectCard = ({
-  item,
-  onOpen,
-  onEdit,
-  onDelete,
-}: TProjectCardProps) => {
-  const { project, createdLabel, updatedLabel, promptsCount } = item;
-  const pluralSuffix = promptsCount === 1 ? "" : "s";
-
+const ProjectCardMetaRow = memo(({ icon, label }: TProjectCardMetaRowProps) => {
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        borderRadius: 3,
-        borderColor: (theme) =>
-          theme.palette.mode === "dark"
-            ? theme.palette.grey[800]
-            : theme.palette.grey[200],
-        boxShadow: (theme) => theme.shadows[1],
-        transition: (theme) =>
-          theme.transitions.create(["transform", "box-shadow"], {
-            duration: theme.transitions.duration.shorter,
-          }),
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: (theme) => theme.shadows[4],
-        },
-      }}
-      data-testid={`project-card-${project.id}`}
-    >
+    <Stack direction="row" spacing={1} alignItems="center">
+      {icon}
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+    </Stack>
+  );
+});
+
+ProjectCardMetaRow.displayName = "ProjectCardMetaRow";
+
+const ProjectCardDetails = memo(
+  ({
+    project,
+    createdLabel,
+    updatedLabel,
+    onOpen,
+  }: TProjectCardDetailsProps) => {
+    const handleOpen = useCallback(() => onOpen(project), [onOpen, project]);
+
+    return (
       <CardActionArea
-        onClick={() => onOpen(project)}
-        sx={{ flexGrow: 1, alignSelf: "stretch" }}
+        onClick={handleOpen}
+        sx={{
+          flexGrow: 1,
+          alignSelf: "stretch",
+          borderEndEndRadius: 3,
+          borderEndStartRadius: 3,
+        }}
         data-testid={`project-card-area-${project.id}`}
       >
         <CardContent sx={{ px: 3, py: 3 }}>
@@ -58,22 +59,52 @@ export const ProjectCard = ({
               {project.name}
             </Typography>
             <Stack spacing={1.5}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <CalendarTodayRoundedIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.secondary">
-                  Created: {createdLabel}
-                </Typography>
-              </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <AccessTimeRoundedIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.secondary">
-                  Updated: {updatedLabel}
-                </Typography>
-              </Stack>
+              <ProjectCardMetaRow
+                icon={
+                  <CalendarTodayRoundedIcon fontSize="small" color="primary" />
+                }
+                label={`Created: ${createdLabel}`}
+              />
+              <ProjectCardMetaRow
+                icon={
+                  <AccessTimeRoundedIcon fontSize="small" color="primary" />
+                }
+                label={`Updated: ${updatedLabel}`}
+              />
             </Stack>
           </Stack>
         </CardContent>
       </CardActionArea>
+    );
+  }
+);
+
+ProjectCardDetails.displayName = "ProjectCardDetails";
+
+const ProjectCardFooter = memo(
+  ({ project, promptsCount, onEdit, onDelete }: TProjectCardFooterProps) => {
+    const handlerEdit = useCallback(
+      (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onEdit(project);
+      },
+      [onEdit, project]
+    );
+
+    const handleDelete = useCallback(
+      (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        onDelete(project);
+      },
+      [onDelete, project]
+    );
+
+    const promptsLabel = useMemo(() => {
+      const pluralSuffix = promptsCount === 1 ? "" : "s";
+      return `${promptsCount} Prompt${pluralSuffix}`;
+    }, [promptsCount]);
+
+    return (
       <CardActions
         sx={{
           px: 3,
@@ -92,7 +123,7 @@ export const ProjectCard = ({
         <Stack direction="row" spacing={1} alignItems="center">
           <ChatBubbleOutlineRoundedIcon fontSize="small" color="primary" />
           <Typography variant="body2" color="text.secondary">
-            {promptsCount} Prompt{pluralSuffix}
+            {promptsLabel}
           </Typography>
         </Stack>
         <Stack direction="row" spacing={1}>
@@ -100,10 +131,7 @@ export const ProjectCard = ({
             <IconButton
               size="small"
               aria-label="Edit project"
-              onClick={(event) => {
-                event.stopPropagation();
-                onEdit(project);
-              }}
+              onClick={handlerEdit}
               data-testid={`project-edit-${project.id}`}
             >
               <EditOutlinedIcon fontSize="small" />
@@ -113,10 +141,7 @@ export const ProjectCard = ({
             <IconButton
               size="small"
               aria-label="Delete project"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete(project);
-              }}
+              onClick={handleDelete}
               data-testid={`project-delete-${project.id}`}
             >
               <DeleteOutlineRoundedIcon fontSize="small" />
@@ -124,6 +149,55 @@ export const ProjectCard = ({
           </Tooltip>
         </Stack>
       </CardActions>
-    </Card>
-  );
-};
+    );
+  }
+);
+
+ProjectCardFooter.displayName = "ProjectCardFooter";
+
+export const ProjectCard = memo(
+  ({ item, onOpen, onEdit, onDelete }: TProjectCardProps) => {
+    const { project, createdLabel, updatedLabel, promptsCount } = item;
+
+    return (
+      <Card
+        variant="outlined"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          borderRadius: 3,
+          borderColor: (theme) =>
+            theme.palette.mode === "dark"
+              ? theme.palette.grey[800]
+              : theme.palette.grey[200],
+          boxShadow: (theme) => theme.shadows[1],
+          transition: (theme) =>
+            theme.transitions.create(["transform", "box-shadow"], {
+              duration: theme.transitions.duration.shorter,
+            }),
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: (theme) => theme.shadows[4],
+          },
+        }}
+        data-testid={`project-card-${project.id}`}
+      >
+        <ProjectCardDetails
+          project={project}
+          createdLabel={createdLabel}
+          updatedLabel={updatedLabel}
+          onOpen={onOpen}
+        />
+        <ProjectCardFooter
+          project={project}
+          promptsCount={promptsCount}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      </Card>
+    );
+  }
+);
+
+ProjectCard.displayName = "ProjectCard";
