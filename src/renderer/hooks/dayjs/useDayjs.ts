@@ -4,21 +4,23 @@ import { TDayjs } from "./types";
 let cachedDayjs: TDayjs = undefined;
 
 export function useDayjs() {
-  const [isLoaded, setLoaded] = useState(false);
+  const [isLoaded, setLoaded] = useState(() => cachedDayjs !== undefined);
 
   useEffect(() => {
-    if (cachedDayjs === undefined) {
-      import("dayjs").then((mod) => {
-        const instance = mod.default || mod;
-        cachedDayjs = instance;
-        setLoaded(true);
-      });
+    if (cachedDayjs !== undefined) {
+      return;
     }
+
+    import("dayjs").then((mod) => {
+      const instance = mod.default || mod;
+      cachedDayjs = instance;
+      setLoaded(true);
+    });
   }, []);
 
-  if (isLoaded) {
-    return cachedDayjs;
+  if (!isLoaded) {
+    return undefined;
   }
 
-  return undefined;
+  return cachedDayjs;
 }

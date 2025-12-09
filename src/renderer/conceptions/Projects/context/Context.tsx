@@ -1,13 +1,21 @@
 import { createContext, useCallback, useRef } from "react";
 
-import { buildProjectsFixture, cloneProjects } from "../../../constants";
+import { PROJECTS_SOURCE } from "../../../constants";
 import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 
 export const Context = createContext<TContext | null>(null);
 
+const cloneProjects = (value: readonly TProject[]): TProject[] => {
+  return value.map((project) => ({
+    ...project,
+    created: new Date(project.created),
+    updated: new Date(project.updated),
+  }));
+};
+
 export function Provider({ children, initialProjects }: TProviderProps) {
   const projects = useRef<TProject[]>(
-    cloneProjects(initialProjects ?? buildProjectsFixture())
+    cloneProjects(initialProjects ?? PROJECTS_SOURCE)
   );
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 

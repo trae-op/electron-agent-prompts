@@ -1,15 +1,14 @@
 import { ReactNode } from "react";
-import type { TProjectOverviewItem } from "../hooks";
 
 export type TProjectsGridProps = {
-  projects: TProjectOverviewItem[];
+  projects: TProject[];
   onOpen: (project: TProject) => void;
   onEdit: (project: TProject) => void;
   onDelete: (project: TProject) => void;
 };
 
 export type TProjectCardProps = {
-  item: TProjectOverviewItem;
+  project: TProject;
   onOpen: (project: TProject) => void;
   onEdit: (project: TProject) => void;
   onDelete: (project: TProject) => void;
@@ -33,7 +32,7 @@ export type TProjectCardMetaRowProps = {
 
 export type TProjectCardFooterProps = {
   project: TProject;
-  promptsCount: number;
+  countTasks: number;
   onEdit: (project: TProject) => void;
   onDelete: (project: TProject) => void;
 };

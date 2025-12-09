@@ -1,2 +1,2 @@
 export * from "./useProjectsActions";
-export type { TProjectOverviewItem, TProjectActionsHook } from "./types";
+export type { TProjectActionsHook } from "./types";

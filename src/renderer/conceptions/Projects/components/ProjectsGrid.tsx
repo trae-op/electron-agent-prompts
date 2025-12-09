@@ -8,10 +8,10 @@ export const ProjectsGrid = memo(
   ({ projects, onOpen, onEdit, onDelete }: TProjectsGridProps) => {
     const renderedProjects = useMemo(
       () =>
-        projects.map((item) => (
-          <Grid key={item.project.id} size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+        projects.map((project) => (
+          <Grid key={project.id} size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
             <ProjectCard
-              item={item}
+              project={project}
               onOpen={onOpen}
               onEdit={onEdit}
               onDelete={onDelete}

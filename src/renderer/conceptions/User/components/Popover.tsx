@@ -1,5 +1,5 @@
 import IconButton from "@mui/material/IconButton";
-import { styled, type SxProps, type Theme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import Popover from "@mui/material/Popover";
@@ -43,14 +43,17 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const UserAvatar = memo(({ sx }: { sx?: SxProps<Theme> }) => {
+const UserAvatar = memo((props: { width?: number; height?: number }) => {
   const user = useUserSelector();
 
-  if (user === undefined) {
+  if (
+    user === undefined ||
+    (user !== undefined && user.picture === undefined)
+  ) {
     return null;
   }
 
-  return <Avatar sx={sx} alt="profile" src={user.picture || ""} />;
+  return <Avatar sx={props} alt="profile" src={user.picture} />;
 });
 
 const DisplayName = () => {
@@ -101,7 +104,7 @@ export const UserPopover = ({ nav, isNewVersionApp }: TUserPopoverProps) => {
           }}
           variant={isNewVersionApp ? "dot" : "standard"}
         >
-          <UserAvatar sx={{ width: 28, height: 28 }} />
+          <UserAvatar width={28} height={28} />
         </StyledBadge>
       </IconButton>
 
@@ -121,7 +124,7 @@ export const UserPopover = ({ nav, isNewVersionApp }: TUserPopoverProps) => {
       >
         <Box sx={{ width: 200 }}>
           <Stack sx={{ mt: 2, mb: 2 }} spacing={1} alignItems="center">
-            <UserAvatar sx={{ width: 80, height: 80 }} />
+            <UserAvatar width={80} height={80} />
             <DisplayName />
             <DisplayEmail />
           </Stack>

@@ -19,6 +19,7 @@ import type {
   TProjectCardMetaRowProps,
   TProjectCardProps,
 } from "./types";
+import { useDayjs } from "../../../hooks/dayjs";
 
 const ProjectCardMetaRow = memo(({ icon, label }: TProjectCardMetaRowProps) => {
   return (
@@ -82,7 +83,7 @@ const ProjectCardDetails = memo(
 ProjectCardDetails.displayName = "ProjectCardDetails";
 
 const ProjectCardFooter = memo(
-  ({ project, promptsCount, onEdit, onDelete }: TProjectCardFooterProps) => {
+  ({ project, countTasks, onEdit, onDelete }: TProjectCardFooterProps) => {
     const handlerEdit = useCallback(
       (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -100,9 +101,9 @@ const ProjectCardFooter = memo(
     );
 
     const promptsLabel = useMemo(() => {
-      const pluralSuffix = promptsCount === 1 ? "" : "s";
-      return `${promptsCount} Prompt${pluralSuffix}`;
-    }, [promptsCount]);
+      const pluralSuffix = countTasks === 1 ? "" : "s";
+      return `${countTasks} Prompt${pluralSuffix}`;
+    }, [countTasks]);
 
     return (
       <CardActions
@@ -156,8 +157,26 @@ const ProjectCardFooter = memo(
 ProjectCardFooter.displayName = "ProjectCardFooter";
 
 export const ProjectCard = memo(
-  ({ item, onOpen, onEdit, onDelete }: TProjectCardProps) => {
-    const { project, createdLabel, updatedLabel, promptsCount } = item;
+  ({ project, onOpen, onEdit, onDelete }: TProjectCardProps) => {
+    const dayjs = useDayjs();
+
+    const memoizedTimeValue = useMemo(() => {
+      if (!dayjs) {
+        return null;
+      }
+
+      return {
+        created: dayjs(project.created),
+        updated: dayjs(project.updated),
+      };
+    }, [dayjs, project.created, project.updated]);
+
+    if (memoizedTimeValue === null) {
+      return null;
+    }
+
+    const createdLabel = memoizedTimeValue.created.format("MMM D, YYYY");
+    const updatedLabel = memoizedTimeValue.updated.format("MMM D, YYYY");
 
     return (
       <Card
@@ -191,7 +210,7 @@ export const ProjectCard = memo(
         />
         <ProjectCardFooter
           project={project}
-          promptsCount={promptsCount}
+          countTasks={project.countTasks}
           onEdit={onEdit}
           onDelete={onDelete}
         />
