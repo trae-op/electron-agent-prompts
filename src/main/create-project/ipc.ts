@@ -1,10 +1,14 @@
-import { ipcMainOn } from "../@shared/utils.js";
+import { ipcMainHandle } from "../@shared/utils.js";
 import { createProject } from "./service.js";
 
 export function registerIpc(): void {
-  ipcMainOn("createProject", async (event: Electron.IpcMainEvent, payload) => {
+  ipcMainHandle("createProject", async (payload) => {
+    if (payload === undefined) {
+      return undefined;
+    }
+
     const result = await createProject(payload);
 
-    event.reply("createProject", result);
+    return result;
   });
 }

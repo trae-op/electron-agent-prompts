@@ -9,9 +9,6 @@ type TEventPayloadSend = {
     provider: TProviders;
   };
   openLatestVersion: TOpenLatestVersion;
-  createProject: {
-    name: string;
-  };
   openUpdate: {
     id: string;
   };
@@ -26,6 +23,5 @@ type TSend = {
   checkForUpdates: () => void;
   windowAuth: (payload: TEventPayloadSend["windowAuth"]) => void;
   openLatestVersion: (payload: TEventPayloadSend["openLatestVersion"]) => void;
-  createProject: (payload: TEventPayloadSend["createProject"]) => void;
   windowOpenUpdate: (payload: TEventPayloadSend["openUpdate"]) => void;
 };

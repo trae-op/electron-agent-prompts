@@ -4,7 +4,6 @@ type TEventPayloadReceive = {
   updateApp: TUpdateData;
   openUpdateApp: TOpenUpdateApp;
   auth: TAuth;
-  createProject: boolean | undefined;
   user: {
     user: TUser;
   };
@@ -13,9 +12,6 @@ type TEventPayloadReceive = {
 type TReceive = {
   subscribeWindowOpenUpdateApp: (
     callback: (payload: TEventPayloadReceive["openUpdateApp"]) => void
-  ) => TUnsubscribeFunction;
-  subscribeCreateProject: (
-    callback: (payload: TEventPayloadReceive["createProject"]) => void
   ) => TUnsubscribeFunction;
   subscribeUpdateApp: (
     callback: (payload: TEventPayloadReceive["updateApp"]) => void

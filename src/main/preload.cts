@@ -26,12 +26,6 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("user", (payload) => {
         callback(payload);
       }),
-    subscribeCreateProject: (
-      callback: (payload: TEventPayloadReceive["createProject"]) => void
-    ) =>
-      ipcOn("createProject", (payload) => {
-        callback(payload);
-      }),
   },
   send: {
     restart: () => {
@@ -55,9 +49,6 @@ electron.contextBridge.exposeInMainWorld("electron", {
     windowClosePreload: () => {
       ipcSend("windowClosePreload");
     },
-    createProject: (payload: TEventPayloadSend["createProject"]) => {
-      ipcSend("createProject", payload);
-    },
     openLatestVersion: (payload: TEventPayloadSend["openLatestVersion"]) => {
       ipcSend("openLatestVersion", payload);
     },
@@ -67,6 +58,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
   },
   invoke: {
     getVersion: () => ipcInvoke("getVersion"),
+    createProject: (payload) => ipcInvoke("createProject", payload),
   },
 } satisfies Window["electron"]);
 
