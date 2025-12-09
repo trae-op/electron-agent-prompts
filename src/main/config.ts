@@ -78,6 +78,9 @@ export const restApi = {
       base: "/user",
       byId: (id: string) => `/${id}`,
     },
+    projects: {
+      base: "/projects",
+    },
     githubReleases: `https://api.github.com/repos/${publishOptions.owner}/${publishOptions.repo}/releases`,
   },
 };
