@@ -49,6 +49,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     windowClosePreload: () => {
       ipcSend("windowClosePreload");
     },
+    createProject: (payload: TEventPayloadSend["createProject"]) => {
+      ipcSend("createProject", payload);
+    },
     openLatestVersion: (payload: TEventPayloadSend["openLatestVersion"]) => {
       ipcSend("openLatestVersion", payload);
     },
