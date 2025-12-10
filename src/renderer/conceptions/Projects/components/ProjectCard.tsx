@@ -19,7 +19,7 @@ import type {
   TProjectCardMetaRowProps,
   TProjectCardProps,
 } from "./types";
-import { useDayjs } from "../../../hooks/dayjs";
+import { useDayjs } from "@hooks/dayjs";
 
 const ProjectCardMetaRow = memo(({ icon, label }: TProjectCardMetaRowProps) => {
   return (

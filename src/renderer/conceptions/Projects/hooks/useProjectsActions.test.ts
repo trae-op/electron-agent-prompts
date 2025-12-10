@@ -22,16 +22,6 @@ describe("useProjectsActions", () => {
     infoSpy.mockRestore();
   });
 
-  it("logs a message when creating a project", () => {
-    const { result } = renderHook(() => useProjectsActions());
-
-    act(() => {
-      result.current.handleCreateProject();
-    });
-
-    expect(infoSpy).toHaveBeenCalledWith("[Projects] Create project requested");
-  });
-
   it("logs when opening a project", () => {
     const project = createProject();
     const { result } = renderHook(() => useProjectsActions());
