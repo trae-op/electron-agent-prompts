@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
@@ -20,9 +20,9 @@ import { ProjectsHeader } from "./ProjectsHeader";
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
 const Home = () => {
-  const onSuccess = (data: TProject) => {
+  const onSuccess = useCallback((data: TProject) => {
     console.log("Project created successfully:", data);
-  };
+  }, []);
 
   return (
     <ProviderUpdater>

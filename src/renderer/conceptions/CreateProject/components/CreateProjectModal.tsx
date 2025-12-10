@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { useCreateProjectModalActions } from "../hooks";
-import { TCreateProjectModalProps } from "./types";
+import { TCreateProjectFormProps, TCreateProjectModalProps } from "./types";
 import { useCreateProjectModalOpenSelector } from "../context";
 
 const SubmitButton = () => {
@@ -33,6 +33,70 @@ const SubmitButton = () => {
     </Button>
   );
 };
+
+const Form = memo(
+  ({ formAction, isPending, handleClose }: TCreateProjectFormProps) => {
+    const isOpen = useCreateProjectModalOpenSelector();
+
+    if (!isOpen) {
+      return null;
+    }
+
+    return (
+      <Box
+        component="section"
+        sx={{
+          width: { xs: "100%", sm: 420 },
+          maxWidth: 480,
+          bgcolor: "background.paper",
+          borderRadius: 3,
+          p: { xs: 3, sm: 4 },
+          boxShadow: (theme) => theme.shadows[6],
+        }}
+      >
+        <Stack spacing={3}>
+          <Typography component="h2" variant="h6" fontWeight={600}>
+            Create a new project
+          </Typography>
+          <form
+            action={formAction}
+            noValidate
+            data-testid="create-project-form"
+          >
+            <Stack spacing={2.5}>
+              <TextField
+                data-testid="create-project-name"
+                name="name"
+                id="create-project-name"
+                label="Project Name"
+                placeholder="My agent prompt project"
+                autoFocus
+                autoComplete="off"
+                fullWidth
+                disabled={isPending}
+              />
+              <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+                <Button
+                  type="button"
+                  variant="text"
+                  color="inherit"
+                  onClick={handleClose}
+                  disabled={isPending}
+                  sx={{
+                    textTransform: "none",
+                  }}
+                >
+                  Cancel
+                </Button>
+                <SubmitButton />
+              </Stack>
+            </Stack>
+          </form>
+        </Stack>
+      </Box>
+    );
+  }
+);
 
 export const CreateProjectModal = memo(
   ({ onSuccess }: TCreateProjectModalProps) => {
@@ -78,63 +142,11 @@ export const CreateProjectModal = memo(
             p: 2,
           }}
         >
-          {isOpen ? (
-            <Box
-              component="section"
-              sx={{
-                width: { xs: "100%", sm: 420 },
-                maxWidth: 480,
-                bgcolor: "background.paper",
-                borderRadius: 3,
-                p: { xs: 3, sm: 4 },
-                boxShadow: (theme) => theme.shadows[6],
-              }}
-            >
-              <Stack spacing={3}>
-                <Typography component="h2" variant="h6" fontWeight={600}>
-                  Create a new project
-                </Typography>
-                <form
-                  action={formAction}
-                  noValidate
-                  data-testid="create-project-form"
-                >
-                  <Stack spacing={2.5}>
-                    <TextField
-                      data-testid="create-project-name"
-                      name="name"
-                      id="create-project-name"
-                      label="Project Name"
-                      placeholder="My agent prompt project"
-                      autoFocus
-                      autoComplete="off"
-                      fullWidth
-                      disabled={isPending}
-                    />
-                    <Stack
-                      direction="row"
-                      spacing={1.5}
-                      justifyContent="flex-end"
-                    >
-                      <Button
-                        type="button"
-                        variant="text"
-                        color="inherit"
-                        onClick={handleClose}
-                        disabled={isPending}
-                        sx={{
-                          textTransform: "none",
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <SubmitButton />
-                    </Stack>
-                  </Stack>
-                </form>
-              </Stack>
-            </Box>
-          ) : null}
+          <Form
+            formAction={formAction}
+            isPending={isPending}
+            handleClose={handleClose}
+          />
         </Box>
       </Modal>
     );

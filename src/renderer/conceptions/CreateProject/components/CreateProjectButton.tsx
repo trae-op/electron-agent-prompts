@@ -1,10 +1,10 @@
 import Button from "@mui/material/Button";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
-import { useCreateProjectModal } from "../hooks";
+import { useCreateProjectModalActions } from "../hooks";
 
 export const CreateProjectButton = () => {
-  const { openModal } = useCreateProjectModal();
+  const { openModal } = useCreateProjectModalActions();
 
   return (
     <Button
