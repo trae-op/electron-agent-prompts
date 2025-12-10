@@ -38,7 +38,7 @@ describe("ProjectsOverview", () => {
     });
 
     render(
-      <Provider initialProjects={[]}>
+      <Provider initialProjects={[]} initialIsLoading={false}>
         <ProjectsOverview />
       </Provider>
     );
@@ -58,7 +58,7 @@ describe("ProjectsOverview", () => {
     vi.mocked(useProjectsActions).mockReturnValue(actions);
 
     render(
-      <Provider initialProjects={projects}>
+      <Provider initialProjects={projects} initialIsLoading={false}>
         <ProjectsOverview />
       </Provider>
     );

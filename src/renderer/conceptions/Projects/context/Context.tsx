@@ -11,9 +11,13 @@ const cloneProjects = (value: readonly TProject[]): TProject[] => {
   }));
 };
 
-export function Provider({ children, initialProjects }: TProviderProps) {
+export function Provider({
+  children,
+  initialProjects,
+  initialIsLoading,
+}: TProviderProps) {
   const projects = useRef<TProject[]>(cloneProjects(initialProjects ?? []));
-  const isProjectsLoading = useRef<boolean>(true);
+  const isProjectsLoading = useRef<boolean>(initialIsLoading ?? true);
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const getProjects = useCallback((): TProject[] => {

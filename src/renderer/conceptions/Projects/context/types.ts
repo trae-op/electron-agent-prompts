@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 export type TProviderProps = PropsWithChildren<{
   initialProjects?: TProject[];
+  initialIsLoading?: boolean;
 }>;
 
 export type TSubscriberCallback = () => void;
