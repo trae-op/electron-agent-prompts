@@ -29,3 +29,7 @@ export const useSetProjectsLoadingDispatch = () => {
 export const useAddNewProjectDispatch = () => {
   return useProjectsContext().addNewProject;
 };
+
+export const useUpdateProjectDispatch = () => {
+  return useProjectsContext().updateProject;
+};

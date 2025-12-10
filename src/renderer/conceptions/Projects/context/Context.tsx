@@ -43,6 +43,14 @@ export function Provider({
     subscribers.current.forEach((callback) => callback());
   }, []);
 
+  const updateProject = useCallback((value: TProject): void => {
+    const [nextProject] = cloneProjects([value]);
+    projects.current = projects.current.map((project) =>
+      project.id === nextProject.id ? nextProject : project
+    );
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
   const subscribe = useCallback((callback: () => void) => {
     subscribers.current.add(callback);
 
@@ -58,6 +66,7 @@ export function Provider({
         setProjectsLoading,
         getProjectsLoading,
         addNewProject,
+        updateProject,
         setProjects,
         subscribe,
       }}
