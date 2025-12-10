@@ -78,3 +78,9 @@ src/renderer/
 3.  **State**: If it needs global state, create a Context Provider in `conceptions/<Domain>/context/`.
 4.  **UI**: Create components in `conceptions/<Domain>/components/` or `src/renderer/components/` if generic.
 5.  **Route**: If it's a new page, add a component in `src/renderer/windows/` and a route in `App.tsx`.
+
+## 8. Forms
+
+- Use the React Server Actions form pattern with `useActionState` to manage submissions and ensure the action logic remains outside the component body so it can be reused or tested.
+- Drive submit buttons from a dedicated component that calls `useFormStatus` for the `pending` flag; import that component into the form so loading logic is isolated from the main form layout.
+- For large forms, split the UI into focused child components that subscribe to the form state through a domain context. Only the field-level components should re-render when state changes; the main form skeleton should stay static to avoid unnecessary work.
