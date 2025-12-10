@@ -13,10 +13,20 @@ const cloneProjects = (value: readonly TProject[]): TProject[] => {
 
 export function Provider({ children, initialProjects }: TProviderProps) {
   const projects = useRef<TProject[]>(cloneProjects(initialProjects ?? []));
+  const isProjectsLoading = useRef<boolean>(true);
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const getProjects = useCallback((): TProject[] => {
     return projects.current;
+  }, []);
+
+  const getProjectsLoading = useCallback((): boolean => {
+    return isProjectsLoading.current;
+  }, []);
+
+  const setProjectsLoading = useCallback((value: boolean): void => {
+    isProjectsLoading.current = value;
+    subscribers.current.forEach((callback) => callback());
   }, []);
 
   const setProjects = useCallback((value: TProject[]): void => {
@@ -41,6 +51,8 @@ export function Provider({ children, initialProjects }: TProviderProps) {
     <Context.Provider
       value={{
         getProjects,
+        setProjectsLoading,
+        getProjectsLoading,
         addNewProject,
         setProjects,
         subscribe,

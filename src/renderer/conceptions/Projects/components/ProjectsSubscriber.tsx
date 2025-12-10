@@ -1,12 +1,17 @@
 import { useEffect, useCallback } from "react";
-import { useSetProjectsDispatch } from "../context/useSelectors";
+import {
+  useSetProjectsDispatch,
+  useSetProjectsLoadingDispatch,
+} from "../context/useSelectors";
 
 export const ProjectsSubscriber = () => {
   const setProjects = useSetProjectsDispatch();
+  const setProjectsLoading = useSetProjectsLoadingDispatch();
 
   const subscribeUpdateApp = useCallback(() => {
     return window.electron.receive.subscribeProjects(({ projects }) => {
       setProjects(projects);
+      setProjectsLoading(false);
     });
   }, []);
 

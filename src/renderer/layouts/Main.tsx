@@ -1,11 +1,9 @@
 import { useMemo } from "react";
 import { Outlet } from "react-router-dom";
-import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import type { PaletteMode } from "@mui/material";
-import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 import { usePaletteModeSelector } from "@composites/LightDarkMode";
 
 const buildTheme = (mode: PaletteMode) =>
@@ -29,7 +27,6 @@ const buildTheme = (mode: PaletteMode) =>
   });
 
 export const MainLayout = () => {
-  useClosePreloadWindow();
   const mode = usePaletteModeSelector();
   const theme = useMemo(() => buildTheme(mode), [mode]);
 

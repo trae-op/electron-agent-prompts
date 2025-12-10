@@ -8,8 +8,22 @@ export const useProjectsSelector = (): TProject[] => {
   return useSyncExternalStore(subscribe, getProjects, getProjects);
 };
 
+export const useProjectsLoadingSelector = (): boolean => {
+  const { getProjectsLoading, subscribe } = useProjectsContext();
+
+  return useSyncExternalStore(
+    subscribe,
+    getProjectsLoading,
+    getProjectsLoading
+  );
+};
+
 export const useSetProjectsDispatch = () => {
   return useProjectsContext().setProjects;
+};
+
+export const useSetProjectsLoadingDispatch = () => {
+  return useProjectsContext().setProjectsLoading;
 };
 
 export const useAddNewProjectDispatch = () => {

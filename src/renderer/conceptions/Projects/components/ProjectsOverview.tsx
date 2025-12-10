@@ -1,16 +1,23 @@
 import { memo } from "react";
 import Stack from "@mui/material/Stack";
+import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { useProjectsActions } from "../hooks";
 import { ProjectsGrid } from "./ProjectsGrid";
-import { useProjectsSelector } from "../context";
+import { useProjectsSelector, useProjectsLoadingSelector } from "../context";
 import Typography from "@mui/material/Typography";
+import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 
 export const ProjectsOverview = memo(() => {
+  useClosePreloadWindow();
   const projects = useProjectsSelector();
-
+  const isLoading = useProjectsLoadingSelector();
   const { handleOpenProject, handleEditProject, handleDeleteProject } =
     useProjectsActions();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Stack
