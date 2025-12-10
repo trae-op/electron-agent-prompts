@@ -5,7 +5,6 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { Provider as ProviderUser } from "@conceptions/User";
 import {
   Provider as ProviderProjects,
-  ProjectsOverview,
   ProjectsSubscriber,
   useAddNewProjectDispatch,
 } from "@conceptions/Projects";
@@ -18,6 +17,7 @@ import {
   UpdateSubscriber,
 } from "@conceptions/Updater";
 import { ProjectsHeader } from "./ProjectsHeader";
+import { ProjectsOverview } from "./ProjectsOverview";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 

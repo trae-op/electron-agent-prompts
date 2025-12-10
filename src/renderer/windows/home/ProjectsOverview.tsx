@@ -1,10 +1,13 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { useProjectsActions } from "../hooks";
-import { ProjectsGrid } from "./ProjectsGrid";
-import { useProjectsSelector, useProjectsLoadingSelector } from "../context";
+import { useProjectsActions } from "@conceptions/Projects/hooks";
+import { ProjectsGrid } from "@conceptions/Projects/components/ProjectsGrid";
+import {
+  useProjectsSelector,
+  useProjectsLoadingSelector,
+} from "@conceptions/Projects/context";
 import Typography from "@mui/material/Typography";
 import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 
@@ -12,8 +15,11 @@ export const ProjectsOverview = memo(() => {
   useClosePreloadWindow();
   const projects = useProjectsSelector();
   const isLoading = useProjectsLoadingSelector();
-  const { handleOpenProject, handleEditProject, handleDeleteProject } =
-    useProjectsActions();
+  const { handleOpenProject, handleDeleteProject } = useProjectsActions();
+
+  const handleEditProject = useCallback((project: TProject) => {
+    console.info("[Projects] Edit project", project.id);
+  }, []);
 
   if (isLoading) {
     return <LoadingSpinner />;

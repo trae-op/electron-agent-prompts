@@ -7,10 +7,6 @@ export const useProjectsActions = (): TProjectActionsHook => {
     console.info("[Projects] Open project", project.id);
   }, []);
 
-  const handleEditProject = useCallback((project: TProject) => {
-    console.info("[Projects] Edit project", project.id);
-  }, []);
-
   const handleDeleteProject = useCallback((project: TProject) => {
     console.info("[Projects] Delete project", project.id);
   }, []);
@@ -18,9 +14,8 @@ export const useProjectsActions = (): TProjectActionsHook => {
   return useMemo(
     () => ({
       handleOpenProject,
-      handleEditProject,
       handleDeleteProject,
     }),
-    [handleOpenProject, handleEditProject, handleDeleteProject]
+    [handleOpenProject, handleDeleteProject]
   );
 };

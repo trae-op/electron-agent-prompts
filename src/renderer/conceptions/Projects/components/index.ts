@@ -1,4 +1,3 @@
-export * from "./ProjectsOverview";
 export * from "./ProjectsGrid";
 export * from "./ProjectCard";
 export * from "./ProjectsSubscriber";

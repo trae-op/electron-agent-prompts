@@ -12,7 +12,7 @@ vi.mock("./ProjectsGrid", () => ({
 }));
 
 import { Provider } from "../context";
-import { ProjectsOverview } from "./ProjectsOverview";
+import { ProjectsOverview } from "../../../windows/home/ProjectsOverview";
 import { useProjectsActions } from "../hooks";
 import { ProjectsGrid } from "./ProjectsGrid";
 
@@ -33,7 +33,6 @@ describe("ProjectsOverview", () => {
   it("renders an empty state when no projects exist", () => {
     vi.mocked(useProjectsActions).mockReturnValue({
       handleOpenProject: vi.fn(),
-      handleEditProject: vi.fn(),
       handleDeleteProject: vi.fn(),
     });
 
@@ -52,7 +51,6 @@ describe("ProjectsOverview", () => {
     const projects = [createProject("a"), createProject("b")];
     const actions = {
       handleOpenProject: vi.fn(),
-      handleEditProject: vi.fn(),
       handleDeleteProject: vi.fn(),
     };
     vi.mocked(useProjectsActions).mockReturnValue(actions);
@@ -72,7 +70,6 @@ describe("ProjectsOverview", () => {
     expect(mock.mock.calls[0]?.[0]).toMatchObject({
       projects,
       onOpen: actions.handleOpenProject,
-      onEdit: actions.handleEditProject,
       onDelete: actions.handleDeleteProject,
     });
   });
