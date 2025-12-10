@@ -7,11 +7,16 @@ import {
   Provider as ProviderProjects,
   ProjectsSubscriber,
   useAddNewProjectDispatch,
+  useUpdateProjectDispatch,
 } from "@conceptions/Projects";
 import {
   Provider as ProviderCreateProject,
   CreateProjectModal,
 } from "@conceptions/CreateProject";
+import {
+  Provider as ProviderUpdateProject,
+  UpdateProjectModal,
+} from "@conceptions/UpdateProject";
 import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
@@ -31,6 +36,16 @@ const CreateProjectModalContainer = () => {
   return <CreateProjectModal onSuccess={onSuccess} />;
 };
 
+const UpdateProjectModalContainer = () => {
+  const updateProject = useUpdateProjectDispatch();
+
+  const onSuccess = useCallback((data: TProject) => {
+    updateProject(data);
+  }, []);
+
+  return <UpdateProjectModal onSuccess={onSuccess} />;
+};
+
 const Home = () => {
   return (
     <ProviderUpdater>
@@ -39,44 +54,47 @@ const Home = () => {
         <ProviderCreateProject>
           <ProviderProjects>
             <ProjectsSubscriber />
-            <Suspense fallback={<LoadingSpinner />}>
-              <LazyTopPanel />
-            </Suspense>
-            <Stack
-              sx={{
-                mt: 6,
-                width: "100%",
-              }}
-              direction="column"
-              spacing={1}
-            >
-              <Box
+            <ProviderUpdateProject>
+              <Suspense fallback={<LoadingSpinner />}>
+                <LazyTopPanel />
+              </Suspense>
+              <Stack
                 sx={{
-                  pl: 2,
-                  pr: 2,
-                }}
-              >
-                <ProjectsHeader />
-                <CreateProjectModalContainer />
-              </Box>
-
-              <Box
-                overflow="auto"
-                sx={{
-                  pl: 2,
-                  pr: 2,
-                  pb: 1,
-                  pt: 1,
+                  mt: 6,
                   width: "100%",
-                  height: "calc(100vh - 140px)",
-                  "&::-webkit-scrollbar": {
-                    width: 0,
-                  },
                 }}
+                direction="column"
+                spacing={1}
               >
-                <ProjectsOverview />
-              </Box>
-            </Stack>
+                <Box
+                  sx={{
+                    pl: 2,
+                    pr: 2,
+                  }}
+                >
+                  <ProjectsHeader />
+                  <CreateProjectModalContainer />
+                  <UpdateProjectModalContainer />
+                </Box>
+
+                <Box
+                  overflow="auto"
+                  sx={{
+                    pl: 2,
+                    pr: 2,
+                    pb: 1,
+                    pt: 1,
+                    width: "100%",
+                    height: "calc(100vh - 140px)",
+                    "&::-webkit-scrollbar": {
+                      width: 0,
+                    },
+                  }}
+                >
+                  <ProjectsOverview />
+                </Box>
+              </Stack>
+            </ProviderUpdateProject>
           </ProviderProjects>
         </ProviderCreateProject>
       </ProviderUser>

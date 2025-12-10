@@ -68,6 +68,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
   invoke: {
     getVersion: () => ipcInvoke("getVersion"),
     createProject: (payload) => ipcInvoke("createProject", payload),
+    updateProject: (payload) => ipcInvoke("updateProject", payload),
   },
 } satisfies Window["electron"]);
 

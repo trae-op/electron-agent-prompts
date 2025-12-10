@@ -10,16 +10,21 @@ import {
 } from "@conceptions/Projects/context";
 import Typography from "@mui/material/Typography";
 import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
+import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
 
 export const ProjectsOverview = memo(() => {
   useClosePreloadWindow();
   const projects = useProjectsSelector();
   const isLoading = useProjectsLoadingSelector();
   const { handleOpenProject, handleDeleteProject } = useProjectsActions();
+  const { openModal: openUpdateProjectModal } = useUpdateProjectModalActions();
 
-  const handleEditProject = useCallback((project: TProject) => {
-    console.info("[Projects] Edit project", project.id);
-  }, []);
+  const handleEditProject = useCallback(
+    (project: TProject) => {
+      openUpdateProjectModal(project);
+    },
+    [openUpdateProjectModal]
+  );
 
   if (isLoading) {
     return <LoadingSpinner />;

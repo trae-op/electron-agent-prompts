@@ -16,6 +16,7 @@ import { registerIpc as registerIpcPreload } from "./app-preload/ipc.js";
 import { registerIpc as registerIpcAuth } from "./auth/ipc.js";
 import { registerIpc as registerIpcUser } from "./user/ipc.js";
 import { registerIpc as registerIpcCreateProject } from "./create-project/ipc.js";
+import { registerIpc as registerIpcUpdateProject } from "./update-project/ipc.js";
 import { registerIpc as registerIpcProjects } from "./projects/ipc.js";
 import { crash } from "./crash/service.js";
 import { menu } from "./config.js";
@@ -84,6 +85,7 @@ app.on("ready", async () => {
   registerIpcUser();
   registerIpcProjects();
   registerIpcCreateProject();
+  registerIpcUpdateProject();
   registerIpcPreload();
   registerIpcAppVersion();
   registerIpcUpdater();
