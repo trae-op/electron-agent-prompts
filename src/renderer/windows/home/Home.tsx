@@ -45,6 +45,7 @@ const Home = () => {
             <Stack
               sx={{
                 mt: 6,
+                width: "100%",
               }}
               direction="column"
               spacing={1}

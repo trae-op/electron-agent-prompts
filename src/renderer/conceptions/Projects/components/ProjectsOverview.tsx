@@ -13,10 +13,23 @@ export const ProjectsOverview = memo(() => {
     useProjectsActions();
 
   return (
-    <Stack spacing={3} width="100%" data-testid="projects-overview">
+    <Stack
+      spacing={3}
+      width="100%"
+      height="100%"
+      sx={
+        projects.length === 0
+          ? {
+              alignItems: "center",
+              justifyContent: "center",
+            }
+          : undefined
+      }
+      data-testid="projects-overview"
+    >
       {projects.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
-          Not found any projects? Create a new project to get started!
+        <Typography variant="h5" color="text.secondary">
+          Not found any projects!
         </Typography>
       ) : (
         <ProjectsGrid
