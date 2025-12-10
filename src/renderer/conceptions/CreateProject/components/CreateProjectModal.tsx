@@ -1,4 +1,4 @@
-import { memo, useActionState, useCallback, useEffect, useRef } from "react";
+import { memo, useActionState, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
@@ -8,9 +8,9 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import { useCreateProjectModal } from "../hooks";
-import { useLatestCreatedProjectSelector } from "../context";
+import { useCreateProjectModalActions } from "../hooks";
 import { TCreateProjectModalProps } from "./types";
+import { useCreateProjectModalOpenSelector } from "../context";
 
 const SubmitButton = () => {
   const { pending } = useFormStatus();
@@ -36,9 +36,8 @@ const SubmitButton = () => {
 
 export const CreateProjectModal = memo(
   ({ onSuccess }: TCreateProjectModalProps) => {
-    const { isOpen, closeModal } = useCreateProjectModal();
-    const latestProject = useLatestCreatedProjectSelector();
-    const formRef = useRef<HTMLFormElement | null>(null);
+    const isOpen = useCreateProjectModalOpenSelector();
+    const { closeModal } = useCreateProjectModalActions();
 
     const [_, formAction, isPending] = useActionState(
       useCallback(
@@ -59,18 +58,6 @@ export const CreateProjectModal = memo(
       ),
       undefined
     );
-
-    useEffect(() => {
-      if (latestProject !== undefined) {
-        formRef.current?.reset();
-      }
-    }, [latestProject]);
-
-    useEffect(() => {
-      if (!isOpen) {
-        formRef.current?.reset();
-      }
-    }, [isOpen]);
 
     const handleClose = useCallback(() => {
       if (isPending) {
@@ -108,7 +95,6 @@ export const CreateProjectModal = memo(
                   Create a new project
                 </Typography>
                 <form
-                  ref={formRef}
                   action={formAction}
                   noValidate
                   data-testid="create-project-form"

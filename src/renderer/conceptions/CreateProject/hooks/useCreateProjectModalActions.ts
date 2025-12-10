@@ -1,13 +1,11 @@
 import { useCallback } from "react";
 
 import {
-  useCreateProjectModalOpenSelector,
   useSetCreateProjectModalOpenDispatch,
   useSetLatestCreatedProjectDispatch,
 } from "../context";
 
-export const useCreateProjectModal = () => {
-  const isOpen = useCreateProjectModalOpenSelector();
+export const useCreateProjectModalActions = () => {
   const setIsOpen = useSetCreateProjectModalOpenDispatch();
   const setLatestProject = useSetLatestCreatedProjectDispatch();
 
@@ -22,7 +20,6 @@ export const useCreateProjectModal = () => {
   }, [setIsOpen, setLatestProject]);
 
   return {
-    isOpen,
     openModal,
     closeModal,
   };

@@ -40,14 +40,14 @@ src/renderer/
 
 - **Structure**: A conception folder should contain everything related to that domain:
   - `context/`: Providers for global state (e.g., `AuthProvider`).
-  - `hooks/`: Hooks to access perform actions (e.g., `useCreateProjectActions`). There must be event handlers (e.g., `handleCreateProject`, `handleUpdateProject`, `handleDeleteProject`)
+  - `hooks/`: Hooks to access perform actions and called `use<NameOfFeature>Actions`. There must be event handlers called (e.g., `handle<NameOfFeature>`, `handleUpdate<NameOfFeature>`, `handleDelete<NameOfFeature>`) where `<NameOfFeature>` could be anything related to feature.
   - `components/`: UI components specific to this domain.
 - **Usage**: Wrap the application (or part of it) with the domain's Provider in `App.tsx`.
 
 ### Context Pattern
 
 - **State container**: Follow the pattern from `src/renderer/conceptions/Updater/context/Context.tsx`. Keep mutable values in `useRef` containers, expose typed getter/setter pairs, and collect subscribers in a `Set<TSubscriberCallback>` so updates do not trigger full-provider renders.
-- **Selectors**: Implement selectors with `useSyncExternalStore` (`useSelectors.ts`) that read through the getters. This keeps consuming components in sync while avoiding unnecessary re-renders or stale reads. The selectors must called `use<NameOfFeature>Selector` where `<NameOfFeature>` could be anything related to feature.
+- **Selectors**: Implement selectors with `useSyncExternalStore` (`useSelectors.ts`) that read through the getters. This keeps consuming components in sync while avoiding unnecessary re-renders or stale reads. The selector `useSelectors.ts` must contain hooks called `use<NameOfFeature>Selector` where `<NameOfFeature>` could be anything related to feature.
 - **Dispatch helpers**: Export setter hooks alongside selectors so components interact through a stable API (`useSetStatusDispatch`, etc.). Do not expose raw context values.
 - **Type safety**: Declare the shared context contract in `types.ts` and use explicit domain types (`TUpdateData`) for each getter/setter. Consumers should import from the context index barrel.
 - **Provider usage**: Export the provider and selectors from `context/index.ts`, and mount the provider at the domain composition boundary (e.g., the updater window) before calling selectors in child components.
