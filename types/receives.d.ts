@@ -7,6 +7,9 @@ type TEventPayloadReceive = {
   user: {
     user: TUser;
   };
+  projects: {
+    projects: TProject[];
+  };
 };
 
 type TReceive = {
@@ -21,5 +24,8 @@ type TReceive = {
   ) => TUnsubscribeFunction;
   subscribeUser: (
     callback: (payload: TEventPayloadReceive["user"]) => void
+  ) => TUnsubscribeFunction;
+  subscribeProjects: (
+    callback: (payload: TEventPayloadReceive["projects"]) => void
   ) => TUnsubscribeFunction;
 };

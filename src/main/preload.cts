@@ -26,6 +26,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("user", (payload) => {
         callback(payload);
       }),
+    subscribeProjects: (
+      callback: (payload: TEventPayloadReceive["projects"]) => void
+    ) =>
+      ipcOn("projects", (payload) => {
+        callback(payload);
+      }),
   },
   send: {
     restart: () => {
@@ -33,6 +39,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     },
     user: () => {
       ipcSend("user");
+    },
+    projects: () => {
+      ipcSend("projects");
     },
     checkForUpdates: () => {
       ipcSend("checkForUpdates");

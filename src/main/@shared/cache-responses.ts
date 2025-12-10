@@ -20,3 +20,22 @@ export function cacheUser(userId: string | undefined): TUser | undefined {
 
   return undefined;
 }
+
+export function cacheProjects(): TProject[] | undefined {
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return undefined;
+  }
+
+  const projects =
+    cacheResponse[
+      `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.projects.base}`
+    ];
+
+  if (Array.isArray(projects)) {
+    return projects as TProject[];
+  }
+
+  return undefined;
+}

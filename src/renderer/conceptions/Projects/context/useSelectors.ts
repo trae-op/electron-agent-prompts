@@ -11,3 +11,7 @@ export const useProjectsSelector = (): TProject[] => {
 export const useSetProjectsDispatch = () => {
   return useProjectsContext().setProjects;
 };
+
+export const useAddNewProjectDispatch = () => {
+  return useProjectsContext().addNewProject;
+};

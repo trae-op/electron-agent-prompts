@@ -14,10 +14,6 @@ export type TProjectCardProps = {
   onDelete: (project: TProject) => void;
 };
 
-export type TProjectsEmptyStateProps = {
-  onCreateProject: () => void;
-};
-
 export type TProjectCardDetailsProps = {
   project: TProject;
   createdLabel: string;

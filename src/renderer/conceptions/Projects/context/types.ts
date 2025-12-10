@@ -9,5 +9,6 @@ export type TSubscriberCallback = () => void;
 export type TContext = {
   getProjects: () => TProject[];
   setProjects: (value: TProject[]) => void;
+  addNewProject: (value: TProject) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
 };

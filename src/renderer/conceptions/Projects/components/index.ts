@@ -1,9 +1,5 @@
 export * from "./ProjectsOverview";
 export * from "./ProjectsGrid";
 export * from "./ProjectCard";
-export * from "./ProjectsEmptyState";
-export type {
-  TProjectsGridProps,
-  TProjectCardProps,
-  TProjectsEmptyStateProps,
-} from "./types";
+export * from "./ProjectsSubscriber";
+export type { TProjectsGridProps, TProjectCardProps } from "./types";

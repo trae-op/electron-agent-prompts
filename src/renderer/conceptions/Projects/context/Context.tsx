@@ -1,6 +1,4 @@
 import { createContext, useCallback, useRef } from "react";
-
-import { PROJECTS_SOURCE } from "../../../constants";
 import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 
 export const Context = createContext<TContext | null>(null);
@@ -14,9 +12,7 @@ const cloneProjects = (value: readonly TProject[]): TProject[] => {
 };
 
 export function Provider({ children, initialProjects }: TProviderProps) {
-  const projects = useRef<TProject[]>(
-    cloneProjects(initialProjects ?? PROJECTS_SOURCE)
-  );
+  const projects = useRef<TProject[]>(cloneProjects(initialProjects ?? []));
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const getProjects = useCallback((): TProject[] => {
@@ -25,6 +21,11 @@ export function Provider({ children, initialProjects }: TProviderProps) {
 
   const setProjects = useCallback((value: TProject[]): void => {
     projects.current = cloneProjects(value);
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
+  const addNewProject = useCallback((value: TProject): void => {
+    projects.current = [...projects.current, ...cloneProjects([value])];
     subscribers.current.forEach((callback) => callback());
   }, []);
 
@@ -40,6 +41,7 @@ export function Provider({ children, initialProjects }: TProviderProps) {
     <Context.Provider
       value={{
         getProjects,
+        addNewProject,
         setProjects,
         subscribe,
       }}

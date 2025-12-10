@@ -6,6 +6,8 @@ import { Provider as ProviderUser } from "@conceptions/User";
 import {
   Provider as ProviderProjects,
   ProjectsOverview,
+  ProjectsSubscriber,
+  useAddNewProjectDispatch,
 } from "@conceptions/Projects";
 import {
   Provider as ProviderCreateProject,
@@ -19,18 +21,24 @@ import { ProjectsHeader } from "./ProjectsHeader";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
-const Home = () => {
+const CreateProjectModalContainer = () => {
+  const addNewProject = useAddNewProjectDispatch();
+
   const onSuccess = useCallback((data: TProject) => {
-    console.log("Project created successfully:", data);
+    addNewProject(data);
   }, []);
 
+  return <CreateProjectModal onSuccess={onSuccess} />;
+};
+
+const Home = () => {
   return (
     <ProviderUpdater>
       <UpdateSubscriber />
       <ProviderUser>
         <ProviderCreateProject>
-          <CreateProjectModal onSuccess={onSuccess} />
           <ProviderProjects>
+            <ProjectsSubscriber />
             <Suspense fallback={<LoadingSpinner />}>
               <LazyTopPanel />
             </Suspense>
@@ -48,6 +56,7 @@ const Home = () => {
                 }}
               >
                 <ProjectsHeader />
+                <CreateProjectModalContainer />
               </Box>
 
               <Box
