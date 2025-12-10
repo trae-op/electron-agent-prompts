@@ -1,15 +1,15 @@
 import { useCallback } from "react";
 
 import {
-  useCreateProjectModalOpen,
-  useSetCreateProjectModalOpen,
-  useSetLatestCreatedProject,
+  useCreateProjectModalOpenSelector,
+  useSetCreateProjectModalOpenDispatch,
+  useSetLatestCreatedProjectDispatch,
 } from "../context";
 
 export const useCreateProjectModal = () => {
-  const isOpen = useCreateProjectModalOpen();
-  const setIsOpen = useSetCreateProjectModalOpen();
-  const setLatestProject = useSetLatestCreatedProject();
+  const isOpen = useCreateProjectModalOpenSelector();
+  const setIsOpen = useSetCreateProjectModalOpenDispatch();
+  const setLatestProject = useSetLatestCreatedProjectDispatch();
 
   const openModal = useCallback(() => {
     setLatestProject(undefined);

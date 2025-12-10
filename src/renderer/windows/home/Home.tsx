@@ -20,12 +20,16 @@ import { ProjectsHeader } from "./ProjectsHeader";
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
 const Home = () => {
+  const onSuccess = (data: TProject) => {
+    console.log("Project created successfully:", data);
+  };
+
   return (
     <ProviderUpdater>
       <UpdateSubscriber />
       <ProviderUser>
         <ProviderCreateProject>
-          <CreateProjectModal />
+          <CreateProjectModal onSuccess={onSuccess} />
           <ProviderProjects>
             <Suspense fallback={<LoadingSpinner />}>
               <LazyTopPanel />

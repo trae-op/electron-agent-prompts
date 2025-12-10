@@ -2,22 +2,22 @@ import { useSyncExternalStore } from "react";
 
 import { useCreateProjectContext } from "./useContext";
 
-export const useCreateProjectModalOpen = (): boolean => {
+export const useCreateProjectModalOpenSelector = (): boolean => {
   const { getIsOpen, subscribe } = useCreateProjectContext();
 
   return useSyncExternalStore(subscribe, getIsOpen, getIsOpen);
 };
 
-export const useLatestCreatedProject = (): TProject | undefined => {
+export const useLatestCreatedProjectSelector = (): TProject | undefined => {
   const { getLatestProject, subscribe } = useCreateProjectContext();
 
   return useSyncExternalStore(subscribe, getLatestProject, getLatestProject);
 };
 
-export const useSetCreateProjectModalOpen = () => {
+export const useSetCreateProjectModalOpenDispatch = () => {
   return useCreateProjectContext().setIsOpen;
 };
 
-export const useSetLatestCreatedProject = () => {
+export const useSetLatestCreatedProjectDispatch = () => {
   return useCreateProjectContext().setLatestProject;
 };

@@ -1,6 +1,6 @@
 type TEventPayloadInvoke = {
   getVersion: string;
-  createProject: boolean | undefined;
+  createProject: TProject | undefined;
 };
 
 type TEventSendInvoke = {

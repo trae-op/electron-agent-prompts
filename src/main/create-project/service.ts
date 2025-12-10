@@ -4,8 +4,8 @@ import { restApi } from "../config.js";
 
 export async function createProject(
   payload: TEventSendInvoke["createProject"]
-): Promise<boolean | undefined> {
-  const response = await post<boolean>(
+): Promise<TProject | undefined> {
+  const response = await post<TProject>(
     `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.projects.base}`,
     payload
   );
