@@ -36,7 +36,7 @@ app.on("ready", async () => {
     isCache: true,
     options: {
       show: false,
-      resizable: false,
+      ...(!isDev() ? { resizable: false } : {}),
       width: 700,
       height: 600,
     },
