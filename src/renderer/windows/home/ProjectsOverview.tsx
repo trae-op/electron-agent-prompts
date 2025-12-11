@@ -2,7 +2,6 @@ import { memo, useCallback } from "react";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { useProjectsActions } from "@conceptions/Projects/hooks";
 import { ProjectsGrid } from "@conceptions/Projects/components/ProjectsGrid";
 import {
   useProjectsSelector,
@@ -16,12 +15,25 @@ export const ProjectsOverview = memo(() => {
   useClosePreloadWindow();
   const projects = useProjectsSelector();
   const isLoading = useProjectsLoadingSelector();
-  const { handleOpenProject, handleDeleteProject } = useProjectsActions();
   const { openModal: openUpdateProjectModal } = useUpdateProjectModalActions();
 
   const handleEditProject = useCallback(
     (project: TProject) => {
       openUpdateProjectModal(project);
+    },
+    [openUpdateProjectModal]
+  );
+
+  const handleOpenProject = useCallback(
+    (project: TProject) => {
+      console.info("Open project", project.id);
+    },
+    [openUpdateProjectModal]
+  );
+
+  const handleDeleteProject = useCallback(
+    (project: TProject) => {
+      console.info("Delete project", project.id);
     },
     [openUpdateProjectModal]
   );
