@@ -19,9 +19,10 @@ Tests should be co-located with the files they test.
 1.  **Mock Electron APIs**: The main process runs in a Node.js environment during tests, but it imports `electron`. You must mock `electron` modules to prevent runtime errors.
 2.  **Mock External Services**: Mock network requests, file system operations, and other side effects.
 3.  **Test Pure Logic**: Focus on testing business logic and data transformations.
-4.  **Test IPC Handlers**: Verify that IPC handlers call the correct services with the correct arguments.
-5.  **Positive and Negative Scenarios**: For every important behavior, add at least one positive test (happy path, valid input, successful response) and at least one negative test (error paths, invalid input, rejected promises, missing data, edge cases).
-6.  **Run and Fix New Tests**: After creating a new unit test, run that test immediately (for example with `npm run test:unit:main`) and inspect the results; if the test fails, fix the test or the implementation until it passes.
+4.  **Skip E2E**: There is no requirement to create or execute Playwright or other end-to-end suites; focus solely on unit-level coverage.
+5.  **Test IPC Handlers**: Verify that IPC handlers call the correct services with the correct arguments.
+6.  **Positive and Negative Scenarios**: For every important behavior, add at least one positive test (happy path, valid input, successful response) and at least one negative test (error paths, invalid input, rejected promises, missing data, edge cases).
+7.  **Run and Fix New Tests**: After creating a new unit test, run that test immediately (for example with `npm run test:unit:main`) and inspect the results; if the test fails, fix the test or the implementation until it passes.
 
 ## Setup
 

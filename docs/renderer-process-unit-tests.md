@@ -49,9 +49,10 @@ import "@testing-library/jest-dom";
 1.  **Mock `window.electron`**: The renderer communicates with the main process via `window.electron`. This object is not available in the test environment and must be mocked.
 2.  **Test Components**: Use `@testing-library/react` to render components and assert on their output.
 3.  **Test Hooks**: Use `renderHook` from `@testing-library/react` to test custom hooks.
-4.  **Positive and Negative Scenarios**: For key UI flows and hooks, write at least one positive test (expected user behavior, valid state, successful IPC) and at least one negative test (error UI states, validation failures, failed IPC, empty/edge data).
-5.  **Avoid Implementation Details**: Test how the user interacts with the component, not the internal state.
-6.  **The `data-testid` Rule**: Always use the **`data-testid`** word to find elements. This is for elements where you want to check the value or text. if the component does not have this prop `data-testid` then find this component and add this prop, then just use for example `screen.getByTestId('test-id')` in the unit test
+4.  **Skip E2E**: You do not need to write or execute Playwright or other end-to-end suites for renderer changes; focus solely on unit coverage.
+5.  **Positive and Negative Scenarios**: For key UI flows and hooks, write at least one positive test (expected user behavior, valid state, successful IPC) and at least one negative test (error UI states, validation failures, failed IPC, empty/edge data).
+6.  **Avoid Implementation Details**: Test how the user interacts with the component, not the internal state.
+7.  **The `data-testid` Rule**: Always use the **`data-testid`** word to find elements. This is for elements where you want to check the value or text. if the component does not have this prop `data-testid` then find this component and add this prop, then just use for example `screen.getByTestId('test-id')` in the unit test
 
 - Example:
   ```typescript
@@ -59,7 +60,7 @@ import "@testing-library/jest-dom";
   // In the test: expect(screen.getByTestId('user-greeting')).toHaveTextContent('Hello, John');
   ```
 
-6. **Run and Fix New Tests**: After creating a new unit test, run that test immediately (for example with `npm run test:unit:renderer`) and inspect the results; if the test fails, fix the test or the implementation until it passes.
+8. **Run and Fix New Tests**: After creating a new unit test, run that test immediately (for example with `npm run test:unit:renderer`) and inspect the results; if the test fails, fix the test or the implementation until it passes.
 
 ## Writing Tests
 
