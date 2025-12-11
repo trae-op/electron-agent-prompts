@@ -28,5 +28,6 @@ window.electron = {
   invoke: {
     getVersion: vi.fn(),
     createProject: vi.fn(),
+    updateProject: vi.fn(),
   },
 };

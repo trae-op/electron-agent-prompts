@@ -11,10 +11,16 @@ vi.mock("./ProjectsGrid", () => ({
   ProjectsGrid: vi.fn(() => <div data-testid="projects-grid-mock" />),
 }));
 
+vi.mock("@conceptions/UpdateProject", () => ({
+  __esModule: true,
+  useUpdateProjectModalActions: vi.fn(),
+}));
+
 import { Provider } from "../context";
 import { ProjectsOverview } from "../../../windows/home/ProjectsOverview";
 import { useProjectsActions } from "../hooks";
 import { ProjectsGrid } from "./ProjectsGrid";
+import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
 
 const createProject = (id: string): TProject => ({
   id,
@@ -28,6 +34,10 @@ describe("ProjectsOverview", () => {
   beforeEach(() => {
     vi.mocked(useProjectsActions).mockReset();
     vi.mocked(ProjectsGrid).mockClear();
+    vi.mocked(useUpdateProjectModalActions).mockReset();
+    vi.mocked(useUpdateProjectModalActions).mockReturnValue({
+      openModal: vi.fn(),
+    });
   });
 
   it("renders an empty state when no projects exist", () => {
@@ -53,7 +63,11 @@ describe("ProjectsOverview", () => {
       handleOpenProject: vi.fn(),
       handleDeleteProject: vi.fn(),
     };
+    const openModal = vi.fn();
     vi.mocked(useProjectsActions).mockReturnValue(actions);
+    vi.mocked(useUpdateProjectModalActions).mockReturnValue({
+      openModal,
+    });
 
     render(
       <Provider initialProjects={projects} initialIsLoading={false}>
@@ -70,7 +84,13 @@ describe("ProjectsOverview", () => {
     expect(mock.mock.calls[0]?.[0]).toMatchObject({
       projects,
       onOpen: actions.handleOpenProject,
+      onEdit: expect.any(Function),
       onDelete: actions.handleDeleteProject,
     });
+
+    const gridProps = mock.mock.calls[0]?.[0];
+    expect(gridProps).toBeDefined();
+    gridProps?.onEdit(projects[0]);
+    expect(openModal).toHaveBeenCalledWith(projects[0]);
   });
 });

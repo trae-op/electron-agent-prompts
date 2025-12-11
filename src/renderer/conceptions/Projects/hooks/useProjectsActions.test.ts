@@ -33,17 +33,6 @@ describe("useProjectsActions", () => {
     expect(infoSpy).toHaveBeenCalledWith("[Projects] Open project", project.id);
   });
 
-  it("logs when editing a project", () => {
-    const project = createProject();
-    const { result } = renderHook(() => useProjectsActions());
-
-    act(() => {
-      result.current.handleEditProject(project);
-    });
-
-    expect(infoSpy).toHaveBeenCalledWith("[Projects] Edit project", project.id);
-  });
-
   it("logs when deleting a project", () => {
     const project = createProject();
     const { result } = renderHook(() => useProjectsActions());
