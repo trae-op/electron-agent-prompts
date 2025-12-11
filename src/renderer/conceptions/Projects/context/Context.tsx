@@ -51,6 +51,13 @@ export function Provider({
     subscribers.current.forEach((callback) => callback());
   }, []);
 
+  const removeProject = useCallback((projectId: string): void => {
+    projects.current = projects.current.filter(
+      (project) => project.id !== projectId
+    );
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
   const subscribe = useCallback((callback: () => void) => {
     subscribers.current.add(callback);
 
@@ -67,6 +74,7 @@ export function Provider({
         getProjectsLoading,
         addNewProject,
         updateProject,
+        removeProject,
         setProjects,
         subscribe,
       }}

@@ -10,12 +10,14 @@ import {
 import Typography from "@mui/material/Typography";
 import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
+import { useDeleteProjectModalActions } from "@conceptions/DeleteProject";
 
 export const ProjectsOverview = memo(() => {
   useClosePreloadWindow();
   const projects = useProjectsSelector();
   const isLoading = useProjectsLoadingSelector();
   const { openModal: openUpdateProjectModal } = useUpdateProjectModalActions();
+  const { openModal: openDeleteProjectModal } = useDeleteProjectModalActions();
 
   const handleEditProject = useCallback(
     (project: TProject) => {
@@ -33,9 +35,9 @@ export const ProjectsOverview = memo(() => {
 
   const handleDeleteProject = useCallback(
     (project: TProject) => {
-      console.info("Delete project", project.id);
+      openDeleteProjectModal(project);
     },
-    [openUpdateProjectModal]
+    [openDeleteProjectModal]
   );
 
   if (isLoading) {

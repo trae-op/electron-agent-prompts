@@ -14,5 +14,6 @@ export type TContext = {
   setProjects: (value: TProject[]) => void;
   addNewProject: (value: TProject) => void;
   updateProject: (value: TProject) => void;
+  removeProject: (projectId: string) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
 };

@@ -33,3 +33,7 @@ export const useAddNewProjectDispatch = () => {
 export const useUpdateProjectDispatch = () => {
   return useProjectsContext().updateProject;
 };
+
+export const useRemoveProjectDispatch = () => {
+  return useProjectsContext().removeProject;
+};

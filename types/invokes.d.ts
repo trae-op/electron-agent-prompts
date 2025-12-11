@@ -2,6 +2,7 @@ type TEventPayloadInvoke = {
   getVersion: string;
   createProject: TProject | undefined;
   updateProject: TProject | undefined;
+  deleteProject: boolean;
 };
 
 type TEventSendInvoke = {
@@ -13,6 +14,9 @@ type TEventSendInvoke = {
     id: string;
     name: string;
   };
+  deleteProject: {
+    id: string;
+  };
 };
 
 type TInvoke = {
@@ -23,4 +27,7 @@ type TInvoke = {
   updateProject: (
     payload: TEventSendInvoke["updateProject"]
   ) => Promise<TEventPayloadInvoke["updateProject"]>;
+  deleteProject: (
+    payload: TEventSendInvoke["deleteProject"]
+  ) => Promise<TEventPayloadInvoke["deleteProject"]>;
 };
