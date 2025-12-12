@@ -39,3 +39,22 @@ export function cacheProjects(): TProject[] | undefined {
 
   return undefined;
 }
+
+export function cacheTasks(): TTask[] | undefined {
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return undefined;
+  }
+
+  const tasks =
+    cacheResponse[
+      `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.tasks.base}`
+    ];
+
+  if (Array.isArray(tasks)) {
+    return tasks as TTask[];
+  }
+
+  return undefined;
+}

@@ -10,6 +10,9 @@ type TEventPayloadReceive = {
   projects: {
     projects: TProject[];
   };
+  tasks: {
+    tasks: TTask[];
+  };
 };
 
 type TReceive = {
@@ -27,5 +30,8 @@ type TReceive = {
   ) => TUnsubscribeFunction;
   subscribeProjects: (
     callback: (payload: TEventPayloadReceive["projects"]) => void
+  ) => TUnsubscribeFunction;
+  subscribeTasks: (
+    callback: (payload: TEventPayloadReceive["tasks"]) => void
   ) => TUnsubscribeFunction;
 };

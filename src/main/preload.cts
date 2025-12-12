@@ -32,6 +32,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("projects", (payload) => {
         callback(payload);
       }),
+    subscribeTasks: (
+      callback: (payload: TEventPayloadReceive["tasks"]) => void
+    ) =>
+      ipcOn("tasks", (payload) => {
+        callback(payload);
+      }),
   },
   send: {
     restart: () => {
@@ -42,6 +48,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     },
     projects: () => {
       ipcSend("projects");
+    },
+    tasks: () => {
+      ipcSend("tasks");
     },
     checkForUpdates: () => {
       ipcSend("checkForUpdates");
@@ -70,6 +79,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     createProject: (payload) => ipcInvoke("createProject", payload),
     updateProject: (payload) => ipcInvoke("updateProject", payload),
     deleteProject: (payload) => ipcInvoke("deleteProject", payload),
+    createTask: (payload) => ipcInvoke("createTask", payload),
+    updateTask: (payload) => ipcInvoke("updateTask", payload),
+    deleteTask: (payload) => ipcInvoke("deleteTask", payload),
   },
 } satisfies Window["electron"]);
 

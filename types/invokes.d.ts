@@ -3,6 +3,9 @@ type TEventPayloadInvoke = {
   createProject: TProject | undefined;
   updateProject: TProject | undefined;
   deleteProject: boolean;
+  createTask: TTask | undefined;
+  updateTask: TTask | undefined;
+  deleteTask: boolean;
 };
 
 type TEventSendInvoke = {
@@ -17,6 +20,22 @@ type TEventSendInvoke = {
   deleteProject: {
     id: string;
   };
+  createTask: {
+    name: string;
+    projectId?: number;
+    fileId?: string;
+    url?: string | null;
+  };
+  updateTask: {
+    id: number;
+    name: string;
+    projectId?: number;
+    fileId?: string;
+    url?: string | null;
+  };
+  deleteTask: {
+    id: number;
+  };
 };
 
 type TInvoke = {
@@ -30,4 +49,13 @@ type TInvoke = {
   deleteProject: (
     payload: TEventSendInvoke["deleteProject"]
   ) => Promise<TEventPayloadInvoke["deleteProject"]>;
+  createTask: (
+    payload: TEventSendInvoke["createTask"]
+  ) => Promise<TEventPayloadInvoke["createTask"]>;
+  updateTask: (
+    payload: TEventSendInvoke["updateTask"]
+  ) => Promise<TEventPayloadInvoke["updateTask"]>;
+  deleteTask: (
+    payload: TEventSendInvoke["deleteTask"]
+  ) => Promise<TEventPayloadInvoke["deleteTask"]>;
 };
