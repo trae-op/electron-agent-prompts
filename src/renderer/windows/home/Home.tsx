@@ -26,7 +26,6 @@ import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
 } from "@conceptions/Updater";
-import { ProjectsHeader } from "./ProjectsHeader";
 import { ProjectsOverview } from "./ProjectsOverview";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
@@ -76,7 +75,7 @@ const Home = () => {
                 </Suspense>
                 <Stack
                   sx={{
-                    mt: 6,
+                    mt: 4,
                     width: "100%",
                   }}
                   direction="column"
@@ -88,28 +87,12 @@ const Home = () => {
                       pr: 2,
                     }}
                   >
-                    <ProjectsHeader />
                     <CreateProjectModalContainer />
                     <UpdateProjectModalContainer />
                     <DeleteProjectModalContainer />
                   </Box>
 
-                  <Box
-                    overflow="auto"
-                    sx={{
-                      pl: 2,
-                      pr: 2,
-                      pb: 1,
-                      pt: 1,
-                      width: "100%",
-                      height: "calc(100vh - 140px)",
-                      "&::-webkit-scrollbar": {
-                        width: 0,
-                      },
-                    }}
-                  >
-                    <ProjectsOverview />
-                  </Box>
+                  <ProjectsOverview />
                 </Stack>
               </ProviderDeleteProject>
             </ProviderUpdateProject>

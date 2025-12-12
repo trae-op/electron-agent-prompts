@@ -1,4 +1,4 @@
-export * from "./ProjectsGrid";
-export * from "./ProjectCard";
+export * from "./ProjectList";
+export * from "./ProjectListItem";
 export * from "./ProjectsSubscriber";
-export type { TProjectsGridProps, TProjectCardProps } from "./types";
+export type { TProjectListProps, TProjectListItemProps } from "./types";

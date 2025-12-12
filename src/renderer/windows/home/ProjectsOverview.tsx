@@ -2,7 +2,7 @@ import { memo, useCallback } from "react";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 
-import { ProjectsGrid } from "@conceptions/Projects/components/ProjectsGrid";
+import { ProjectList } from "@conceptions/Projects/components/ProjectList";
 import {
   useProjectsSelector,
   useProjectsLoadingSelector,
@@ -11,6 +11,8 @@ import Typography from "@mui/material/Typography";
 import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
 import { useDeleteProjectModalActions } from "@conceptions/DeleteProject";
+import { CreateProjectButton } from "@conceptions/CreateProject";
+import Box from "@mui/material/Box";
 
 export const ProjectsOverview = memo(() => {
   useClosePreloadWindow();
@@ -45,33 +47,32 @@ export const ProjectsOverview = memo(() => {
   }
 
   return (
-    <Stack
-      spacing={3}
-      width="100%"
-      height="100%"
-      sx={
-        projects.length === 0
-          ? {
-              alignItems: "center",
-              justifyContent: "center",
-            }
-          : undefined
-      }
-      data-testid="projects-overview"
-    >
-      {projects.length === 0 ? (
-        <Typography variant="h5" color="text.secondary">
-          Not found any projects!
-        </Typography>
-      ) : (
-        <ProjectsGrid
-          projects={projects}
-          onOpen={handleOpenProject}
-          onEdit={handleEditProject}
-          onDelete={handleDeleteProject}
-        />
-      )}
-    </Stack>
+    <Box width={300}>
+      <CreateProjectButton />
+      <Stack
+        height="calc(100vh - 95px)"
+        overflow="auto"
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: 0,
+          },
+        }}
+        data-testid="projects-overview"
+      >
+        {projects.length === 0 ? (
+          <Typography variant="h5" color="text.secondary">
+            Not found any projects!
+          </Typography>
+        ) : (
+          <ProjectList
+            projects={projects}
+            onOpen={handleOpenProject}
+            onEdit={handleEditProject}
+            onDelete={handleDeleteProject}
+          />
+        )}
+      </Stack>
+    </Box>
   );
 });
 
