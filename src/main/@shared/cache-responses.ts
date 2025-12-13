@@ -1,8 +1,6 @@
 import { restApi } from "../config.js";
 import { getElectronStorage } from "./store.js";
-
-export const buildTasksEndpoint = (projectId: number): string =>
-  `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.tasks.base}?projectId=${projectId}`;
+import { buildTasksEndpoint } from "./utils.js";
 
 export function cacheUser(userId: string | undefined): TUser | undefined {
   let user: TUser | undefined = undefined;

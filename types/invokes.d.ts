@@ -22,7 +22,7 @@ type TEventSendInvoke = {
   };
   createTask: {
     name: string;
-    projectId: number;
+    projectId: string;
     fileId?: string;
     url?: string | null;
   };

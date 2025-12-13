@@ -4,7 +4,13 @@ import {
   type WebContents,
   type IpcMainEvent,
 } from "electron";
-import { windows } from "../config.js";
+import { restApi, windows } from "../config.js";
+``;
+
+export const buildTasksEndpoint = (projectId: number): string =>
+  `${restApi.urls.base}${restApi.urls.baseApi}${
+    restApi.urls.tasks.base
+  }${restApi.urls.tasks.byProjectId(projectId)}`;
 
 export function isDev(): boolean {
   return process.env.NODE_ENV === "development";

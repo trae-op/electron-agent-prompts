@@ -1,6 +1,7 @@
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
-import { buildTasksEndpoint } from "../@shared/cache-responses.js";
+import { restApi } from "../config.js";
+import { buildTasksEndpoint } from "../@shared/utils.js";
 
 export async function getTasks<R extends TTask[]>(
   projectId: number

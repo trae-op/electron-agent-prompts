@@ -106,11 +106,10 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
         if (projectId !== undefined) {
           const rawName = formData.get("name");
           const name = typeof rawName === "string" ? rawName.trim() : "";
-          const projectIdNumber = Number(projectId);
 
           const response = await window.electron.invoke.createTask({
             name,
-            projectId: projectIdNumber,
+            projectId,
           });
 
           if (response !== undefined) {
