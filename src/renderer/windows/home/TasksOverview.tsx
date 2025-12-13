@@ -4,13 +4,13 @@ import Box from "@mui/material/Box";
 
 import { TaskList, useTasksSelector } from "@conceptions/Tasks";
 import { useUpdateTaskModalActions } from "@conceptions/UpdateTask";
-import { useDeleteTaskModalActions } from "@conceptions/DeleteTask";
+import { useSetDeleteTaskModalTaskDispatch } from "@conceptions/DeleteTask";
 import { CreateTaskButton } from "@conceptions/CreateTask";
 
 export const TasksOverview = memo(() => {
   const tasks = useTasksSelector();
   const { openModal: openUpdateTaskModal } = useUpdateTaskModalActions();
-  const { openModal: openDeleteTaskModal } = useDeleteTaskModalActions();
+  const setDeleteTask = useSetDeleteTaskModalTaskDispatch();
 
   const handleEditTask = useCallback((task: TTask) => {
     openUpdateTaskModal(task);
@@ -21,7 +21,7 @@ export const TasksOverview = memo(() => {
   }, []);
 
   const handleDeleteTask = useCallback((task: TTask) => {
-    openDeleteTaskModal(task);
+    setDeleteTask(task);
   }, []);
 
   return (

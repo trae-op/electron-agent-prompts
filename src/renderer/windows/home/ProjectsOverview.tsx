@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import { useProjectsSelector, ProjectList } from "@conceptions/Projects";
 import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
-import { useDeleteProjectModalActions } from "@conceptions/DeleteProject";
+import { useSetDeleteProjectModalProjectDispatch } from "@conceptions/DeleteProject";
 import { CreateProjectButton } from "@conceptions/CreateProject";
 import Box from "@mui/material/Box";
 
@@ -11,7 +11,7 @@ const ProjectsOverview = memo(() => {
   const navigate = useNavigate();
   const projects = useProjectsSelector();
   const { openModal: openUpdateProjectModal } = useUpdateProjectModalActions();
-  const { openModal: openDeleteProjectModal } = useDeleteProjectModalActions();
+  const setDeleteProject = useSetDeleteProjectModalProjectDispatch();
 
   const handleEditProject = useCallback((project: TProject) => {
     openUpdateProjectModal(project);
@@ -26,7 +26,7 @@ const ProjectsOverview = memo(() => {
   );
 
   const handleDeleteProject = useCallback((project: TProject) => {
-    openDeleteProjectModal(project);
+    setDeleteProject(project);
   }, []);
 
   return (
