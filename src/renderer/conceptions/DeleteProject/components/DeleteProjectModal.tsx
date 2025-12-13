@@ -107,7 +107,7 @@ export const DeleteProjectModal = memo(
     const [_, formAction, isPending] = useActionState(
       useCallback(
         async (_state: undefined, _formData: FormData): Promise<undefined> => {
-          if (project === undefined) {
+          if (project?.id === undefined) {
             return undefined;
           }
 
@@ -122,7 +122,7 @@ export const DeleteProjectModal = memo(
 
           return undefined;
         },
-        [closeModal, onSuccess, project]
+        [project?.id]
       ),
       undefined
     );

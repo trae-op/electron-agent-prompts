@@ -25,7 +25,7 @@ export const TasksOverview = memo(() => {
   }, []);
 
   return (
-    <Box width={"100%"}>
+    <Box width="100%">
       <CreateTaskButton />
       <Stack
         height="calc(100vh - 95px)"
