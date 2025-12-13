@@ -136,7 +136,7 @@ export const DeleteProjectModal = memo(
     }, [closeModal, isPending]);
 
     return (
-      <Modal open={isOpen} onClose={handleClose} keepMounted>
+      <Modal open={isOpen} onClose={handleClose}>
         <Box
           sx={{
             display: "flex",

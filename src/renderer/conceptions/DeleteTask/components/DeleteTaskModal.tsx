@@ -123,7 +123,7 @@ export const DeleteTaskModal = memo(({ onSuccess }: TDeleteTaskModalProps) => {
   }, [closeModal, isPending]);
 
   return (
-    <Modal open={isOpen} onClose={handleClose} keepMounted>
+    <Modal open={isOpen} onClose={handleClose}>
       <Box
         sx={{
           display: "flex",
