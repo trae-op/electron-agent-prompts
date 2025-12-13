@@ -3,7 +3,7 @@ import { createTask } from "./service.js";
 
 export function registerIpc(): void {
   ipcMainHandle("createTask", async (payload) => {
-    if (payload === undefined) {
+    if (payload === undefined || payload.projectId === undefined) {
       return undefined;
     }
 

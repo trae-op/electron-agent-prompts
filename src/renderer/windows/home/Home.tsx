@@ -5,7 +5,6 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { Provider as ProviderUser } from "@conceptions/User";
 import {
   Provider as ProviderProjects,
-  ProjectsSubscriber,
   useAddNewProjectDispatch,
   useUpdateProjectDispatch,
   useRemoveProjectDispatch,
@@ -26,16 +25,22 @@ import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
 } from "@conceptions/Updater";
-import { ProjectsOverview } from "./ProjectsOverview";
+import { Provider as ProviderTasks } from "@conceptions/Tasks";
+import { Subscriber } from "./Subscriber";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
+const LazyTasksContent = lazy(() => import("./TasksContent"));
+const LazyProjectsOverview = lazy(() => import("./ProjectsOverview"));
 
 const CreateProjectModalContainer = () => {
   const addNewProject = useAddNewProjectDispatch();
 
-  const onSuccess = useCallback((data: TProject) => {
-    addNewProject(data);
-  }, []);
+  const onSuccess = useCallback(
+    (data: TProject) => {
+      addNewProject(data);
+    },
+    [addNewProject]
+  );
 
   return <CreateProjectModal onSuccess={onSuccess} />;
 };
@@ -43,9 +48,12 @@ const CreateProjectModalContainer = () => {
 const UpdateProjectModalContainer = () => {
   const updateProject = useUpdateProjectDispatch();
 
-  const onSuccess = useCallback((data: TProject) => {
-    updateProject(data);
-  }, []);
+  const onSuccess = useCallback(
+    (data: TProject) => {
+      updateProject(data);
+    },
+    [updateProject]
+  );
 
   return <UpdateProjectModal onSuccess={onSuccess} />;
 };
@@ -53,9 +61,12 @@ const UpdateProjectModalContainer = () => {
 const DeleteProjectModalContainer = () => {
   const removeProject = useRemoveProjectDispatch();
 
-  const onSuccess = useCallback((projectId: string) => {
-    removeProject(projectId);
-  }, []);
+  const onSuccess = useCallback(
+    (projectId: string) => {
+      removeProject(projectId);
+    },
+    [removeProject]
+  );
 
   return <DeleteProjectModal onSuccess={onSuccess} />;
 };
@@ -64,41 +75,51 @@ const Home = () => {
   return (
     <ProviderUpdater>
       <UpdateSubscriber />
-      <ProviderUser>
-        <ProviderCreateProject>
-          <ProviderProjects>
-            <ProjectsSubscriber />
-            <ProviderUpdateProject>
-              <ProviderDeleteProject>
+
+      <ProviderCreateProject>
+        <ProviderProjects>
+          <ProviderTasks>
+            <Subscriber />
+          </ProviderTasks>
+          <ProviderUpdateProject>
+            <ProviderDeleteProject>
+              <ProviderUser>
                 <Suspense fallback={<LoadingSpinner />}>
                   <LazyTopPanel />
                 </Suspense>
-                <Stack
+              </ProviderUser>
+              <Stack
+                sx={{
+                  mt: 4,
+                  width: "100%",
+                }}
+                direction="column"
+                spacing={1}
+              >
+                <Box
                   sx={{
-                    mt: 4,
-                    width: "100%",
+                    pl: 2,
+                    pr: 2,
                   }}
-                  direction="column"
-                  spacing={1}
                 >
-                  <Box
-                    sx={{
-                      pl: 2,
-                      pr: 2,
-                    }}
-                  >
-                    <CreateProjectModalContainer />
-                    <UpdateProjectModalContainer />
-                    <DeleteProjectModalContainer />
-                  </Box>
+                  <CreateProjectModalContainer />
+                  <UpdateProjectModalContainer />
+                  <DeleteProjectModalContainer />
+                </Box>
 
-                  <ProjectsOverview />
+                <Stack direction="row" alignItems="center" spacing={0.2}>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <LazyProjectsOverview />
+                  </Suspense>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <LazyTasksContent />
+                  </Suspense>
                 </Stack>
-              </ProviderDeleteProject>
-            </ProviderUpdateProject>
-          </ProviderProjects>
-        </ProviderCreateProject>
-      </ProviderUser>
+              </Stack>
+            </ProviderDeleteProject>
+          </ProviderUpdateProject>
+        </ProviderProjects>
+      </ProviderCreateProject>
     </ProviderUpdater>
   );
 };

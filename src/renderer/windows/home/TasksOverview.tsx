@@ -3,19 +3,14 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-import { LoadingSpinner } from "@components/LoadingSpinner";
 import { TaskList } from "@conceptions/Tasks/components/TaskList";
-import {
-  useTasksSelector,
-  useTasksLoadingSelector,
-} from "@conceptions/Tasks/context";
+import { useTasksSelector } from "@conceptions/Tasks/context";
 import { useUpdateTaskModalActions } from "@conceptions/UpdateTask";
 import { useDeleteTaskModalActions } from "@conceptions/DeleteTask";
 import { CreateTaskButton } from "@conceptions/CreateTask";
 
 export const TasksOverview = memo(() => {
   const tasks = useTasksSelector();
-  const isLoading = useTasksLoadingSelector();
   const { openModal: openUpdateTaskModal } = useUpdateTaskModalActions();
   const { openModal: openDeleteTaskModal } = useDeleteTaskModalActions();
 
@@ -36,10 +31,6 @@ export const TasksOverview = memo(() => {
     },
     [openDeleteTaskModal]
   );
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <Box width={"100%"}>

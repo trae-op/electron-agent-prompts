@@ -3,7 +3,9 @@ type TEventPayloadSend = {
   windowClosePreload: undefined;
   user: undefined;
   projects: undefined;
-  tasks: undefined;
+  tasks: {
+    projectId: number;
+  };
   logout: undefined;
   checkForUpdates: undefined;
   checkAuth: undefined;
@@ -21,7 +23,7 @@ type TSend = {
   windowClosePreload: () => void;
   user: () => void;
   projects: () => void;
-  tasks: () => void;
+  tasks: (payload: TEventPayloadSend["tasks"]) => void;
   checkAuth: () => void;
   logout: () => void;
   checkForUpdates: () => void;

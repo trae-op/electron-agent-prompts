@@ -24,6 +24,10 @@ export const App = () => {
                 </Route>
                 <Route element={<PrivateRoute />}>
                   <Route path="/window:main" element={<LazyHomeWindow />} />
+                  <Route
+                    path="/window:main/:projectId"
+                    element={<LazyHomeWindow />}
+                  />
                 </Route>
 
                 <Route

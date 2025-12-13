@@ -1,14 +1,13 @@
-import { restApi } from "../config.js";
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
+import { buildTasksEndpoint } from "../@shared/cache-responses.js";
 
-export async function getTasks<R extends TTask[]>(): Promise<R | undefined> {
-  const response = await get<R>(
-    `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.tasks.base}`,
-    {
-      isCache: true,
-    }
-  );
+export async function getTasks<R extends TTask[]>(
+  projectId: number
+): Promise<R | undefined> {
+  const response = await get<R>(buildTasksEndpoint(projectId), {
+    isCache: true,
+  });
 
   if (response.error !== undefined) {
     showErrorMessages({

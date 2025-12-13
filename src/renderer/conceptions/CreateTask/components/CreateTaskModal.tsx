@@ -11,6 +11,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useCreateTaskModalActions } from "../hooks";
 import { TCreateTaskFormProps, TCreateTaskModalProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
+import { useParams } from "react-router-dom";
 
 const SubmitButton = () => {
   const { pending } = useFormStatus();
@@ -95,8 +96,15 @@ const Form = memo(
 );
 
 export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
+  const { projectId } = useParams<{ projectId?: string }>();
   const isOpen = useCreateTaskModalOpenSelector();
   const { closeModal } = useCreateTaskModalActions();
+
+  if (projectId === undefined) {
+    return null;
+  }
+
+  const projectIdNumber = Number(projectId);
 
   const [_, formAction, isPending] = useActionState(
     useCallback(
@@ -106,6 +114,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
 
         const response = await window.electron.invoke.createTask({
           name,
+          projectId: projectIdNumber,
         });
 
         if (response !== undefined) {
@@ -113,7 +122,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
           onSuccess(response);
         }
       },
-      [closeModal]
+      [closeModal, onSuccess, projectIdNumber]
     ),
     undefined
   );

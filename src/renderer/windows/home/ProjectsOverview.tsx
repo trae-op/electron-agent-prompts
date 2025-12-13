@@ -1,23 +1,19 @@
 import { memo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
-import { LoadingSpinner } from "@components/LoadingSpinner";
 
 import { ProjectList } from "@conceptions/Projects/components/ProjectList";
-import {
-  useProjectsSelector,
-  useProjectsLoadingSelector,
-} from "@conceptions/Projects/context";
+import { useProjectsSelector } from "@conceptions/Projects/context";
 import Typography from "@mui/material/Typography";
-import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
 import { useDeleteProjectModalActions } from "@conceptions/DeleteProject";
 import { CreateProjectButton } from "@conceptions/CreateProject";
 import Box from "@mui/material/Box";
 
-export const ProjectsOverview = memo(() => {
-  useClosePreloadWindow();
+const ProjectsOverview = memo(() => {
+  const navigate = useNavigate();
+
   const projects = useProjectsSelector();
-  const isLoading = useProjectsLoadingSelector();
   const { openModal: openUpdateProjectModal } = useUpdateProjectModalActions();
   const { openModal: openDeleteProjectModal } = useDeleteProjectModalActions();
 
@@ -29,10 +25,11 @@ export const ProjectsOverview = memo(() => {
   );
 
   const handleOpenProject = useCallback(
-    (project: TProject) => {
-      console.info("Open project", project.id);
+    async (project: TProject) => {
+      await navigate(`/window:main/${project.id}`);
+      window.electron.send.tasks({ projectId: Number(project.id) });
     },
-    [openUpdateProjectModal]
+    [navigate]
   );
 
   const handleDeleteProject = useCallback(
@@ -42,12 +39,8 @@ export const ProjectsOverview = memo(() => {
     [openDeleteProjectModal]
   );
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <Box width={300}>
+    <Box width={500}>
       <CreateProjectButton />
       <Stack
         height="calc(100vh - 95px)"
@@ -76,4 +69,4 @@ export const ProjectsOverview = memo(() => {
   );
 });
 
-ProjectsOverview.displayName = "ProjectsOverview";
+export default ProjectsOverview;
