@@ -2,7 +2,6 @@ import { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import { useProjectsSelector, ProjectList } from "@conceptions/Projects";
-import Typography from "@mui/material/Typography";
 import { useUpdateProjectModalActions } from "@conceptions/UpdateProject";
 import { useDeleteProjectModalActions } from "@conceptions/DeleteProject";
 import { CreateProjectButton } from "@conceptions/CreateProject";
@@ -30,8 +29,6 @@ const ProjectsOverview = memo(() => {
     openDeleteProjectModal(project);
   }, []);
 
-  console.log("Received projects >>>>", projects);
-
   return (
     <Box width={500}>
       <CreateProjectButton />
@@ -45,18 +42,12 @@ const ProjectsOverview = memo(() => {
         }}
         data-testid="projects-overview"
       >
-        {projects.length === 0 ? (
-          <Typography variant="h5" color="text.secondary">
-            Not found any projects!
-          </Typography>
-        ) : (
-          <ProjectList
-            projects={projects}
-            onOpen={handleOpenProject}
-            onEdit={handleEditProject}
-            onDelete={handleDeleteProject}
-          />
-        )}
+        <ProjectList
+          projects={projects}
+          onOpen={handleOpenProject}
+          onEdit={handleEditProject}
+          onDelete={handleDeleteProject}
+        />
       </Stack>
     </Box>
   );

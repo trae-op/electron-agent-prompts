@@ -25,6 +25,10 @@ import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
 } from "@conceptions/Updater";
+
+import { Provider as ProviderUpdateTask } from "@conceptions/UpdateTask";
+import { Provider as ProviderDeleteTask } from "@conceptions/DeleteTask";
+import { Provider as ProviderCreateTask } from "@conceptions/CreateTask";
 import { Provider as ProviderTasks } from "@conceptions/Tasks";
 import { Subscriber } from "./Subscriber";
 
@@ -71,44 +75,55 @@ const Home = () => {
         <ProviderProjects>
           <ProviderTasks>
             <Subscriber />
-          </ProviderTasks>
-          <ProviderUpdateProject>
-            <ProviderDeleteProject>
-              <ProviderUser>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <LazyTopPanel />
-                </Suspense>
-              </ProviderUser>
-              <Stack
-                sx={{
-                  mt: 4,
-                  width: "100%",
-                }}
-                direction="column"
-                spacing={1}
-              >
-                <Box
-                  sx={{
-                    pl: 2,
-                    pr: 2,
-                  }}
-                >
-                  <CreateProjectModalContainer />
-                  <UpdateProjectModalContainer />
-                  <DeleteProjectModalContainer />
-                </Box>
 
-                <Stack direction="row" alignItems="center" spacing={0.2}>
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <LazyProjectsOverview />
-                  </Suspense>
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <LazyTasksContent />
-                  </Suspense>
-                </Stack>
-              </Stack>
-            </ProviderDeleteProject>
-          </ProviderUpdateProject>
+            <ProviderUpdateProject>
+              <ProviderDeleteProject>
+                <ProviderCreateTask>
+                  <ProviderUpdateTask>
+                    <ProviderDeleteTask>
+                      <ProviderUser>
+                        <Suspense fallback={<LoadingSpinner />}>
+                          <LazyTopPanel />
+                        </Suspense>
+                      </ProviderUser>
+                      <Stack
+                        sx={{
+                          mt: 4,
+                          width: "100%",
+                        }}
+                        direction="column"
+                        spacing={1}
+                      >
+                        <Box
+                          sx={{
+                            pl: 2,
+                            pr: 2,
+                          }}
+                        >
+                          <CreateProjectModalContainer />
+                          <UpdateProjectModalContainer />
+                          <DeleteProjectModalContainer />
+                        </Box>
+
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          spacing={0.2}
+                        >
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <LazyProjectsOverview />
+                          </Suspense>
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <LazyTasksContent />
+                          </Suspense>
+                        </Stack>
+                      </Stack>
+                    </ProviderDeleteTask>
+                  </ProviderUpdateTask>
+                </ProviderCreateTask>
+              </ProviderDeleteProject>
+            </ProviderUpdateProject>
+          </ProviderTasks>
         </ProviderProjects>
       </ProviderCreateProject>
     </ProviderUpdater>

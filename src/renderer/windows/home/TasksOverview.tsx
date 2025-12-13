@@ -1,6 +1,5 @@
 import { memo, useCallback } from "react";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 import { TaskList, useTasksSelector } from "@conceptions/Tasks";
@@ -44,18 +43,12 @@ export const TasksOverview = memo(() => {
         }}
         data-testid="tasks-overview"
       >
-        {tasks.length === 0 ? (
-          <Typography variant="h5" color="text.secondary">
-            Not found any tasks!
-          </Typography>
-        ) : (
-          <TaskList
-            tasks={tasks}
-            onOpen={handleOpenTask}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-          />
-        )}
+        <TaskList
+          tasks={tasks}
+          onOpen={handleOpenTask}
+          onEdit={handleEditTask}
+          onDelete={handleDeleteTask}
+        />
       </Stack>
     </Box>
   );

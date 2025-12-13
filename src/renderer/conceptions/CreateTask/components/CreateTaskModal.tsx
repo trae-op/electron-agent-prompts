@@ -100,29 +100,26 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   const isOpen = useCreateTaskModalOpenSelector();
   const { closeModal } = useCreateTaskModalActions();
 
-  if (projectId === undefined) {
-    return null;
-  }
-
-  const projectIdNumber = Number(projectId);
-
   const [_, formAction, isPending] = useActionState(
     useCallback(
       async (_state: undefined, formData: FormData): Promise<undefined> => {
-        const rawName = formData.get("name");
-        const name = typeof rawName === "string" ? rawName.trim() : "";
+        if (projectId !== undefined) {
+          const rawName = formData.get("name");
+          const name = typeof rawName === "string" ? rawName.trim() : "";
+          const projectIdNumber = Number(projectId);
 
-        const response = await window.electron.invoke.createTask({
-          name,
-          projectId: projectIdNumber,
-        });
+          const response = await window.electron.invoke.createTask({
+            name,
+            projectId: projectIdNumber,
+          });
 
-        if (response !== undefined) {
-          closeModal();
-          onSuccess(response);
+          if (response !== undefined) {
+            closeModal();
+            onSuccess(response);
+          }
         }
       },
-      [closeModal, onSuccess, projectIdNumber]
+      [projectId]
     ),
     undefined
   );
@@ -133,7 +130,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
     }
 
     closeModal();
-  }, [closeModal, isPending]);
+  }, [isPending]);
 
   return (
     <Modal open={isOpen} onClose={handleClose} keepMounted>
