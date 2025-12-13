@@ -8,7 +8,6 @@ export const Subscriber = () => {
 
   const subscribeTasks = useCallback(() => {
     return window.electron.receive.subscribeTasks(({ tasks }) => {
-      console.log("Received tasks update:", tasks);
       setTasks(tasks);
     });
   }, []);

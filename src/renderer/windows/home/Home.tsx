@@ -35,12 +35,9 @@ const LazyProjectsOverview = lazy(() => import("./ProjectsOverview"));
 const CreateProjectModalContainer = () => {
   const addNewProject = useAddNewProjectDispatch();
 
-  const onSuccess = useCallback(
-    (data: TProject) => {
-      addNewProject(data);
-    },
-    [addNewProject]
-  );
+  const onSuccess = useCallback((data: TProject) => {
+    addNewProject(data);
+  }, []);
 
   return <CreateProjectModal onSuccess={onSuccess} />;
 };
@@ -48,12 +45,9 @@ const CreateProjectModalContainer = () => {
 const UpdateProjectModalContainer = () => {
   const updateProject = useUpdateProjectDispatch();
 
-  const onSuccess = useCallback(
-    (data: TProject) => {
-      updateProject(data);
-    },
-    [updateProject]
-  );
+  const onSuccess = useCallback((data: TProject) => {
+    updateProject(data);
+  }, []);
 
   return <UpdateProjectModal onSuccess={onSuccess} />;
 };
@@ -61,12 +55,9 @@ const UpdateProjectModalContainer = () => {
 const DeleteProjectModalContainer = () => {
   const removeProject = useRemoveProjectDispatch();
 
-  const onSuccess = useCallback(
-    (projectId: string) => {
-      removeProject(projectId);
-    },
-    [removeProject]
-  );
+  const onSuccess = useCallback((projectId: string) => {
+    removeProject(projectId);
+  }, []);
 
   return <DeleteProjectModal onSuccess={onSuccess} />;
 };

@@ -3,8 +3,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-import { TaskList } from "@conceptions/Tasks/components/TaskList";
-import { useTasksSelector } from "@conceptions/Tasks/context";
+import { TaskList, useTasksSelector } from "@conceptions/Tasks";
 import { useUpdateTaskModalActions } from "@conceptions/UpdateTask";
 import { useDeleteTaskModalActions } from "@conceptions/DeleteTask";
 import { CreateTaskButton } from "@conceptions/CreateTask";
