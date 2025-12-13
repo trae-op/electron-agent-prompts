@@ -133,7 +133,7 @@ export const DeleteProjectModal = memo(
       }
 
       closeModal();
-    }, [closeModal, isPending]);
+    }, [isPending]);
 
     return (
       <Modal open={isOpen} onClose={handleClose}>
