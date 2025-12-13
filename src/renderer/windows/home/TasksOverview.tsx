@@ -12,23 +12,17 @@ export const TasksOverview = memo(() => {
   const { openModal: openUpdateTaskModal } = useUpdateTaskModalActions();
   const { openModal: openDeleteTaskModal } = useDeleteTaskModalActions();
 
-  const handleEditTask = useCallback(
-    (task: TTask) => {
-      openUpdateTaskModal(task);
-    },
-    [openUpdateTaskModal]
-  );
+  const handleEditTask = useCallback((task: TTask) => {
+    openUpdateTaskModal(task);
+  }, []);
 
   const handleOpenTask = useCallback((task: TTask) => {
     console.info("Open task", task.id);
   }, []);
 
-  const handleDeleteTask = useCallback(
-    (task: TTask) => {
-      openDeleteTaskModal(task);
-    },
-    [openDeleteTaskModal]
-  );
+  const handleDeleteTask = useCallback((task: TTask) => {
+    openDeleteTaskModal(task);
+  }, []);
 
   return (
     <Box width={"100%"}>

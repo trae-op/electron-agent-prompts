@@ -14,11 +14,12 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 
 import type { TProjectListItemProps } from "./types";
 import { useDayjs } from "@hooks/dayjs";
+import { useParams } from "react-router-dom";
 
 export const ProjectListItem = memo(
   ({ project, onOpen, onEdit, onDelete, divider }: TProjectListItemProps) => {
+    const { projectId } = useParams<{ projectId?: string }>();
     const dayjs = useDayjs();
-
     const memoizedTimeValue = useMemo(() => {
       if (!dayjs) {
         return null;
@@ -56,6 +57,7 @@ export const ProjectListItem = memo(
 
     const createdLabel = memoizedTimeValue.created.format("MM-DD-YYYY");
     const updatedLabel = memoizedTimeValue.updated.format("MM-DD-YYYY");
+    const isActive = projectId === project.id + "";
 
     return (
       <ListItem
@@ -96,6 +98,11 @@ export const ProjectListItem = memo(
               theme.transitions.create(["background-color", "transform"], {
                 duration: theme.transitions.duration.shorter,
               }),
+            ...(isActive
+              ? {
+                  backgroundColor: (theme) => theme.palette.action.hover,
+                }
+              : {}),
             "&:hover": {
               backgroundColor: (theme) => theme.palette.action.hover,
             },
