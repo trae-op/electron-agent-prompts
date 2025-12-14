@@ -1,7 +1,6 @@
 import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
-import Avatar from "@mui/material/Avatar";
 import Popover from "@mui/material/Popover";
 
 import { useControl } from "../hooks/useControl";
@@ -53,7 +52,13 @@ const UserAvatar = memo((props: { width?: number; height?: number }) => {
     return null;
   }
 
-  return <Avatar sx={props} alt="profile" src={user.picture} />;
+  return (
+    <img
+      style={{ width: props.width, height: props.height, borderRadius: "50%" }}
+      alt="profile"
+      src={user.picture}
+    />
+  );
 });
 
 const DisplayName = () => {
