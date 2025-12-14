@@ -1,26 +1,11 @@
-import { lazy, Suspense, useCallback } from "react";
-import Box from "@mui/material/Box";
+import { lazy, Suspense } from "react";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { Provider as ProviderUser } from "@conceptions/User";
-import {
-  Provider as ProviderProjects,
-  useAddNewProjectDispatch,
-  useUpdateProjectDispatch,
-  useRemoveProjectDispatch,
-} from "@conceptions/Projects";
-import {
-  Provider as ProviderCreateProject,
-  CreateProjectModal,
-} from "@conceptions/CreateProject";
-import {
-  Provider as ProviderUpdateProject,
-  UpdateProjectModal,
-} from "@conceptions/UpdateProject";
-import {
-  Provider as ProviderDeleteProject,
-  DeleteProjectModal,
-} from "@conceptions/DeleteProject";
+import { Provider as ProviderProjects } from "@conceptions/Projects";
+import { Provider as ProviderCreateProject } from "@conceptions/CreateProject";
+import { Provider as ProviderUpdateProject } from "@conceptions/UpdateProject";
+import { Provider as ProviderDeleteProject } from "@conceptions/DeleteProject";
 import {
   Provider as ProviderUpdater,
   UpdateSubscriber,
@@ -31,40 +16,18 @@ import { Provider as ProviderDeleteTask } from "@conceptions/DeleteTask";
 import { Provider as ProviderCreateTask } from "@conceptions/CreateTask";
 import { Provider as ProviderTasks } from "@conceptions/Tasks";
 import { Subscriber } from "./Subscriber";
+import {
+  CreateProjectModalContainer,
+  CreateTaskModalContainer,
+  DeleteProjectModalContainer,
+  DeleteTaskModalContainer,
+  UpdateProjectModalContainer,
+  UpdateTaskModalContainer,
+} from "./InitModals";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 const LazyTasksContent = lazy(() => import("./TasksContent"));
 const LazyProjectsOverview = lazy(() => import("./ProjectsOverview"));
-
-const CreateProjectModalContainer = () => {
-  const addNewProject = useAddNewProjectDispatch();
-
-  const onSuccess = useCallback((data: TProject) => {
-    addNewProject(data);
-  }, []);
-
-  return <CreateProjectModal onSuccess={onSuccess} />;
-};
-
-const UpdateProjectModalContainer = () => {
-  const updateProject = useUpdateProjectDispatch();
-
-  const onSuccess = useCallback((data: TProject) => {
-    updateProject(data);
-  }, []);
-
-  return <UpdateProjectModal onSuccess={onSuccess} />;
-};
-
-const DeleteProjectModalContainer = () => {
-  const removeProject = useRemoveProjectDispatch();
-
-  const onSuccess = useCallback((projectId: string) => {
-    removeProject(projectId);
-  }, []);
-
-  return <DeleteProjectModal onSuccess={onSuccess} />;
-};
 
 const Home = () => {
   return (
@@ -81,6 +44,13 @@ const Home = () => {
                 <ProviderCreateTask>
                   <ProviderUpdateTask>
                     <ProviderDeleteTask>
+                      <CreateProjectModalContainer />
+                      <UpdateProjectModalContainer />
+                      <DeleteProjectModalContainer />
+                      <CreateTaskModalContainer />
+                      <UpdateTaskModalContainer />
+                      <DeleteTaskModalContainer />
+
                       <ProviderUser>
                         <Suspense fallback={<LoadingSpinner />}>
                           <LazyTopPanel />
@@ -94,21 +64,10 @@ const Home = () => {
                         direction="column"
                         spacing={1}
                       >
-                        <Box
-                          sx={{
-                            pl: 2,
-                            pr: 2,
-                          }}
-                        >
-                          <CreateProjectModalContainer />
-                          <UpdateProjectModalContainer />
-                          <DeleteProjectModalContainer />
-                        </Box>
-
                         <Stack
                           direction="row"
                           alignItems="center"
-                          spacing={0.2}
+                          spacing={0.1}
                         >
                           <Suspense fallback={<LoadingSpinner />}>
                             <LazyProjectsOverview />
