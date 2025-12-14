@@ -64,11 +64,7 @@ const Home = () => {
                         direction="column"
                         spacing={1}
                       >
-                        <Stack
-                          direction="row"
-                          alignItems="center"
-                          spacing={0.1}
-                        >
+                        <Stack direction="row" alignItems="center">
                           <Suspense fallback={<LoadingSpinner />}>
                             <LazyProjectsOverview />
                           </Suspense>

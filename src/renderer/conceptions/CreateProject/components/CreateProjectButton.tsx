@@ -12,7 +12,7 @@ export const CreateProjectButton = () => {
       startIcon={<AddRoundedIcon />}
       onClick={openModal}
       sx={{
-        width: "100%",
+        width: "99.8%",
         borderRadius: 0,
         px: 2.5,
         py: 1,
