@@ -10,7 +10,7 @@ export const TaskList = memo(
     const sortedTasks = tasks
       .slice()
       .sort(
-        (a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime()
+        (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
       );
 
     return (
