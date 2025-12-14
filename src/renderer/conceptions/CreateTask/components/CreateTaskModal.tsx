@@ -6,13 +6,32 @@ import { ConfirmModel } from "@composites/ConfirmModel";
 import { useCreateTaskModalActions } from "../hooks";
 import { TCreateTaskModalProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
+import { useFormStatus } from "react-dom";
+
+const Fields = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <TextField
+      data-testid="create-task-name"
+      name="name"
+      id="create-task-name"
+      label="Task Name"
+      placeholder="My agent prompt task"
+      autoFocus
+      autoComplete="off"
+      fullWidth
+      disabled={pending}
+    />
+  );
+};
 
 export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   const { projectId } = useParams<{ projectId?: string }>();
   const isOpen = useCreateTaskModalOpenSelector();
   const { closeModal } = useCreateTaskModalActions();
 
-  const [_, formAction, isPending] = useActionState(
+  const [_, formAction] = useActionState(
     useCallback(
       async (_state: undefined, formData: FormData): Promise<undefined> => {
         if (projectId === undefined) {
@@ -40,12 +59,8 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   );
 
   const handleClose = useCallback(() => {
-    if (isPending) {
-      return;
-    }
-
     closeModal();
-  }, [closeModal, isPending]);
+  }, []);
 
   const isModalOpen = isOpen && projectId !== undefined;
 
@@ -60,19 +75,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
       confirmPendingLabel="Creating..."
       formTestId="create-task-form"
       messageTestId="create-task-message"
-      content={
-        <TextField
-          data-testid="create-task-name"
-          name="name"
-          id="create-task-name"
-          label="Task Name"
-          placeholder="My agent prompt task"
-          autoFocus
-          autoComplete="off"
-          fullWidth
-          disabled={isPending}
-        />
-      }
+      content={<Fields />}
     />
   );
 });

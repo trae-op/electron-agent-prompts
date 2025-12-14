@@ -5,13 +5,32 @@ import { ConfirmModel } from "@composites/ConfirmModel";
 import { useCreateProjectModalActions } from "../hooks";
 import { TCreateProjectModalProps } from "./types";
 import { useCreateProjectModalOpenSelector } from "../context";
+import { useFormStatus } from "react-dom";
+
+const Fields = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <TextField
+      data-testid="create-project-name"
+      name="name"
+      id="create-project-name"
+      label="Project Name"
+      placeholder="My agent prompt project"
+      autoFocus
+      autoComplete="off"
+      fullWidth
+      disabled={pending}
+    />
+  );
+};
 
 export const CreateProjectModal = memo(
   ({ onSuccess }: TCreateProjectModalProps) => {
     const isOpen = useCreateProjectModalOpenSelector();
     const { closeModal } = useCreateProjectModalActions();
 
-    const [_, formAction, isPending] = useActionState(
+    const [_, formAction] = useActionState(
       useCallback(
         async (_state: undefined, formData: FormData): Promise<undefined> => {
           const rawName = formData.get("name");
@@ -34,12 +53,8 @@ export const CreateProjectModal = memo(
     );
 
     const handleClose = useCallback(() => {
-      if (isPending) {
-        return;
-      }
-
       closeModal();
-    }, [closeModal, isPending]);
+    }, []);
 
     return (
       <ConfirmModel
@@ -52,19 +67,7 @@ export const CreateProjectModal = memo(
         confirmPendingLabel="Creating..."
         formTestId="create-project-form"
         messageTestId="create-project-message"
-        content={
-          <TextField
-            data-testid="create-project-name"
-            name="name"
-            id="create-project-name"
-            label="Project Name"
-            placeholder="My agent prompt project"
-            autoFocus
-            autoComplete="off"
-            fullWidth
-            disabled={isPending}
-          />
-        }
+        content={<Fields />}
       />
     );
   }

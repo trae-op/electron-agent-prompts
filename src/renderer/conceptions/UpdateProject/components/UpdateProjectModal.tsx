@@ -7,13 +7,39 @@ import {
   useSetUpdateProjectModalProjectDispatch,
 } from "../context";
 import { TUpdateProjectModalProps } from "./types";
+import { useFormStatus } from "react-dom";
+
+const Fields = () => {
+  const { pending } = useFormStatus();
+  const project = useUpdateProjectModalProjectSelector();
+
+  if (project === undefined) {
+    return null;
+  }
+
+  return (
+    <TextField
+      key={project.id}
+      data-testid="update-project-name"
+      name="name"
+      id="update-project-name"
+      label="Project Name"
+      placeholder="My agent prompt project"
+      defaultValue={project.name}
+      autoFocus
+      autoComplete="off"
+      fullWidth
+      disabled={pending}
+    />
+  );
+};
 
 export const UpdateProjectModal = memo(
   ({ onSuccess }: TUpdateProjectModalProps) => {
     const project = useUpdateProjectModalProjectSelector();
     const setProject = useSetUpdateProjectModalProjectDispatch();
 
-    const [_, formAction, isPending] = useActionState(
+    const [_, formAction] = useActionState(
       useCallback(
         async (_state: undefined, formData: FormData): Promise<undefined> => {
           if (project?.id === undefined) {
@@ -55,23 +81,7 @@ export const UpdateProjectModal = memo(
         confirmPendingLabel="Saving..."
         formTestId="update-project-form"
         messageTestId="update-project-message"
-        content={
-          project !== undefined && (
-            <TextField
-              key={project.id}
-              data-testid="update-project-name"
-              name="name"
-              id="update-project-name"
-              label="Project Name"
-              placeholder="My agent prompt project"
-              defaultValue={project.name}
-              autoFocus
-              autoComplete="off"
-              fullWidth
-              disabled={isPending}
-            />
-          )
-        }
+        content={<Fields />}
       />
     );
   }

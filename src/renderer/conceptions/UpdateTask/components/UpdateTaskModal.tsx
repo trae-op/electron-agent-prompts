@@ -7,12 +7,38 @@ import {
   useSetUpdateTaskModalTaskDispatch,
 } from "../context";
 import { TUpdateTaskModalProps } from "./types";
+import { useFormStatus } from "react-dom";
+
+const Fields = () => {
+  const { pending } = useFormStatus();
+  const task = useUpdateTaskModalTaskSelector();
+
+  if (task === undefined) {
+    return null;
+  }
+
+  return (
+    <TextField
+      key={task.id}
+      data-testid="update-task-name"
+      name="name"
+      id="update-task-name"
+      label="Task Name"
+      placeholder="My agent prompt task"
+      defaultValue={task.name}
+      autoFocus
+      autoComplete="off"
+      fullWidth
+      disabled={pending}
+    />
+  );
+};
 
 export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
   const task = useUpdateTaskModalTaskSelector();
   const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
 
-  const [_, formAction, isPending] = useActionState(
+  const [_, formAction] = useActionState(
     useCallback(
       async (_state: undefined, formData: FormData): Promise<undefined> => {
         if (task === undefined) {
@@ -54,23 +80,7 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
       confirmPendingLabel="Saving..."
       formTestId="update-task-form"
       messageTestId="update-task-message"
-      content={
-        task !== undefined && (
-          <TextField
-            key={task.id}
-            data-testid="update-task-name"
-            name="name"
-            id="update-task-name"
-            label="Task Name"
-            placeholder="My agent prompt task"
-            defaultValue={task.name}
-            autoFocus
-            autoComplete="off"
-            fullWidth
-            disabled={isPending}
-          />
-        )
-      }
+      content={<Fields />}
     />
   );
 });
