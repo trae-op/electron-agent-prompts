@@ -11,7 +11,8 @@ export type TConfirmModelProps = {
   isOpen: boolean;
   title: string;
   description: ReactNode;
-  formAction: (payload: FormData) => void;
+  content?: ReactNode;
+  formAction: (payload: FormData) => void | Promise<void | undefined>;
   onClose?: () => void;
   confirmLabel?: string;
   confirmPendingLabel?: string;

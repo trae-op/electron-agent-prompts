@@ -67,10 +67,11 @@ const ConfirmModelComponent = ({
   confirmColor = "primary",
   formTestId = "confirm-model-form",
   messageTestId = "confirm-model-message",
+  content,
 }: TConfirmModelProps) => {
   const handlerClose = useCallback(() => {
     onClose?.();
-  }, []);
+  }, [onClose]);
 
   return (
     <Modal open={isOpen} onClose={handlerClose}>
@@ -100,17 +101,22 @@ const ConfirmModelComponent = ({
             <Typography component="h2" variant="h6" fontWeight={600}>
               {title}
             </Typography>
-            <Typography color="text.secondary" data-testid={messageTestId}>
-              {description}
-            </Typography>
+            {description !== undefined && (
+              <Typography color="text.secondary" data-testid={messageTestId}>
+                {description}
+              </Typography>
+            )}
             <form action={formAction} noValidate data-testid={formTestId}>
-              <Stack direction="row" spacing={1.5} justifyContent="flex-end">
-                <CancelButton handlerClose={handlerClose} />
-                <SubmitButton
-                  label={confirmLabel}
-                  pendingLabel={confirmPendingLabel}
-                  color={confirmColor}
-                />
+              <Stack spacing={2.5}>
+                {content}
+                <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+                  <CancelButton handlerClose={handlerClose} />
+                  <SubmitButton
+                    label={confirmLabel}
+                    pendingLabel={confirmPendingLabel}
+                    color={confirmColor}
+                  />
+                </Stack>
               </Stack>
             </form>
           </Stack>
