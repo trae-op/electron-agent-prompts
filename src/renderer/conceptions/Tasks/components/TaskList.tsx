@@ -19,8 +19,6 @@ export const TaskList = memo(
         sx={{
           bgcolor: (theme) => theme.palette.background.paper,
           alignSelf: "flex-start",
-          boxShadow: (theme) => theme.shadows[1],
-          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
           pt: 0,
           pb: 0,
           width: "100%",

@@ -58,7 +58,7 @@ const Home = () => {
                       </ProviderUser>
                       <Stack
                         sx={{
-                          mt: 4,
+                          mt: 6,
                           width: "100%",
                         }}
                         direction="column"

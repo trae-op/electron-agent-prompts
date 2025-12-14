@@ -29,7 +29,7 @@ export const TasksOverview = memo(() => {
     <Box width="100%">
       <CreateTaskButton />
       <Stack
-        height="calc(100vh - 95px)"
+        height="calc(100vh - 88px)"
         overflow="auto"
         sx={{
           "&::-webkit-scrollbar": {

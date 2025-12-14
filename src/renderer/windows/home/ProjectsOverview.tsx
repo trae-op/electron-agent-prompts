@@ -33,9 +33,10 @@ const ProjectsOverview = memo(() => {
     <Box width={500}>
       <CreateProjectButton />
       <Stack
-        height="calc(100vh - 95px)"
+        height="calc(100vh - 88px)"
         overflow="auto"
         sx={{
+          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
           "&::-webkit-scrollbar": {
             width: 0,
           },
