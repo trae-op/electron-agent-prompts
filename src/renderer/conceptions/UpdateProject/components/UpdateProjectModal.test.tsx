@@ -5,9 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 import {
   Provider,
-  useSetUpdateProjectModalOpenDispatch,
   useSetUpdateProjectModalProjectDispatch,
-  useUpdateProjectModalOpenSelector,
   useUpdateProjectModalProjectSelector,
 } from "../context";
 import { UpdateProjectModal } from "./UpdateProjectModal";
@@ -31,19 +29,18 @@ const OpenModalWithProjectOnMount = ({
   project: TProject;
   children: ReactNode;
 }) => {
-  const setOpen = useSetUpdateProjectModalOpenDispatch();
   const setProject = useSetUpdateProjectModalProjectDispatch();
 
   useEffect(() => {
     setProject(project);
-    setOpen(true);
-  }, [project, setOpen, setProject]);
+  }, [project, setProject]);
 
   return <>{children}</>;
 };
 
 const ModalStateProbe = () => {
-  const isOpen = useUpdateProjectModalOpenSelector();
+  const project = useUpdateProjectModalProjectSelector();
+  const isOpen = project !== undefined;
   return <span data-testid="update-project-modal-state">{String(isOpen)}</span>;
 };
 
