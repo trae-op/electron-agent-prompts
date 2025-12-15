@@ -10,6 +10,7 @@ export const windows: TWindows = {
   updateApp: "window:update-app",
   preloadApp: "window:preload-app",
   auth: "window:auth",
+  task: `window:task/:id`,
 };
 
 export const folders = {

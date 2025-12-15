@@ -18,7 +18,7 @@ export const TasksOverview = memo(() => {
   }, []);
 
   const handleOpenTask = useCallback((task: TTask) => {
-    console.info("Open task", task.id);
+    window.electron.send.windowTask({ id: task.id + "" });
   }, []);
 
   const handleDeleteTask = useCallback((task: TTask) => {

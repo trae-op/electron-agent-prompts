@@ -22,6 +22,7 @@ import { registerIpc as registerIpcProjects } from "./projects/ipc.js";
 import { registerIpc as registerIpcCreateTask } from "./create-task/ipc.js";
 import { registerIpc as registerIpcUpdateTask } from "./update-task/ipc.js";
 import { registerIpc as registerIpcDeleteTask } from "./delete-task/ipc.js";
+import { registerIpc as registerIpcTask } from "./task/ipc.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
 import { menu } from "./config.js";
@@ -99,6 +100,7 @@ app.on("ready", async () => {
   registerIpcPreload();
   registerIpcAppVersion();
   registerIpcUpdater();
+  registerIpcTask();
 
   handleCloseEvents(mainWindow);
 });

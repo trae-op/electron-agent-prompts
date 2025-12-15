@@ -1,4 +1,5 @@
 import {
+  BrowserWindow,
   ipcMain,
   type WebFrameMain,
   type WebContents,
@@ -39,6 +40,17 @@ export function ipcWebContentsSend<Key extends keyof TEventPayloadReceive>(
   payload: TEventPayloadReceive[Key]
 ) {
   webContentsSend.send(key, payload);
+}
+
+export function ipcWebContentsBroadcast<Key extends keyof TEventPayloadReceive>(
+  key: Key,
+  payload: TEventPayloadReceive[Key]
+) {
+  BrowserWindow.getAllWindows().forEach((window) => {
+    if (!window.isDestroyed()) {
+      window.webContents.send(key, payload);
+    }
+  });
 }
 
 export function ipcMainOn<Key extends keyof TEventPayloadSend>(

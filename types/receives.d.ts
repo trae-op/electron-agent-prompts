@@ -13,6 +13,9 @@ type TEventPayloadReceive = {
   tasks: {
     tasks: TTask[];
   };
+  task: {
+    task: TTask;
+  };
 };
 
 type TReceive = {
@@ -24,6 +27,9 @@ type TReceive = {
   ) => TUnsubscribeFunction;
   subscribeWindowAuth: (
     callback: (payload: TEventPayloadReceive["auth"]) => void
+  ) => TUnsubscribeFunction;
+  subscribeWindowTask: (
+    callback: (payload: TEventPayloadReceive["task"]) => void
   ) => TUnsubscribeFunction;
   subscribeUser: (
     callback: (payload: TEventPayloadReceive["user"]) => void

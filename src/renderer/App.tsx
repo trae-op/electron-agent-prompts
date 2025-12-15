@@ -1,8 +1,7 @@
 import { lazy, Suspense } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { MainLayout } from "@layouts/Main";
-import { PublicRoute } from "@composites/PublicRoute";
-import { PrivateRoute } from "@composites/PrivateRoute";
+import { PrivateRoute, PublicRoute } from "@composites/Routes";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { ProviderAuth } from "@conceptions/Auth";
 import { ProviderLightDarkMode } from "@composites/LightDarkMode";
@@ -10,6 +9,7 @@ import { ProviderLightDarkMode } from "@composites/LightDarkMode";
 const LazyHomeWindow = lazy(() => import("./windows/home/Home"));
 const LazyUpdaterWindow = lazy(() => import("./windows/updater/Updater"));
 const LazyLogInWindow = lazy(() => import("./windows/logIn/LogIn"));
+const LazyTaskWindow = lazy(() => import("./windows/task/Task"));
 
 export const App = () => {
   return (
@@ -29,7 +29,7 @@ export const App = () => {
                     element={<LazyHomeWindow />}
                   />
                 </Route>
-
+                <Route path="/window:task/:id" element={<LazyTaskWindow />} />
                 <Route
                   path="/window:update-app"
                   element={<LazyUpdaterWindow />}

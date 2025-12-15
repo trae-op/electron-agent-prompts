@@ -14,6 +14,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("auth", (payload) => {
         callback(payload);
       }),
+    subscribeWindowTask: (
+      callback: (payload: TEventPayloadReceive["task"]) => void
+    ) =>
+      ipcOn("task", (payload) => {
+        callback(payload);
+      }),
     subscribeWindowOpenUpdateApp: (
       callback: (payload: TEventPayloadReceive["openUpdateApp"]) => void
     ) =>
@@ -51,6 +57,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     },
     tasks: (payload: TEventPayloadSend["tasks"]) => {
       ipcSend("tasks", payload);
+    },
+    windowTask: (payload: TEventPayloadSend["windowTask"]) => {
+      ipcSend("windowTask", payload);
     },
     checkForUpdates: () => {
       ipcSend("checkForUpdates");

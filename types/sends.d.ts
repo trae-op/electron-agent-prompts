@@ -12,6 +12,9 @@ type TEventPayloadSend = {
   windowAuth: {
     provider: TProviders;
   };
+  windowTask: {
+    id: string;
+  };
   openLatestVersion: TOpenLatestVersion;
   openUpdate: {
     id: string;
@@ -28,6 +31,7 @@ type TSend = {
   logout: () => void;
   checkForUpdates: () => void;
   windowAuth: (payload: TEventPayloadSend["windowAuth"]) => void;
+  windowTask: (payload: TEventPayloadSend["windowTask"]) => void;
   openLatestVersion: (payload: TEventPayloadSend["openLatestVersion"]) => void;
   windowOpenUpdate: (payload: TEventPayloadSend["openUpdate"]) => void;
 };

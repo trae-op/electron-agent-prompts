@@ -1,6 +1,5 @@
 import { type Event, type WebContentsWillRedirectEventParams } from "electron";
-import { ipcMainOn, ipcWebContentsSend } from "../@shared/utils.js";
-import { getWindow } from "../@shared/control-window/receive.js";
+import { ipcMainOn, ipcWebContentsBroadcast } from "../@shared/utils.js";
 import { openWindow } from "./window.js";
 import { getElectronStorage, setElectronStorage } from "../@shared/store.js";
 import { cacheUser } from "../@shared/cache-responses.js";
@@ -14,20 +13,15 @@ export function registerIpc(): void {
   });
 
   ipcMainOn("checkAuth", () => {
-    const mainWindow = getWindow<TWindows["main"]>("window:main");
     const userId = getElectronStorage("userId");
     const userFromCache = cacheUser(userId);
+    const isAuthenticated = Boolean(userFromCache);
 
-    if (mainWindow !== undefined) {
-      ipcWebContentsSend("auth", mainWindow.webContents, {
-        isAuthenticated: Boolean(userFromCache),
-      });
-    }
+    ipcWebContentsBroadcast("auth", { isAuthenticated });
   });
 
   ipcMainOn("windowAuth", (_, { provider }) => {
     const window = openWindow(provider);
-    const mainWindow = getWindow<TWindows["main"]>("window:main");
 
     window.webContents.on(
       "will-redirect",
@@ -54,12 +48,10 @@ export function registerIpc(): void {
           const token = searchParams.get("token");
           const userId = searchParams.get("userId");
 
-          if (token !== null && userId !== null && mainWindow !== undefined) {
+          if (token !== null && userId !== null) {
             setElectronStorage("authToken", token);
             setElectronStorage("userId", userId);
-            ipcWebContentsSend("auth", mainWindow.webContents, {
-              isAuthenticated: true,
-            });
+            ipcWebContentsBroadcast("auth", { isAuthenticated: true });
           } else {
             showErrorMessages({
               title: messages.auth.errorTokenUserMissing,
