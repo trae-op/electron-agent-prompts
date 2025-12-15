@@ -28,8 +28,9 @@ export const App = () => {
                     path="/window:main/:projectId"
                     element={<LazyHomeWindow />}
                   />
+                  <Route path="/window:task/:id" element={<LazyTaskWindow />} />
                 </Route>
-                <Route path="/window:task/:id" element={<LazyTaskWindow />} />
+
                 <Route
                   path="/window:update-app"
                   element={<LazyUpdaterWindow />}
