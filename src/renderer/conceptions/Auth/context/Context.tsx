@@ -5,7 +5,7 @@ import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 export const Context = createContext<TContext | null>(null);
 
 export function Provider({ children }: TProviderProps) {
-  const isAuthenticated = useRef(false);
+  const isAuthenticated = useRef(true);
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const hasAuthenticated = useCallback((): boolean | undefined => {

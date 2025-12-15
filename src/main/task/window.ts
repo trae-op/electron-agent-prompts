@@ -10,8 +10,8 @@ export function openWindow({
     isCache: true,
     options: {
       alwaysOnTop: true,
-      width: 400,
-      height: 400,
+      width: 600,
+      height: 600,
       ...(options || {}),
     },
   });

@@ -23,8 +23,8 @@ type TEventSendInvoke = {
   createTask: {
     name: string;
     projectId: string;
-    fileId?: string;
-    url?: string | null;
+    file?: ArrayBuffer;
+    fileName?: string | null;
   };
   updateTask: {
     id: number;

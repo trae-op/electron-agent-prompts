@@ -5,6 +5,7 @@ import { restApi } from "../config.js";
 export async function createTask(
   payload: TEventSendInvoke["createTask"]
 ): Promise<TTask | undefined> {
+  console.log("createTask:", payload);
   const response = await post<TTask>(
     `${restApi.urls.base}${restApi.urls.baseApi}${restApi.urls.tasks.base}`,
     payload
