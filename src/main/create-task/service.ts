@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import { post } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";
-import { getStore } from "../@shared/store.js";
+import { getStore, setStore } from "../@shared/store.js";
 import path from "path/posix";
 
 export async function createTask(
@@ -39,5 +39,6 @@ export async function createTask(
     return undefined;
   }
 
+  setStore("uploadedFilePath", undefined);
   return response.data;
 }
