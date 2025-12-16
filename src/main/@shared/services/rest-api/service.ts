@@ -17,7 +17,6 @@ function getAuthorization(): AxiosRequestConfig["headers"] | undefined {
   const token = getElectronStorage("authToken");
   if (token !== undefined) {
     return {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     };
   }

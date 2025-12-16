@@ -1,7 +1,7 @@
 import ElectronStorage from "electron-store";
 
-type TStore = {
-  [key: string]: any | undefined;
+type TStore<V = any> = {
+  [key: string]: V | undefined;
 };
 
 export type TCacheResponse = {
@@ -17,8 +17,8 @@ type TElectronStore = {
 const store = new Map<keyof TStore, TStore[keyof TStore]>();
 const electronStorage = new ElectronStorage<TStore>();
 
-export function getStore<K extends keyof TStore>(key: K) {
-  return store.get(key) as TStore[K] | undefined;
+export function getStore<V, K extends keyof TStore<V>>(key: K) {
+  return store.get(key) as TStore<V>[K] | undefined;
 }
 
 export function hasStore<K extends keyof TStore>(name: K) {
