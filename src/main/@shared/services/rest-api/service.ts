@@ -9,6 +9,7 @@ import {
   getElectronStorage,
   TCacheResponse,
 } from "../../store.js";
+import { buildTasksEndpoint } from "../../utils.js";
 import { restApi } from "../../../config.js";
 import type { ApiResponse, DataError, RequestOptions } from "./types.js";
 import { logout } from "../logout.js";
@@ -180,6 +181,103 @@ function hasIdProperty(value: unknown): value is { id: string | number } {
   return false;
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasProjectId(value: unknown): value is { projectId: number | string } {
+  if (!isPlainObject(value) || !("projectId" in value)) {
+    return false;
+  }
+
+  const projectId = (value as { projectId: unknown }).projectId;
+
+  return typeof projectId === "number" || typeof projectId === "string";
+}
+
+function addResponseEntityElectronStorage(
+  endpoint: string,
+  entity: unknown
+): void {
+  if (!hasIdProperty(entity)) {
+    return;
+  }
+
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return;
+  }
+
+  const endpointsToUpdate = new Set<string>();
+  endpointsToUpdate.add(endpoint);
+
+  if (hasProjectId(entity)) {
+    const parsedProjectId = Number(entity.projectId);
+    if (!Number.isNaN(parsedProjectId)) {
+      endpointsToUpdate.add(buildTasksEndpoint(parsedProjectId));
+    }
+  }
+
+  const updates: TCacheResponse = {};
+  let hasUpdates = false;
+  const entityId = String(entity.id);
+  const entityRecord = isPlainObject(entity) ? entity : undefined;
+
+  endpointsToUpdate.forEach((targetEndpoint) => {
+    const cachedValue = cacheResponse[targetEndpoint];
+
+    if (cachedValue === undefined) {
+      return;
+    }
+
+    if (Array.isArray(cachedValue)) {
+      const nextItems = [...cachedValue];
+      const existingIndex = nextItems.findIndex(
+        (item) => hasIdProperty(item) && String(item.id) === entityId
+      );
+
+      if (existingIndex !== -1) {
+        const currentItem = nextItems[existingIndex];
+        nextItems[existingIndex] =
+          isPlainObject(currentItem) && entityRecord !== undefined
+            ? { ...currentItem, ...entityRecord }
+            : entity;
+      } else {
+        nextItems.push(entityRecord ?? entity);
+      }
+
+      updates[targetEndpoint] = nextItems;
+      hasUpdates = true;
+      return;
+    }
+
+    if (isPlainObject(cachedValue) && entityRecord !== undefined) {
+      updates[targetEndpoint] = {
+        ...cachedValue,
+        ...entityRecord,
+      };
+      hasUpdates = true;
+      return;
+    }
+
+    if (cachedValue !== entity) {
+      updates[targetEndpoint] = entity;
+      hasUpdates = true;
+    }
+  });
+
+  if (!hasUpdates) {
+    return;
+  }
+
+  const merged = merge(updates);
+
+  if (merged !== undefined) {
+    setElectronStorage("response", merged);
+  }
+}
+
 function deleteResponseEntityElectronStorage(entityId: string): void {
   const cacheResponse = getElectronStorage("response");
 
@@ -250,6 +348,14 @@ export async function post<T>(
       data,
       options
     );
+    if (
+      response.status >= 200 &&
+      response.status < 300 &&
+      response.data !== undefined &&
+      response.data !== null
+    ) {
+      addResponseEntityElectronStorage(endpoint, response.data);
+    }
     return handleResponse<T>(response);
   } catch (error: any) {
     return handleError(error as AxiosError<DataError>);
