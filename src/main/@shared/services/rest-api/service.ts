@@ -170,6 +170,61 @@ export function merge(data: TCacheResponse): TCacheResponse | undefined {
   return cacheStore;
 }
 
+function hasIdProperty(value: unknown): value is { id: string | number } {
+  if (typeof value === "object" && value !== null && "id" in value) {
+    const candidateId = (value as { id: unknown }).id;
+
+    return typeof candidateId === "string" || typeof candidateId === "number";
+  }
+
+  return false;
+}
+
+function deleteResponseEntityElectronStorage(entityId: string): void {
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return;
+  }
+
+  const updates: TCacheResponse = {};
+  let hasUpdates = false;
+
+  for (const [endpoint, cachedValue] of Object.entries(cacheResponse)) {
+    if (Array.isArray(cachedValue)) {
+      const filtered = cachedValue.filter((item) => {
+        if (!hasIdProperty(item)) {
+          return true;
+        }
+
+        return String(item.id) !== entityId;
+      });
+
+      if (filtered.length !== cachedValue.length) {
+        updates[endpoint] = filtered;
+        hasUpdates = true;
+      }
+
+      continue;
+    }
+
+    if (hasIdProperty(cachedValue) && String(cachedValue.id) === entityId) {
+      updates[endpoint] = undefined;
+      hasUpdates = true;
+    }
+  }
+
+  if (!hasUpdates) {
+    return;
+  }
+
+  const merged = merge(updates);
+
+  if (merged !== undefined) {
+    setElectronStorage("response", merged);
+  }
+}
+
 function setResponseElectronStorage(
   endpoint: string,
   response: AxiosResponse<any, any>
@@ -220,6 +275,7 @@ export async function put<T>(
 
 export async function del<T>(
   endpoint: string,
+  entityId: string,
   options?: RequestOptions
 ): Promise<ApiResponse<T>> {
   try {
@@ -227,6 +283,9 @@ export async function del<T>(
       endpoint,
       options
     );
+    if (response.status >= 200 && response.status < 300) {
+      deleteResponseEntityElectronStorage(entityId);
+    }
     return handleResponse<T>(response);
   } catch (error: any) {
     return handleError(error as AxiosError<DataError>);
