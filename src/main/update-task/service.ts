@@ -14,7 +14,7 @@ export async function updateTask(
   const filePath = getStore<string, string>("uploadedFilePath");
   const endpoint = `${restApi.urls.base}${restApi.urls.baseApi}${
     restApi.urls.tasks.base
-  }${restApi.urls.tasks.byId(id)}`;
+  }${restApi.urls.tasks.byId(id + "")}`;
 
   const hasFile = typeof filePath === "string" && filePath.length > 0;
 

@@ -8,7 +8,7 @@ export async function deleteTask(
   const response = await del<undefined>(
     `${restApi.urls.base}${restApi.urls.baseApi}${
       restApi.urls.tasks.base
-    }${restApi.urls.tasks.byId(payload.id)}`,
+    }${restApi.urls.tasks.byId(payload.id+'')}`,
     payload.id + ""
   );
 
