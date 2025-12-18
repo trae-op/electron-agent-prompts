@@ -11,8 +11,10 @@ export const ProjectList = memo(
     const sortedProjects = projects
       .slice()
       .sort(
-        (a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime()
+        (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
       );
+
+    console.log("Rendering ProjectList with projects:", projects);
 
     return (
       <List

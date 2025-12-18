@@ -46,7 +46,7 @@ app.on("ready", async () => {
     options: {
       show: false,
       ...(!isDev() ? { resizable: false } : {}),
-      width: 700,
+      width: 800,
       height: 600,
     },
   });

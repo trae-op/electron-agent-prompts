@@ -150,7 +150,7 @@ export const TaskListItem = memo(
                 <Stack direction="row" spacing={0.3} alignItems="center">
                   <EditDocumentIcon
                     fontSize="inherit"
-                    color={Boolean(task.fileId) ? "primary" : "error"}
+                    color={Boolean(task.fileId) ? "success" : "error"}
                   />
                 </Stack>
               </Stack>

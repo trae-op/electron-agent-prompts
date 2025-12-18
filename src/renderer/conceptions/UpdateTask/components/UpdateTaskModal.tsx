@@ -1,12 +1,4 @@
-import {
-  memo,
-  useActionState,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  ChangeEvent,
-} from "react";
+import { memo, useActionState, useCallback, useRef, ChangeEvent } from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
@@ -36,13 +28,6 @@ const VisuallyHiddenInput = styled("input")({
 const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedFileName, setSelectedFileName] = useState<string | undefined>(
-    defaultFileName
-  );
-
-  useEffect(() => {
-    setSelectedFileName(defaultFileName);
-  }, [defaultFileName]);
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +39,6 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
           file,
         });
       }
-
-      setSelectedFileName(file?.name ?? defaultFileName);
     },
     [defaultFileName]
   );
@@ -70,7 +53,6 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
       disabled={pending}
       data-testid="update-task-upload"
     >
-      {selectedFileName ?? "No file selected"}
       <VisuallyHiddenInput
         type="file"
         name="file"
