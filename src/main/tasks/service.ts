@@ -14,7 +14,6 @@ export async function getTasks<R extends TTask[]>(
     showErrorMessages({
       title: "Error request by getTasks",
       body: response.error.message,
-      isDialog: false,
     });
   }
 

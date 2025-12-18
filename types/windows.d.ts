@@ -3,7 +3,7 @@ type TWindows = {
   preloadApp: "window:preload-app";
   updateApp: "window:update-app";
   auth: "window:auth";
-  task: `window:task/:${string}`;
+  task: `window:task/${string}`;
 };
 
 type TParamOpenWindows = {

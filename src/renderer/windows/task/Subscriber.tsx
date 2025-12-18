@@ -11,7 +11,7 @@ export const Subscriber = memo(({ taskId }: { taskId: string }) => {
     window.electron.send.task({
       taskId,
     });
-  }, [taskId]);
+  }, []);
 
   useEffect(() => {
     const unSub = subscribeTask();
