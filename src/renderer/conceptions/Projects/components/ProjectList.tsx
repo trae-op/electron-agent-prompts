@@ -14,8 +14,6 @@ export const ProjectList = memo(
         (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
       );
 
-    console.log("Rendering ProjectList with projects:", projects);
-
     return (
       <List
         data-testid="projects-list"

@@ -3,7 +3,7 @@ import { openWindow } from "./window.js";
 
 export function registerIpc(): void {
   ipcMainOn("windowTask", (_, { id }) => {
-    openWindow({
+    const window = openWindow({
       hash: `window:task/:${id}`,
     });
   });

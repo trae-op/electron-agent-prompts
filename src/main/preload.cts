@@ -58,6 +58,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     tasks: (payload: TEventPayloadSend["tasks"]) => {
       ipcSend("tasks", payload);
     },
+    task: (payload: TEventPayloadSend["task"]) => {
+      ipcSend("task", payload);
+    },
     windowTask: (payload: TEventPayloadSend["windowTask"]) => {
       ipcSend("windowTask", payload);
     },
