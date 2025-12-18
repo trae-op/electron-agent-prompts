@@ -13,10 +13,12 @@ type TEventSendInvoke = {
   getVersion: string;
   createProject: {
     name: string;
+    isGeneral?: boolean;
   };
   updateProject: {
     id: string;
     name: string;
+    isGeneral?: boolean;
   };
   deleteProject: {
     id: string;

@@ -1,4 +1,7 @@
 import { memo, useActionState, useCallback } from "react";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 import { ConfirmModel } from "@composites/ConfirmModel";
@@ -7,21 +10,39 @@ import { TCreateProjectModalProps } from "./types";
 import { useCreateProjectModalOpenSelector } from "../context";
 import { useFormStatus } from "react-dom";
 
+const checkboxInputProps = {
+  "data-testid": "create-project-is-general",
+} as const;
+
 const Fields = () => {
   const { pending } = useFormStatus();
-
   return (
-    <TextField
-      data-testid="create-project-name"
-      name="name"
-      id="create-project-name"
-      label="Project Name"
-      placeholder="My agent prompt project"
-      autoFocus
-      autoComplete="off"
-      fullWidth
-      disabled={pending}
-    />
+    <Stack spacing={2}>
+      <TextField
+        data-testid="create-project-name"
+        name="name"
+        id="create-project-name"
+        label="Project Name"
+        placeholder="My agent prompt project"
+        autoFocus
+        autoComplete="off"
+        fullWidth
+        disabled={pending}
+      />
+      <FormControlLabel
+        control={
+          <Checkbox
+            name="isGeneral"
+            value="true"
+            disabled={pending}
+            slotProps={{
+              input: checkboxInputProps,
+            }}
+          />
+        }
+        label="Mark as general project"
+      />
+    </Stack>
   );
 };
 
@@ -35,9 +56,12 @@ export const CreateProjectModal = memo(
         async (_state: undefined, formData: FormData): Promise<undefined> => {
           const rawName = formData.get("name");
           const name = typeof rawName === "string" ? rawName.trim() : "";
+          const rawIsGeneral = formData.get("isGeneral");
+          const isGeneral = rawIsGeneral === "true";
 
           const response = await window.electron.invoke.createProject({
             name,
+            isGeneral,
           });
 
           if (response !== undefined) {
@@ -54,7 +78,7 @@ export const CreateProjectModal = memo(
 
     const handleClose = useCallback(() => {
       closeModal();
-    }, []);
+    }, [closeModal]);
 
     return (
       <ConfirmModel
