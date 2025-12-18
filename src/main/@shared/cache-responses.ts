@@ -1,6 +1,6 @@
 import { restApi } from "../config.js";
 import { getElectronStorage } from "./store.js";
-import { buildTasksEndpoint } from "./utils.js";
+import { buildTaskEndpoint, buildTasksEndpoint } from "./utils.js";
 
 export function cacheUser(userId: string | undefined): TUser | undefined {
   let user: TUser | undefined = undefined;
@@ -52,6 +52,22 @@ export function cacheTasks(projectId: number): TTask[] | undefined {
 
   if (Array.isArray(tasks)) {
     return tasks as TTask[];
+  }
+
+  return undefined;
+}
+
+export function cacheTask(taskId: string): TTask | undefined {
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return undefined;
+  }
+
+  const task = cacheResponse[buildTaskEndpoint(taskId)];
+
+  if (task !== undefined) {
+    return task as TTask;
   }
 
   return undefined;

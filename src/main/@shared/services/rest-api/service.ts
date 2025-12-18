@@ -9,6 +9,7 @@ import {
   getElectronStorage,
   TCacheResponse,
 } from "../../store.js";
+import { buildTasksEndpoint } from "../../utils.js";
 import { restApi } from "../../../config.js";
 import type { ApiResponse, DataError, RequestOptions } from "./types.js";
 import { logout } from "../logout.js";
@@ -17,7 +18,6 @@ function getAuthorization(): AxiosRequestConfig["headers"] | undefined {
   const token = getElectronStorage("authToken");
   if (token !== undefined) {
     return {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     };
   }
@@ -171,6 +171,158 @@ export function merge(data: TCacheResponse): TCacheResponse | undefined {
   return cacheStore;
 }
 
+function hasIdProperty(value: unknown): value is { id: string | number } {
+  if (typeof value === "object" && value !== null && "id" in value) {
+    const candidateId = (value as { id: unknown }).id;
+
+    return typeof candidateId === "string" || typeof candidateId === "number";
+  }
+
+  return false;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasProjectId(value: unknown): value is { projectId: number | string } {
+  if (!isPlainObject(value) || !("projectId" in value)) {
+    return false;
+  }
+
+  const projectId = (value as { projectId: unknown }).projectId;
+
+  return typeof projectId === "number" || typeof projectId === "string";
+}
+
+function addResponseEntityElectronStorage(
+  endpoint: string,
+  entity: unknown
+): void {
+  if (!hasIdProperty(entity)) {
+    return;
+  }
+
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return;
+  }
+
+  const endpointsToUpdate = new Set<string>();
+  endpointsToUpdate.add(endpoint);
+
+  if (hasProjectId(entity)) {
+    const parsedProjectId = Number(entity.projectId);
+    if (!Number.isNaN(parsedProjectId)) {
+      endpointsToUpdate.add(buildTasksEndpoint(parsedProjectId));
+    }
+  }
+
+  const updates: TCacheResponse = {};
+  let hasUpdates = false;
+  const entityId = String(entity.id);
+  const entityRecord = isPlainObject(entity) ? entity : undefined;
+
+  endpointsToUpdate.forEach((targetEndpoint) => {
+    const cachedValue = cacheResponse[targetEndpoint];
+
+    if (cachedValue === undefined) {
+      return;
+    }
+
+    if (Array.isArray(cachedValue)) {
+      const nextItems = [...cachedValue];
+      const existingIndex = nextItems.findIndex(
+        (item) => hasIdProperty(item) && String(item.id) === entityId
+      );
+
+      if (existingIndex !== -1) {
+        const currentItem = nextItems[existingIndex];
+        nextItems[existingIndex] =
+          isPlainObject(currentItem) && entityRecord !== undefined
+            ? { ...currentItem, ...entityRecord }
+            : entity;
+      } else {
+        nextItems.push(entityRecord ?? entity);
+      }
+
+      updates[targetEndpoint] = nextItems;
+      hasUpdates = true;
+      return;
+    }
+
+    if (isPlainObject(cachedValue) && entityRecord !== undefined) {
+      updates[targetEndpoint] = {
+        ...cachedValue,
+        ...entityRecord,
+      };
+      hasUpdates = true;
+      return;
+    }
+
+    if (cachedValue !== entity) {
+      updates[targetEndpoint] = entity;
+      hasUpdates = true;
+    }
+  });
+
+  if (!hasUpdates) {
+    return;
+  }
+
+  const merged = merge(updates);
+
+  if (merged !== undefined) {
+    setElectronStorage("response", merged);
+  }
+}
+
+function deleteResponseEntityElectronStorage(entityId: string): void {
+  const cacheResponse = getElectronStorage("response");
+
+  if (cacheResponse === undefined) {
+    return;
+  }
+
+  const updates: TCacheResponse = {};
+  let hasUpdates = false;
+
+  for (const [endpoint, cachedValue] of Object.entries(cacheResponse)) {
+    if (Array.isArray(cachedValue)) {
+      const filtered = cachedValue.filter((item) => {
+        if (!hasIdProperty(item)) {
+          return true;
+        }
+
+        return String(item.id) !== entityId;
+      });
+
+      if (filtered.length !== cachedValue.length) {
+        updates[endpoint] = filtered;
+        hasUpdates = true;
+      }
+
+      continue;
+    }
+
+    if (hasIdProperty(cachedValue) && String(cachedValue.id) === entityId) {
+      updates[endpoint] = undefined;
+      hasUpdates = true;
+    }
+  }
+
+  if (!hasUpdates) {
+    return;
+  }
+
+  const merged = merge(updates);
+
+  if (merged !== undefined) {
+    setElectronStorage("response", merged);
+  }
+}
+
 function setResponseElectronStorage(
   endpoint: string,
   response: AxiosResponse<any, any>
@@ -196,6 +348,14 @@ export async function post<T>(
       data,
       options
     );
+    if (
+      response.status >= 200 &&
+      response.status < 300 &&
+      response.data !== undefined &&
+      response.data !== null
+    ) {
+      addResponseEntityElectronStorage(endpoint, response.data);
+    }
     return handleResponse<T>(response);
   } catch (error: any) {
     return handleError(error as AxiosError<DataError>);
@@ -221,6 +381,7 @@ export async function put<T>(
 
 export async function del<T>(
   endpoint: string,
+  entityId: string,
   options?: RequestOptions
 ): Promise<ApiResponse<T>> {
   try {
@@ -228,6 +389,9 @@ export async function del<T>(
       endpoint,
       options
     );
+    if (response.status >= 200 && response.status < 300) {
+      deleteResponseEntityElectronStorage(entityId);
+    }
     return handleResponse<T>(response);
   } catch (error: any) {
     return handleError(error as AxiosError<DataError>);

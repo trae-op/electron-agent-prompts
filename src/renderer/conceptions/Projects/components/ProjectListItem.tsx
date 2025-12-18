@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
+import FolderIcon from "@mui/icons-material/Folder";
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -153,6 +154,11 @@ export const ProjectListItem = memo(
                     {project.countTasks}
                   </Typography>
                 </Stack>
+                {project.isGeneral && (
+                  <Stack direction="row" spacing={0.3} alignItems="center">
+                    <FolderIcon fontSize="inherit" color="success" />
+                  </Stack>
+                )}
               </Stack>
             }
           />

@@ -6,16 +6,19 @@ type TEventPayloadInvoke = {
   createTask: TTask | undefined;
   updateTask: TTask | undefined;
   deleteTask: boolean;
+  uploadFile: undefined;
 };
 
 type TEventSendInvoke = {
   getVersion: string;
   createProject: {
     name: string;
+    isGeneral?: boolean;
   };
   updateProject: {
     id: string;
     name: string;
+    isGeneral?: boolean;
   };
   deleteProject: {
     id: string;
@@ -23,8 +26,6 @@ type TEventSendInvoke = {
   createTask: {
     name: string;
     projectId: string;
-    fileId?: string;
-    url?: string | null;
   };
   updateTask: {
     id: number;
@@ -35,6 +36,10 @@ type TEventSendInvoke = {
   };
   deleteTask: {
     id: number;
+  };
+  uploadFile: {
+    file: Blob;
+    path?: string;
   };
 };
 
@@ -58,4 +63,7 @@ type TInvoke = {
   deleteTask: (
     payload: TEventSendInvoke["deleteTask"]
   ) => Promise<TEventPayloadInvoke["deleteTask"]>;
+  uploadFile: (
+    payload: TEventSendInvoke["uploadFile"]
+  ) => Promise<TEventPayloadInvoke["uploadFile"]>;
 };

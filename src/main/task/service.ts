@@ -1,18 +1,18 @@
+import { restApi } from "../config.js";
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
-import { restApi } from "../config.js";
-import { buildTasksEndpoint } from "../@shared/utils.js";
+import { buildTaskEndpoint } from "../@shared/utils.js";
 
-export async function getTasks<R extends TTask[]>(
-  projectId: number
+export async function getTask<R extends TTask>(
+  taskId: string
 ): Promise<R | undefined> {
-  const response = await get<R>(buildTasksEndpoint(projectId), {
+  const response = await get<R>(buildTaskEndpoint(taskId), {
     isCache: true,
   });
 
   if (response.error !== undefined) {
     showErrorMessages({
-      title: "Error request by getTasks",
+      title: "Error request by getTask",
       body: response.error.message,
     });
   }

@@ -6,6 +6,9 @@ type TEventPayloadSend = {
   tasks: {
     projectId: number;
   };
+  task: {
+    taskId: string;
+  };
   logout: undefined;
   checkForUpdates: undefined;
   checkAuth: undefined;
@@ -27,6 +30,7 @@ type TSend = {
   user: () => void;
   projects: () => void;
   tasks: (payload: TEventPayloadSend["tasks"]) => void;
+  task: (payload: TEventPayloadSend["task"]) => void;
   checkAuth: () => void;
   logout: () => void;
   checkForUpdates: () => void;

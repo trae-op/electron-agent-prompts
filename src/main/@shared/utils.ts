@@ -13,6 +13,11 @@ export const buildTasksEndpoint = (projectId: number): string =>
     restApi.urls.tasks.base
   }${restApi.urls.tasks.byProjectId(projectId)}`;
 
+export const buildTaskEndpoint = (taskId: string): string =>
+  `${restApi.urls.base}${restApi.urls.baseApi}${
+    restApi.urls.tasks.base
+  }${restApi.urls.tasks.byId(taskId)}`;
+
 export function isDev(): boolean {
   return process.env.NODE_ENV === "development";
 }

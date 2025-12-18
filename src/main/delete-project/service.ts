@@ -8,7 +8,8 @@ export async function deleteProject(
   const response = await del<undefined>(
     `${restApi.urls.base}${restApi.urls.baseApi}${
       restApi.urls.projects.base
-    }${restApi.urls.projects.byId(payload.id)}`
+    }${restApi.urls.projects.byId(payload.id)}`,
+    payload.id + ""
   );
 
   if (response.error !== undefined) {

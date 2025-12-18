@@ -58,6 +58,9 @@ electron.contextBridge.exposeInMainWorld("electron", {
     tasks: (payload: TEventPayloadSend["tasks"]) => {
       ipcSend("tasks", payload);
     },
+    task: (payload: TEventPayloadSend["task"]) => {
+      ipcSend("task", payload);
+    },
     windowTask: (payload: TEventPayloadSend["windowTask"]) => {
       ipcSend("windowTask", payload);
     },
@@ -91,6 +94,11 @@ electron.contextBridge.exposeInMainWorld("electron", {
     createTask: (payload) => ipcInvoke("createTask", payload),
     updateTask: (payload) => ipcInvoke("updateTask", payload),
     deleteTask: (payload) => ipcInvoke("deleteTask", payload),
+    uploadFile: (payload) => {
+      const filePath = electron.webUtils.getPathForFile(payload.file);
+      payload.path = filePath;
+      return ipcInvoke("uploadFile", payload);
+    },
   },
 } satisfies Window["electron"]);
 
