@@ -5,6 +5,7 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import {
   Provider as MarkdownProvider,
   ApplyButton,
+  MarkdownContentList,
 } from "@conceptions/Task/Markdown";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Subscriber } from "./Subscriber";
@@ -41,7 +42,7 @@ const Task = () => {
             direction="column"
             spacing={1}
           >
-            {/* Markdown Components editor will go here */}
+            <MarkdownContentList />
           </Stack>
           <Stack spacing={1}>
             <ApplyButton />
