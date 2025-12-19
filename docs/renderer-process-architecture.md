@@ -26,6 +26,19 @@ src/renderer/
 └── main.tsx           # React entry point
 ```
 
+Also can be situation when the Domain contains SubDomains.
+
+```
+src/renderer/
+├── conceptions/            # Domain-specific modules (Logic + State + UI)
+│   ├── <Domain>/           # e.g., User
+│   │   └───<SubDomain>/    # e.g., Settings related to User
+│   │       ├── components/ # Domain-specific components
+│   │       ├── hooks/      # Domain-specific hooks (IPC, state)
+│   │       ├── context/    # React Context for the domain
+│   │       └── index.ts    # Public API for the domain
+```
+
 ## 2. Routing and Windows
 
 - **`App.tsx`**: Defines the application routes using `react-router-dom`.
