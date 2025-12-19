@@ -1,8 +1,9 @@
 import { lazy, Suspense } from "react";
-import { LoadingSpinner } from "@components/LoadingSpinner";
 import { useParams } from "react-router-dom";
-import { Provider as MarkdownProvider } from "../../conceptions/Task/Markdown";
+import { LoadingSpinner } from "@components/LoadingSpinner";
+import { Provider as MarkdownProvider } from "@conceptions/Task/Markdown";
 import { Subscriber } from "./Subscriber";
+
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
 const Task = () => {
@@ -10,19 +11,17 @@ const Task = () => {
     id?: string;
   }>();
 
+  if (id === undefined) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <MarkdownProvider>
-      {id === undefined ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          <Subscriber taskId={id} />
-          <Suspense fallback={<LoadingSpinner />}>
-            <LazyTopPanel />
-          </Suspense>
-          taskId: {id}
-        </>
-      )}
+      <Subscriber taskId={id} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <LazyTopPanel />
+      </Suspense>
+      taskId: {id}
     </MarkdownProvider>
   );
 };
