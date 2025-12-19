@@ -4,7 +4,7 @@ import {
   useDeleteProjectModalProjectSelector,
   useSetDeleteProjectModalProjectDispatch,
 } from "../context";
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import { TDeleteProjectModalProps } from "./types";
 
 export const DeleteProjectModal = memo(
@@ -40,7 +40,7 @@ export const DeleteProjectModal = memo(
     }, []);
 
     return (
-      <ConfirmModel
+      <Popup
         title="Delete project"
         isOpen={project !== undefined}
         description={

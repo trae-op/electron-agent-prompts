@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
@@ -132,7 +132,7 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
   }, [setUpdateTask]);
 
   return (
-    <ConfirmModel
+    <Popup
       title="Update task"
       description="Update the task name."
       isOpen={task !== undefined}

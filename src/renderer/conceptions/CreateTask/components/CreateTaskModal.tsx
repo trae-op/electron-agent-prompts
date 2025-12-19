@@ -14,7 +14,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
 
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import { useCreateTaskModalActions } from "../hooks";
 import { TCreateTaskModalProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
@@ -134,7 +134,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   }, []);
 
   return (
-    <ConfirmModel
+    <Popup
       title="Create a new task"
       description="Set the task name for this project."
       isOpen={isOpen && projectId !== undefined}

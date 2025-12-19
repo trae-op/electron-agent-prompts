@@ -4,7 +4,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import { useCreateProjectModalActions } from "../hooks";
 import { TCreateProjectModalProps } from "./types";
 import { useCreateProjectModalOpenSelector } from "../context";
@@ -81,7 +81,7 @@ export const CreateProjectModal = memo(
     }, [closeModal]);
 
     return (
-      <ConfirmModel
+      <Popup
         title="Create a new project"
         description="Set the project name to get started."
         isOpen={isOpen}

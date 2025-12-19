@@ -4,7 +4,7 @@ import {
   useDeleteTaskModalTaskSelector,
   useSetDeleteTaskModalTaskDispatch,
 } from "../context";
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import { TDeleteTaskModalProps } from "./types";
 
 export const DeleteTaskModal = memo(({ onSuccess }: TDeleteTaskModalProps) => {
@@ -39,7 +39,7 @@ export const DeleteTaskModal = memo(({ onSuccess }: TDeleteTaskModalProps) => {
   }, []);
 
   return (
-    <ConfirmModel
+    <Popup
       title="Delete task"
       isOpen={task !== undefined}
       onClose={handlerClose}

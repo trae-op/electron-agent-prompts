@@ -56,7 +56,7 @@ const CancelButton = memo(({ handlerClose }: TCancelButtonProps) => {
   );
 });
 
-const ConfirmModelComponent = ({
+const PopupComponent = ({
   title,
   isOpen,
   description,
@@ -126,6 +126,6 @@ const ConfirmModelComponent = ({
   );
 };
 
-export const ConfirmModel = memo(ConfirmModelComponent);
+export const Popup = memo(PopupComponent);
 
-ConfirmModel.displayName = "ConfirmModel";
+Popup.displayName = "Popup";

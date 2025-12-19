@@ -4,7 +4,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
-import { ConfirmModel } from "@composites/ConfirmModel";
+import { Popup } from "@composites/Popup";
 import {
   useUpdateProjectModalProjectSelector,
   useSetUpdateProjectModalProjectDispatch,
@@ -96,7 +96,7 @@ export const UpdateProjectModal = memo(
     }, [setProject]);
 
     return (
-      <ConfirmModel
+      <Popup
         title="Update project"
         description="Rename your project."
         isOpen={project !== undefined}
