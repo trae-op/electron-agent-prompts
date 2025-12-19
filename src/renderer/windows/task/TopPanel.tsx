@@ -1,8 +1,11 @@
+import { useCallback, type MouseEvent } from "react";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import TitleIcon from "@mui/icons-material/Title";
 import CodeIcon from "@mui/icons-material/Code";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+
+import { useTitleModalActions } from "@conceptions/Task/Title";
 import { TopPanel } from "@layouts/TopPanel";
 
 const items = [
@@ -12,22 +15,29 @@ const items = [
 ];
 
 const ContainerTopPanel = () => {
-  const handleOpenModal = (event: React.MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest("button");
+  const { openModal } = useTitleModalActions();
 
-    if (button && button.dataset.action === "title") {
-      console.log(`Action: ${button.dataset.action}`);
-    }
+  const handleOpenModal = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement;
+      const button = target.closest("button");
 
-    if (button && button.dataset.action === "code") {
-      console.log(`Action: ${button.dataset.action}`);
-    }
+      if (!button) {
+        return;
+      }
 
-    if (button && button.dataset.action === "list") {
-      console.log(`Action: ${button.dataset.action}`);
-    }
-  };
+      const action = button.dataset.action;
+
+      if (action === "title") {
+        openModal();
+      }
+
+      if (action === "code" || action === "list") {
+        console.log(`Action: ${action}`);
+      }
+    },
+    [openModal]
+  );
 
   return (
     <TopPanel

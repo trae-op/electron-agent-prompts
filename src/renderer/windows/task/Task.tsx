@@ -6,6 +6,7 @@ import {
   Provider as MarkdownProvider,
   ApplyButton,
 } from "@conceptions/Task/Markdown";
+import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Subscriber } from "./Subscriber";
 import { TitleModal } from "./InitModals";
 
@@ -22,29 +23,31 @@ const Task = () => {
 
   return (
     <MarkdownProvider>
-      <Subscriber taskId={id} />
-      <Suspense fallback={<LoadingSpinner />}>
-        <LazyTopPanel />
-      </Suspense>
-      <TitleModal />
-      <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
-        <Stack
-          width="calc(100vw - 25px)"
-          height="calc(100vh - 120px)"
-          sx={{
-            "&::-webkit-scrollbar": {
-              width: 0,
-            },
-          }}
-          direction="column"
-          spacing={1}
-        >
-          {/* Markdown Components editor will go here */}
+      <TitleProvider>
+        <Subscriber taskId={id} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <LazyTopPanel />
+        </Suspense>
+        <TitleModal />
+        <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
+          <Stack
+            width="calc(100vw - 25px)"
+            height="calc(100vh - 120px)"
+            sx={{
+              "&::-webkit-scrollbar": {
+                width: 0,
+              },
+            }}
+            direction="column"
+            spacing={1}
+          >
+            {/* Markdown Components editor will go here */}
+          </Stack>
+          <Stack spacing={1}>
+            <ApplyButton />
+          </Stack>
         </Stack>
-        <Stack spacing={1}>
-          <ApplyButton />
-        </Stack>
-      </Stack>
+      </TitleProvider>
     </MarkdownProvider>
   );
 };

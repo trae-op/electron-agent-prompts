@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from "react";
 
-export type TTypesContent = "edit" | "code" | "list";
+export type TTypesContent = "edit" | "code" | "list" | "title";
 
 export type TContent = {
   type: TTypesContent;
