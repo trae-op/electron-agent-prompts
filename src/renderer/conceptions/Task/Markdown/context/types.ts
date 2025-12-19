@@ -15,6 +15,7 @@ export type TContext = {
   getContents: () => TContent[];
   setContents: (value: TContent[]) => void;
   addContent: (value: TContent) => void;
+  updateContent: (value: TContent) => void;
   deleteContent: (id: string) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
 };

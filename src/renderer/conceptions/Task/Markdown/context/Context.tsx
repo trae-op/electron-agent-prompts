@@ -31,6 +31,13 @@ export function Provider({ children, items }: TProviderProps) {
     subscribers.current.forEach((callback) => callback());
   }, []);
 
+  const updateContent = useCallback((value: TContent): void => {
+    contents.current = contents.current.map((content) =>
+      content.id === value.id ? value : content
+    );
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
   const deleteContent = useCallback((id: string): void => {
     contents.current = contents.current.filter((item) => item.id !== id);
     subscribers.current.forEach((callback) => callback());
@@ -50,6 +57,7 @@ export function Provider({ children, items }: TProviderProps) {
         getContents,
         setContents,
         addContent,
+        updateContent,
         deleteContent,
         subscribe,
       }}

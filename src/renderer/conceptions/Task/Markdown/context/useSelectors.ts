@@ -7,6 +7,10 @@ export function useContentsSelector() {
   return useSyncExternalStore(subscribe, getContents, getContents);
 }
 
+export const useUpdateContentDispatch = () => {
+  return useMarkdownContext().updateContent;
+};
+
 export const useSetContentsDispatch = () => {
   return useMarkdownContext().setContents;
 };

@@ -7,6 +7,7 @@ import {
   ApplyButton,
 } from "@conceptions/Task/Markdown";
 import { Subscriber } from "./Subscriber";
+import { TitleModal } from "./InitModals";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
@@ -25,6 +26,7 @@ const Task = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <LazyTopPanel />
       </Suspense>
+      <TitleModal />
       <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
         <Stack
           width="calc(100vw - 25px)"
@@ -37,7 +39,7 @@ const Task = () => {
           direction="column"
           spacing={1}
         >
-          <h2>title</h2>
+          {/* Markdown Components editor will go here */}
         </Stack>
         <Stack spacing={1}>
           <ApplyButton />
