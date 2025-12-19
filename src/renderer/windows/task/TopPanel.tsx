@@ -16,10 +16,16 @@ const ContainerTopPanel = () => {
     const target = event.target as HTMLElement;
     const button = target.closest("button");
 
-    if (button && button.dataset.id) {
-      const id = button.dataset.id;
-      const action = button.dataset.action;
-      console.log(`Action: ${action}, ID: ${id}`);
+    if (button && button.dataset.action === "title") {
+      console.log(`Action: ${button.dataset.action}`);
+    }
+
+    if (button && button.dataset.action === "code") {
+      console.log(`Action: ${button.dataset.action}`);
+    }
+
+    if (button && button.dataset.action === "list") {
+      console.log(`Action: ${button.dataset.action}`);
     }
   };
 
@@ -57,7 +63,6 @@ const ContainerTopPanel = () => {
         {items.map((item) => (
           <IconButton
             key={item.id}
-            data-id={item.id}
             data-action={item.action}
             aria-label={item.label}
           >
