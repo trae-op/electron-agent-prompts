@@ -1,28 +1,23 @@
 import { createContext, useCallback, useRef } from "react";
 
-import type {
-  TContent,
-  TContext,
-  TProviderProps,
-  TSubscriberCallback,
-} from "./types";
+import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 
 export const Context = createContext<TContext | null>(null);
 
 export function Provider({ children, items }: TProviderProps) {
-  const contents = useRef<TContent[]>(sortContents(items ?? []));
+  const contents = useRef<TMarkdownContent[]>(sortContents(items ?? []));
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
-  const getContents = useCallback((): TContent[] => {
+  const getContents = useCallback((): TMarkdownContent[] => {
     return contents.current;
   }, []);
 
-  const setContents = useCallback((value: TContent[]): void => {
+  const setContents = useCallback((value: TMarkdownContent[]): void => {
     contents.current = sortContents(value);
     subscribers.current.forEach((callback) => callback());
   }, []);
 
-  const addContent = useCallback((value: TContent): void => {
+  const addContent = useCallback((value: TMarkdownContent): void => {
     const next = [
       ...contents.current.filter((item) => item.id !== value.id),
       value,
@@ -31,7 +26,7 @@ export function Provider({ children, items }: TProviderProps) {
     subscribers.current.forEach((callback) => callback());
   }, []);
 
-  const updateContent = useCallback((value: TContent): void => {
+  const updateContent = useCallback((value: TMarkdownContent): void => {
     contents.current = contents.current.map((content) =>
       content.id === value.id ? value : content
     );
@@ -67,6 +62,6 @@ export function Provider({ children, items }: TProviderProps) {
   );
 }
 
-function sortContents(list: TContent[]): TContent[] {
+function sortContents(list: TMarkdownContent[]): TMarkdownContent[] {
   return [...list].sort((first, second) => first.position - second.position);
 }

@@ -7,7 +7,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 
 import { useContentsSelector } from "../context";
-import type { TContent } from "../context/types";
 
 type THeadingVariant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -23,7 +22,7 @@ export const MarkdownContentList = () => {
   );
 };
 
-const ContentItem = ({ content }: { content: TContent }) => {
+const ContentItem = ({ content }: { content: TMarkdownContent }) => {
   switch (content.type) {
     case "title":
       return <TitleItem content={content.content} />;

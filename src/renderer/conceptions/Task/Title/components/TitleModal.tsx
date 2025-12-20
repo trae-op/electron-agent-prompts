@@ -11,7 +11,6 @@ import { Popup } from "@composites/Popup";
 import { useContentsSelector } from "@conceptions/Task/Markdown";
 import { useTitleModalOpenSelector } from "../context";
 import { useTitleModalActions } from "../hooks";
-import type { TContent } from "../../Markdown/context/types";
 import type { THeadingLevel, THeadingOption, TTitleModalProps } from "./types";
 import { createId } from "@utils/generation";
 
@@ -70,7 +69,7 @@ export const TitleModal = memo(({ onSuccess }: TTitleModalProps) => {
           return undefined;
         }
 
-        const content: TContent = {
+        const content: TMarkdownContent = {
           id: createId(),
           type: "title",
           content: buildHeadingContent(nextTitle, selectedHeading),
@@ -129,7 +128,7 @@ function buildHeadingContent(title: string, level: THeadingLevel): string {
   return `${prefix} ${title}`;
 }
 
-function getNextPosition(contents: TContent[]): number {
+function getNextPosition(contents: TMarkdownContent[]): number {
   if (contents.length === 0) {
     return 1;
   }

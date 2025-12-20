@@ -1,23 +1,16 @@
 import { useCallback } from "react";
 
-import { useSetTitleDispatch, useSetTitleModalOpenDispatch } from "../context";
+import { useSetTitleModalOpenDispatch } from "../context";
 
 export const useTitleModalActions = () => {
   const setIsOpen = useSetTitleModalOpenDispatch();
-  const setTitle = useSetTitleDispatch();
-
-  const openModal = useCallback(
-    (value = "") => {
-      setTitle(value);
-      setIsOpen(true);
-    },
-    [setIsOpen, setTitle]
-  );
+  const openModal = useCallback(() => {
+    setIsOpen(true);
+  }, [setIsOpen]);
 
   const closeModal = useCallback(() => {
     setIsOpen(false);
-    setTitle("");
-  }, [setIsOpen, setTitle]);
+  }, [setIsOpen]);
 
   return {
     openModal,

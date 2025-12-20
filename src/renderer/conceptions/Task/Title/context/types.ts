@@ -5,8 +5,8 @@ export type TSubscriberCallback = () => void;
 export type TContext = {
   getIsOpen: () => boolean;
   setIsOpen: (value: boolean) => void;
-  getTitle: () => string;
-  setTitle: (value: string) => void;
+  getContent: () => TMarkdownContent | undefined;
+  setContent: (value: TMarkdownContent | undefined) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
 };
 

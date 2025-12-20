@@ -8,16 +8,16 @@ export const useTitleModalOpenSelector = (): boolean => {
   return useSyncExternalStore(subscribe, getIsOpen, getIsOpen);
 };
 
-export const useTitleValueSelector = (): string => {
-  const { getTitle, subscribe } = useTitleContext();
+export const useContentValueSelector = (): TMarkdownContent | undefined => {
+  const { getContent, subscribe } = useTitleContext();
 
-  return useSyncExternalStore(subscribe, getTitle, getTitle);
+  return useSyncExternalStore(subscribe, getContent, getContent);
 };
 
 export const useSetTitleModalOpenDispatch = () => {
   return useTitleContext().setIsOpen;
 };
 
-export const useSetTitleDispatch = () => {
-  return useTitleContext().setTitle;
+export const useSetContentDispatch = () => {
+  return useTitleContext().setContent;
 };

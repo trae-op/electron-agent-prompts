@@ -6,7 +6,7 @@ export const Context = createContext<TContext | null>(null);
 
 export function Provider({ children }: TProviderProps) {
   const isOpen = useRef<boolean>(false);
-  const title = useRef<string>("");
+  const content = useRef<TMarkdownContent | undefined>(undefined);
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const getIsOpen = useCallback((): boolean => {
@@ -22,14 +22,17 @@ export function Provider({ children }: TProviderProps) {
     subscribers.current.forEach((callback) => callback());
   }, []);
 
-  const getTitle = useCallback((): string => {
-    return title.current;
+  const getContent = useCallback((): TMarkdownContent | undefined => {
+    return content.current;
   }, []);
 
-  const setTitle = useCallback((value: string): void => {
-    title.current = value;
-    subscribers.current.forEach((callback) => callback());
-  }, []);
+  const setContent = useCallback(
+    (value: TMarkdownContent | undefined): void => {
+      content.current = value;
+      subscribers.current.forEach((callback) => callback());
+    },
+    []
+  );
 
   const subscribe = useCallback((callback: TSubscriberCallback) => {
     subscribers.current.add(callback);
@@ -44,8 +47,8 @@ export function Provider({ children }: TProviderProps) {
       value={{
         getIsOpen,
         setIsOpen,
-        getTitle,
-        setTitle,
+        getContent,
+        setContent,
         subscribe,
       }}
     >
