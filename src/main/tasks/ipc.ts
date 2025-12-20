@@ -1,6 +1,7 @@
 import { ipcMainOn } from "../@shared/utils.js";
 import { cacheTasks } from "../@shared/cache-responses.js";
 import { getTasks } from "./service.js";
+import { setStore } from "../@shared/store.js";
 
 export function registerIpc(): void {
   ipcMainOn(
@@ -10,6 +11,8 @@ export function registerIpc(): void {
       payload: TEventPayloadSend["tasks"] | undefined
     ) => {
       const projectId = payload?.projectId;
+
+      setStore("projectId", projectId);
 
       if (projectId === undefined) {
         event.reply("tasks", { projectId: -1, tasks: [] });

@@ -8,10 +8,15 @@ export type TCacheResponse = {
   [key: string]: any | undefined;
 };
 
+export type TCacheMarkdownContent = {
+  [key: string]: TMarkdownContent[] | undefined;
+};
+
 type TElectronStore = {
   authToken: string;
   userId: string;
   response: TCacheResponse;
+  markdownContent: TCacheMarkdownContent;
 };
 
 const store = new Map<keyof TStore, TStore[keyof TStore]>();

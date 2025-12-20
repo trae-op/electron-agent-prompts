@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import {
   Provider as MarkdownProvider,
-  ApplyButton,
+  SaveButton,
   MarkdownContentList,
 } from "@conceptions/Task/Markdown";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
@@ -45,7 +45,7 @@ const Task = () => {
             <MarkdownContentList />
           </Stack>
           <Stack spacing={1}>
-            <ApplyButton />
+            <SaveButton />
           </Stack>
         </Stack>
       </TitleProvider>
