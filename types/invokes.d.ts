@@ -43,6 +43,7 @@ type TEventSendInvoke = {
     path?: string;
   };
   markdownContent: {
+    taskId: string;
     contents: TMarkdownContent[];
   };
 };

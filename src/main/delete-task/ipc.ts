@@ -13,23 +13,18 @@ function deleteMarkdownContent(taskId: string) {
     return;
   }
 
-  const markdownContent = getElectronStorage("markdownContent");
-  if (markdownContent === undefined) {
+  const markdownContent = getElectronStorage("markdownContent") ?? {};
+  const projectMarkdown = markdownContent[projectIdStore] ?? {};
+
+  if (projectMarkdown[taskId] === undefined) {
     return;
   }
 
-  const projectMarkdown = markdownContent[projectIdStore];
-  if (projectMarkdown === undefined) {
-    return;
-  }
-
-  const found = projectMarkdown.find((item) => item.id === taskId);
-  if (found === undefined) {
-    return;
-  }
+  const { [taskId]: _, ...restTasks } = projectMarkdown;
 
   setElectronStorage("markdownContent", {
-    [projectIdStore]: projectMarkdown.filter((item) => item.id !== taskId),
+    ...markdownContent,
+    [projectIdStore]: restTasks,
   });
 }
 
@@ -40,9 +35,6 @@ export function registerIpc(): void {
     }
 
     deleteMarkdownContent(String(payload.id));
-
-    const markdownContent = getElectronStorage("markdownContent");
-    console.log("deleteTask Stored markdown content:", markdownContent);
 
     return deleteTask(payload);
   });

@@ -9,7 +9,9 @@ export type TCacheResponse = {
 };
 
 export type TCacheMarkdownContent = {
-  [key: string]: TMarkdownContent[] | undefined;
+  [key: string]: {
+    [key: string]: TMarkdownContent[] | undefined;
+  };
 };
 
 type TElectronStore = {

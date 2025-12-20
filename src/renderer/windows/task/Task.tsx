@@ -45,7 +45,7 @@ const Task = () => {
             <MarkdownContentList />
           </Stack>
           <Stack spacing={1}>
-            <SaveButton />
+            <SaveButton taskId={id} />
           </Stack>
         </Stack>
       </TitleProvider>

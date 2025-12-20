@@ -8,26 +8,25 @@ import {
   getElectronStorage,
 } from "../@shared/store.js";
 
-function addMarkdownContent(contents: TMarkdownContent[]) {
+function addMarkdownContent(payload: {
+  taskId: string;
+  contents: TMarkdownContent[];
+}) {
   const projectIdStore = getStore<string, string>("projectId");
 
   if (projectIdStore === undefined) {
     return;
   }
 
-  const markdownContent = getElectronStorage("markdownContent");
-  if (markdownContent === undefined) {
-    return;
-  }
-
-  const projectMarkdown = markdownContent[projectIdStore];
-  if (projectMarkdown === undefined) {
-    return;
-  }
+  const markdownContent = getElectronStorage("markdownContent") ?? {};
+  const projectMarkdown = markdownContent[projectIdStore] ?? {};
 
   setElectronStorage("markdownContent", {
     ...markdownContent,
-    [projectIdStore]: contents,
+    [projectIdStore]: {
+      ...projectMarkdown,
+      [payload.taskId]: payload.contents,
+    },
   });
 }
 
@@ -72,9 +71,7 @@ export function registerIpc(): void {
       return undefined;
     }
 
-    addMarkdownContent(payload.contents);
-    const markdownContent = getElectronStorage("markdownContent");
-    console.log("Stored markdown content:", markdownContent);
+    addMarkdownContent(payload);
 
     return undefined;
   });

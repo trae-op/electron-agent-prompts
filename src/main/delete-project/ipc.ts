@@ -13,11 +13,9 @@ function deleteMarkdownContents(projectId: string) {
     return;
   }
 
-  let projects = markdownContent;
+  const { [projectId]: _, ...rest } = markdownContent;
 
-  delete projects[projectId];
-
-  setElectronStorage("markdownContent", projects);
+  setElectronStorage("markdownContent", rest);
 }
 
 export function registerIpc(): void {
@@ -27,9 +25,6 @@ export function registerIpc(): void {
     }
 
     deleteMarkdownContents(payload.id);
-
-    const markdownContent = getElectronStorage("markdownContent");
-    console.log("deleteProject Stored markdown content:", markdownContent);
 
     return deleteProject(payload);
   });
