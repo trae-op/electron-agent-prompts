@@ -2,19 +2,19 @@ import Button from "@mui/material/Button";
 import SaveIcon from "@mui/icons-material/Save";
 
 export const ApplyButton = () => {
-  const openModal = () => {
+  const handleSave = () => {
     // Logic to open modal goes here
-    console.log("Open modal");
+    console.log("Save Button");
   };
 
   return (
     <Button
       variant="contained"
       startIcon={<SaveIcon />}
-      onClick={openModal}
+      onClick={handleSave}
       data-testid="apply-button"
     >
-      Apply
+      Save
     </Button>
   );
 };
