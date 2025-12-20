@@ -24,8 +24,8 @@ const Task = () => {
 
   return (
     <MarkdownProvider>
+      <Subscriber taskId={id} />
       <TitleProvider>
-        <Subscriber taskId={id} />
         <Suspense fallback={<LoadingSpinner />}>
           <LazyTopPanel />
         </Suspense>
