@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   useAddNewProjectDispatch,
   useUpdateProjectDispatch,
@@ -7,10 +9,10 @@ import { CreateProjectModal } from "@conceptions/CreateProject";
 import { UpdateProjectModal } from "@conceptions/UpdateProject";
 import { DeleteProjectModal } from "@conceptions/DeleteProject";
 
-import { useCallback } from "react";
 import {
   useAddNewTaskDispatch,
   useRemoveTaskDispatch,
+  useSetTasksDispatch,
   useUpdateTaskDispatch,
 } from "@conceptions/Tasks";
 import { CreateTaskModal } from "@conceptions/CreateTask";
@@ -38,10 +40,14 @@ export const UpdateProjectModalContainer = () => {
 };
 
 export const DeleteProjectModalContainer = () => {
+  const navigate = useNavigate();
   const removeProject = useRemoveProjectDispatch();
+  const setTasks = useSetTasksDispatch();
 
-  const onSuccess = useCallback((projectId: string) => {
+  const onSuccess = useCallback(async (projectId: string) => {
+    await navigate("/window:main");
     removeProject(projectId);
+    setTasks([]);
   }, []);
 
   return <DeleteProjectModal onSuccess={onSuccess} />;
