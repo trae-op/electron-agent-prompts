@@ -10,14 +10,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
 
 import { useContentsSelector } from "../context";
-
-type THeadingVariant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-
-type TContentActionHandlers = {
-  onUpdate?: (content: TMarkdownContent) => void;
-  onDelete?: (content: TMarkdownContent) => void;
-  onMove?: (content: TMarkdownContent) => void;
-};
+import { TContentActionHandlers, THeadingVariant } from "./types";
 
 export const MarkdownContentList = ({
   onUpdate,

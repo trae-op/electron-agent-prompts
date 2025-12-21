@@ -8,7 +8,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 
 import { Popup } from "@composites/Popup";
-import { useTitleModalOpenSelector, useContentValueSelector } from "../context";
+import {
+  useTitleModalOpenSelector,
+  useContentValueSelector,
+  useSetContentDispatch,
+} from "../context";
 import { useTitleModalActions } from "../hooks";
 import type { THeadingLevel, THeadingOption, TTitleModalProps } from "./types";
 import { createId } from "@utils/generation";
@@ -24,114 +28,126 @@ const headingOptions: THeadingOption[] = [
   { value: "h6", label: "H6" },
 ];
 
-export const Fields = () => {
-  const contentValue = useContentValueSelector();
+export const Fields = memo(
+  ({ contentValue }: { contentValue?: TMarkdownContent }) => {
+    const selectedHeadingLevel = useMemo<THeadingLevel>(() => {
+      if (!contentValue?.content) {
+        return defaultHeadingLevel;
+      }
 
-  const selectedHeadingLevel = useMemo<THeadingLevel>(() => {
-    if (!contentValue?.content) {
-      return defaultHeadingLevel;
-    }
+      const match = contentValue.content.match(/^(#{1,6})\s+/);
+      if (!match) {
+        return defaultHeadingLevel;
+      }
 
-    const match = contentValue.content.match(/^(#{1,6})\s+/);
-    if (!match) {
-      return defaultHeadingLevel;
-    }
+      const depth = Math.min(match[1].length, 6);
+      const candidate = `h${depth}` as THeadingLevel;
 
-    const depth = Math.min(match[1].length, 6);
-    const candidate = `h${depth}` as THeadingLevel;
+      return headingOptions.some((option) => option.value === candidate)
+        ? candidate
+        : defaultHeadingLevel;
+    }, [contentValue]);
 
-    return headingOptions.some((option) => option.value === candidate)
-      ? candidate
-      : defaultHeadingLevel;
-  }, [contentValue]);
+    return (
+      <Stack spacing={2.5}>
+        <TextField
+          name="title"
+          id="title-modal-title"
+          label="Title"
+          placeholder="My section title"
+          autoFocus
+          fullWidth
+          defaultValue={
+            contentValue?.content.replace(/^#+\s*/, "").trim() ?? ""
+          }
+          autoComplete="off"
+        />
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Heading level</FormLabel>
+          <RadioGroup row name="heading" defaultValue={selectedHeadingLevel}>
+            {headingOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio />}
+                label={option.label}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+      </Stack>
+    );
+  }
+);
 
-  return (
-    <Stack spacing={2.5}>
-      <TextField
-        name="title"
-        id="title-modal-title"
-        label="Title"
-        placeholder="My section title"
-        autoFocus
-        fullWidth
-        defaultValue={contentValue?.content.replace(/^#+\s*/, "").trim() ?? ""}
-        autoComplete="off"
-      />
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Heading level</FormLabel>
-        <RadioGroup row name="heading" defaultValue={selectedHeadingLevel}>
-          {headingOptions.map((option) => (
-            <FormControlLabel
-              key={option.value}
-              value={option.value}
-              control={<Radio />}
-              label={option.label}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
-    </Stack>
-  );
-};
+export const TitleModal = memo(
+  ({ onSuccess, onUpdate, contents }: TTitleModalProps) => {
+    const isOpen = useTitleModalOpenSelector();
+    const contentValue = useContentValueSelector();
 
-export const TitleModal = memo(({ onSuccess, contents }: TTitleModalProps) => {
-  const isOpen = useTitleModalOpenSelector();
+    const { closeModal } = useTitleModalActions();
+    const setContent = useSetContentDispatch();
 
-  const { closeModal } = useTitleModalActions();
+    const handleClose = useCallback(() => {
+      setContent(undefined);
+      closeModal();
+    }, [closeModal, setContent]);
 
-  const handleClose = useCallback(() => {
-    closeModal();
-  }, []);
+    const position = useMemo(() => getNextPosition(contents), [contents]);
 
-  const position = useMemo(() => getNextPosition(contents), [contents]);
+    const [_, formAction] = useActionState(
+      useCallback(
+        async (_state: undefined, formData: FormData): Promise<undefined> => {
+          const rawTitle = formData.get("title");
+          const rawHeading = formData.get("heading");
+          const isEditing = Boolean(contentValue);
 
-  const [_, formAction] = useActionState(
-    useCallback(
-      async (_state: undefined, formData: FormData): Promise<undefined> => {
-        const rawTitle = formData.get("title");
-        const rawHeading = formData.get("heading");
+          const nextTitle = typeof rawTitle === "string" ? rawTitle.trim() : "";
+          const selectedHeading = isHeadingLevel(rawHeading)
+            ? rawHeading
+            : defaultHeadingLevel;
 
-        const nextTitle = typeof rawTitle === "string" ? rawTitle.trim() : "";
-        const selectedHeading = isHeadingLevel(rawHeading)
-          ? rawHeading
-          : defaultHeadingLevel;
+          if (nextTitle === "") {
+            return undefined;
+          }
 
-        if (nextTitle === "") {
+          const content: TMarkdownContent = {
+            id: contentValue?.id ?? createId(),
+            type: "title",
+            content: buildHeadingContent(nextTitle, selectedHeading),
+            position: contentValue?.position ?? position,
+          };
+
+          if (isEditing && onUpdate) {
+            onUpdate(content);
+          } else {
+            onSuccess(content);
+          }
+          handleClose();
+
           return undefined;
-        }
+        },
+        [position, handleClose, onSuccess, onUpdate, contentValue]
+      ),
+      undefined
+    );
 
-        const content: TMarkdownContent = {
-          id: createId(),
-          type: "title",
-          content: buildHeadingContent(nextTitle, selectedHeading),
-          position,
-        };
-
-        onSuccess(content);
-        handleClose();
-
-        return undefined;
-      },
-      [position, handleClose, onSuccess]
-    ),
-    undefined
-  );
-
-  return (
-    <Popup
-      title="Add title"
-      description="Choose the heading level and text to insert a markdown title."
-      isOpen={isOpen}
-      onClose={handleClose}
-      formAction={formAction}
-      confirmLabel="Add Title"
-      confirmPendingLabel="Adding..."
-      formTestId="title-modal-form"
-      messageTestId="title-modal-message"
-      content={<Fields />}
-    />
-  );
-});
+    return (
+      <Popup
+        title="Add title"
+        description="Choose the heading level and text to insert a markdown title."
+        isOpen={isOpen}
+        onClose={handleClose}
+        formAction={formAction}
+        confirmLabel="Add Title"
+        confirmPendingLabel="Adding..."
+        formTestId="title-modal-form"
+        messageTestId="title-modal-message"
+        content={<Fields contentValue={contentValue} />}
+      />
+    );
+  }
+);
 
 TitleModal.displayName = "TitleModal";
 

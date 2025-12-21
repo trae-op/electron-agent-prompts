@@ -9,12 +9,15 @@ const TaskOverview = () => {
   const setContent = useSetContentDispatch();
   const setTitleModalOpen = useSetTitleModalOpenDispatch();
 
-  const handleUpdateContent = useCallback((content: TMarkdownContent): void => {
-    if (content.type === "title") {
-      setContent(content);
-    }
-    setTitleModalOpen(true);
-  }, []);
+  const handleUpdateContent = useCallback(
+    (content: TMarkdownContent): void => {
+      if (content.type === "title") {
+        setContent(content);
+        setTitleModalOpen(true);
+      }
+    },
+    [setContent, setTitleModalOpen]
+  );
 
   return <MarkdownContentList onUpdate={handleUpdateContent} />;
 };
