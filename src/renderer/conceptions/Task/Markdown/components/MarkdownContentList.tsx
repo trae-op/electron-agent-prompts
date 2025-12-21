@@ -166,6 +166,8 @@ const ParagraphItem = ({ content }: { content: string }) => {
 };
 
 const CodeItem = ({ content }: { content: string }) => {
+  const segments = tokenizeSegments(content);
+
   return (
     <Paper
       variant="outlined"
@@ -189,11 +191,86 @@ const CodeItem = ({ content }: { content: string }) => {
           whiteSpace: "pre-wrap",
         }}
       >
-        {content}
+        {segments.map((segment, index) => (
+          <Box
+            component="span"
+            key={`${segment.value}-${index}`}
+            sx={(theme) => ({ color: pickColor(segment.type, theme) })}
+          >
+            {segment.value}
+          </Box>
+        ))}
       </Box>
     </Paper>
   );
 };
+
+type TTokenType =
+  | "keyword"
+  | "string"
+  | "number"
+  | "operator"
+  | "comment"
+  | "text";
+
+const keywordPattern =
+  /\b(const|let|var|function|return|if|else|type|interface|extends|implements|new|import|from|export|default|class|async|await|try|catch|finally|throw|switch|case|break|continue|for|while|do|of|in)\b/;
+
+const operatorPattern = /(===|==|=>|<=|>=|&&|\|\||!=|!==|[=+\-*/%!?<>])/;
+
+const codeTokenizer =
+  /(\/\/[^\n]*|\/\*[\s\S]*?\*\/|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b\d+(?:\.\d+)?\b|===|==|=>|<=|>=|&&|\|\||!=|!==|[=+\-*/%!?<>]|\b(?:const|let|var|function|return|if|else|type|interface|extends|implements|new|import|from|export|default|class|async|await|try|catch|finally|throw|switch|case|break|continue|for|while|do|of|in)\b)/g;
+
+function tokenizeSegments(
+  text: string
+): Array<{ value: string; type: TTokenType }> {
+  const segments: Array<{ value: string; type: TTokenType }> = [];
+  let lastIndex = 0;
+
+  for (const match of text.matchAll(codeTokenizer)) {
+    const matchText = match[0];
+    const start = match.index ?? 0;
+
+    if (start > lastIndex) {
+      segments.push({ value: text.slice(lastIndex, start), type: "text" });
+    }
+
+    segments.push({ value: matchText, type: detectType(matchText) });
+    lastIndex = start + matchText.length;
+  }
+
+  if (lastIndex < text.length) {
+    segments.push({ value: text.slice(lastIndex), type: "text" });
+  }
+
+  return segments;
+}
+
+function detectType(token: string): TTokenType {
+  if (/^\/\//.test(token) || /^\/\*/.test(token)) return "comment";
+  if (/^"/.test(token) || /^'/.test(token) || /^`/.test(token)) return "string";
+  if (keywordPattern.test(token)) return "keyword";
+  if (/^\d/.test(token)) return "number";
+  if (operatorPattern.test(token)) return "operator";
+  return "text";
+}
+
+function pickColor(type: TTokenType, theme: any): string | undefined {
+  switch (type) {
+    case "keyword":
+      return theme.palette.primary.main;
+    case "string":
+      return theme.palette.success.main;
+    case "number":
+      return theme.palette.info.main;
+    case "operator":
+      return theme.palette.warning.main;
+    case "comment":
+      return theme.palette.text.secondary;
+    default:
+      return undefined;
+  }
+}
 
 const ListItemBlock = ({ content }: { content: string }) => {
   const items = splitListItems(content);
