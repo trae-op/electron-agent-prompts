@@ -7,10 +7,14 @@ import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { useContentsSelector } from "../context";
 import { TContentActionHandlers, THeadingVariant } from "./types";
+import Divider from "@mui/material/Divider";
 
 export const MarkdownContentList = ({
   onUpdate,
@@ -109,30 +113,35 @@ const ContentBlockWrapper = ({
             "opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease",
         }}
       >
-        <Button
+        <IconButton
           size="small"
-          variant="text"
+          color="primary"
+          aria-label="edit content block"
           onClick={onEdit}
-          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
         >
-          edit
-        </Button>
-        <Button
+          <EditIcon fontSize="small" />
+        </IconButton>
+        <IconButton
           size="small"
-          variant="text"
+          color="error"
+          aria-label="delete content block"
           onClick={onDelete}
-          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
         >
-          delete
-        </Button>
-        <Button
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+        <Divider orientation="vertical" flexItem />
+        <IconButton
           size="small"
-          variant="text"
+          color="primary"
+          disableRipple
+          aria-label="move content block"
+          sx={{
+            cursor: "move",
+          }}
           onClick={onMove}
-          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
         >
-          move
-        </Button>
+          <DragIndicatorIcon fontSize="small" />
+        </IconButton>
       </Stack>
       {children}
     </Box>
