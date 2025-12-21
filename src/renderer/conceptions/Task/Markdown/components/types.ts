@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type TCreateTaskModalProps = {
   onSuccess: (data: TTask) => void;
 };
@@ -14,4 +16,11 @@ export type TContentActionHandlers = {
   onUpdate?: (content: TMarkdownContent) => void;
   onDelete?: (content: TMarkdownContent) => void;
   onMove?: (content: TMarkdownContent) => void;
+};
+
+export type TContentBlockWrapperProps = {
+  children: ReactNode;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onMove?: () => void;
 };

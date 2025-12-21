@@ -1,5 +1,3 @@
-import { type ReactNode } from "react";
-
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -13,7 +11,11 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { useContentsSelector } from "../context";
-import { TContentActionHandlers, THeadingVariant } from "./types";
+import {
+  TContentActionHandlers,
+  TContentBlockWrapperProps,
+  THeadingVariant,
+} from "./types";
 import Divider from "@mui/material/Divider";
 
 export const MarkdownContentList = ({
@@ -58,13 +60,6 @@ function renderContent(contentItem: TMarkdownContent) {
       return <ParagraphItem content={contentItem.content} />;
   }
 }
-
-type TContentBlockWrapperProps = {
-  children: ReactNode;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onMove?: () => void;
-};
 
 const ContentBlockWrapper = ({
   children,
