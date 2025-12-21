@@ -1,3 +1,5 @@
+import { type ReactNode } from "react";
+
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -5,36 +7,143 @@ import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import Button from "@mui/material/Button";
 
 import { useContentsSelector } from "../context";
 
 type THeadingVariant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
-export const MarkdownContentList = () => {
+type TContentActionHandlers = {
+  onUpdate?: (content: TMarkdownContent) => void;
+  onDelete?: (content: TMarkdownContent) => void;
+  onMove?: (content: TMarkdownContent) => void;
+};
+
+export const MarkdownContentList = ({
+  onUpdate,
+  onDelete,
+  onMove,
+}: TContentActionHandlers) => {
   const contents = useContentsSelector();
 
   return (
     <Stack spacing={1.5} data-testid="markdown-content-list">
-      {contents.map((contentItem) => (
-        <ContentItem key={contentItem.id} content={contentItem} />
-      ))}
+      {contents.map((contentItem) => {
+        const handleEdit = () => onUpdate?.(contentItem);
+        const handleDelete = () => onDelete?.(contentItem);
+        const handleMove = () => onMove?.(contentItem);
+
+        return (
+          <ContentBlockWrapper
+            key={contentItem.id}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onMove={handleMove}
+          >
+            {renderContent(contentItem)}
+          </ContentBlockWrapper>
+        );
+      })}
     </Stack>
   );
 };
 
-const ContentItem = ({ content }: { content: TMarkdownContent }) => {
-  switch (content.type) {
+function renderContent(contentItem: TMarkdownContent) {
+  switch (contentItem.type) {
     case "title":
-      return <TitleItem content={content.content} />;
+      return <TitleItem content={contentItem.content} />;
     case "code":
-      return <CodeItem content={content.content} />;
+      return <CodeItem content={contentItem.content} />;
     case "list":
-      return <ListItemBlock content={content.content} />;
+      return <ListItemBlock content={contentItem.content} />;
     case "edit":
-      return <ParagraphItem content={content.content} />;
     default:
-      return <ParagraphItem content={content.content} />;
+      return <ParagraphItem content={contentItem.content} />;
   }
+}
+
+type TContentBlockWrapperProps = {
+  children: ReactNode;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onMove?: () => void;
+};
+
+const ContentBlockWrapper = ({
+  children,
+  onEdit,
+  onDelete,
+  onMove,
+}: TContentBlockWrapperProps) => {
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        px: 1,
+        py: 0.75,
+        borderRadius: 1,
+        border: "1px solid transparent",
+        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          borderColor: (theme) => theme.palette.primary.main,
+          boxShadow: (theme) => `0 0 0 1px ${theme.palette.primary.main}`,
+          ".content-block__controls": {
+            opacity: 1,
+            visibility: "visible",
+            transform: "translateY(-2px)",
+          },
+        },
+      }}
+    >
+      <Stack
+        direction="row"
+        spacing={1}
+        className="content-block__controls"
+        sx={{
+          position: "absolute",
+          top: -28,
+          right: 8,
+          px: 1,
+          py: 0.5,
+          bgcolor: (theme) => theme.palette.background.paper,
+          borderRadius: 1,
+          border: (theme) => `1px solid ${theme.palette.primary.main}`,
+          boxShadow: 1,
+          opacity: 0,
+          visibility: "hidden",
+          transform: "translateY(0)",
+          transition:
+            "opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease",
+        }}
+      >
+        <Button
+          size="small"
+          variant="text"
+          onClick={onEdit}
+          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
+        >
+          edit
+        </Button>
+        <Button
+          size="small"
+          variant="text"
+          onClick={onDelete}
+          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
+        >
+          delete
+        </Button>
+        <Button
+          size="small"
+          variant="text"
+          onClick={onMove}
+          sx={{ textTransform: "none", minWidth: 0, px: 0.75 }}
+        >
+          move
+        </Button>
+      </Stack>
+      {children}
+    </Box>
+  );
 };
 
 const TitleItem = ({ content }: { content: string }) => {

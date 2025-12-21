@@ -4,11 +4,11 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import {
   Provider as MarkdownProvider,
   SaveButton,
-  MarkdownContentList,
 } from "@conceptions/Task/Markdown";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Subscriber } from "./Subscriber";
 import { TitleModal } from "./InitModals";
+import TaskOverview from "./TaskOverview";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
@@ -33,7 +33,7 @@ const Task = () => {
             direction="column"
             spacing={1}
           >
-            <MarkdownContentList />
+            <TaskOverview />
           </Stack>
           <Stack spacing={1}>
             <SaveButton />

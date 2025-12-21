@@ -8,8 +8,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 
 import { Popup } from "@composites/Popup";
-import { useContentsSelector } from "@conceptions/Task/Markdown";
-import { useTitleModalOpenSelector } from "../context";
+import { useTitleModalOpenSelector, useContentValueSelector } from "../context";
 import { useTitleModalActions } from "../hooks";
 import type { THeadingLevel, THeadingOption, TTitleModalProps } from "./types";
 import { createId } from "@utils/generation";
@@ -25,28 +24,60 @@ const headingOptions: THeadingOption[] = [
   { value: "h6", label: "H6" },
 ];
 
-export const HeadingLevel = () => {
+export const Fields = () => {
+  const contentValue = useContentValueSelector();
+
+  const selectedHeadingLevel = useMemo<THeadingLevel>(() => {
+    if (!contentValue?.content) {
+      return defaultHeadingLevel;
+    }
+
+    const match = contentValue.content.match(/^(#{1,6})\s+/);
+    if (!match) {
+      return defaultHeadingLevel;
+    }
+
+    const depth = Math.min(match[1].length, 6);
+    const candidate = `h${depth}` as THeadingLevel;
+
+    return headingOptions.some((option) => option.value === candidate)
+      ? candidate
+      : defaultHeadingLevel;
+  }, [contentValue]);
+
   return (
-    <FormControl component="fieldset">
-      <FormLabel component="legend">Heading level</FormLabel>
-      <RadioGroup row name="heading" defaultValue={defaultHeadingLevel}>
-        {headingOptions.map((option) => (
-          <FormControlLabel
-            key={option.value}
-            value={option.value}
-            control={<Radio />}
-            label={option.label}
-          />
-        ))}
-      </RadioGroup>
-    </FormControl>
+    <Stack spacing={2.5}>
+      <TextField
+        name="title"
+        id="title-modal-title"
+        label="Title"
+        placeholder="My section title"
+        autoFocus
+        fullWidth
+        defaultValue={contentValue?.content.replace(/^#+\s*/, "").trim() ?? ""}
+        autoComplete="off"
+      />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Heading level</FormLabel>
+        <RadioGroup row name="heading" defaultValue={selectedHeadingLevel}>
+          {headingOptions.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              value={option.value}
+              control={<Radio />}
+              label={option.label}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
+    </Stack>
   );
 };
 
-export const TitleModal = memo(({ onSuccess }: TTitleModalProps) => {
+export const TitleModal = memo(({ onSuccess, contents }: TTitleModalProps) => {
   const isOpen = useTitleModalOpenSelector();
+
   const { closeModal } = useTitleModalActions();
-  const contents = useContentsSelector();
 
   const handleClose = useCallback(() => {
     closeModal();
@@ -97,20 +128,7 @@ export const TitleModal = memo(({ onSuccess }: TTitleModalProps) => {
       confirmPendingLabel="Adding..."
       formTestId="title-modal-form"
       messageTestId="title-modal-message"
-      content={
-        <Stack spacing={2.5}>
-          <TextField
-            name="title"
-            id="title-modal-title"
-            label="Title"
-            placeholder="My section title"
-            autoFocus
-            fullWidth
-            autoComplete="off"
-          />
-          <HeadingLevel />
-        </Stack>
-      }
+      content={<Fields />}
     />
   );
 });

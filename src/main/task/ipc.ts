@@ -49,7 +49,7 @@ export function registerIpc(): void {
       hash: `window:task/${id}`,
     });
 
-    // window.webContents.toggleDevTools();
+    window.webContents.toggleDevTools();
   });
 
   ipcMainOn(

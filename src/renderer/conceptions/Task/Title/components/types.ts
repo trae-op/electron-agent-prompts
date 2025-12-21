@@ -1,4 +1,5 @@
 export type TTitleModalProps = {
+  contents: TMarkdownContent[];
   onSuccess: (data: TMarkdownContent) => void;
 };
 
