@@ -55,7 +55,7 @@ function renderContent(contentItem: TMarkdownContent) {
       return <CodeItem content={contentItem.content} />;
     case "list":
       return <ListItemBlock content={contentItem.content} />;
-    case "edit":
+    case "text":
     default:
       return <ParagraphItem content={contentItem.content} />;
   }

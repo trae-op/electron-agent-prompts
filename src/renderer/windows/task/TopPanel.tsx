@@ -6,6 +6,7 @@ import CodeIcon from "@mui/icons-material/Code";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 import { useTitleModalActions } from "@conceptions/Task/Title";
+import { useCodeModalActions } from "@conceptions/Task/Code";
 import { TopPanel } from "@layouts/TopPanel";
 
 const items = [
@@ -15,26 +16,30 @@ const items = [
 ];
 
 const ContainerTopPanel = () => {
-  const { openModal } = useTitleModalActions();
+  const { openModal: openTitleModal } = useTitleModalActions();
+  const { openModal: openCodeModal } = useCodeModalActions();
 
-  const handleOpenModal = useCallback((event: MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest("button");
+  const handleOpenModal = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement;
+      const button = target.closest("button");
 
-    if (!button) {
-      return;
-    }
+      if (!button) {
+        return;
+      }
 
-    const action = button.dataset.action;
+      const action = button.dataset.action;
 
-    if (action === "title") {
-      openModal();
-    }
+      if (action === "title") {
+        openTitleModal();
+      }
 
-    if (action === "code" || action === "list") {
-      console.log(`Action: ${action}`);
-    }
-  }, []);
+      if (action === "code") {
+        openCodeModal();
+      }
+    },
+    [openCodeModal, openTitleModal]
+  );
 
   return (
     <TopPanel
