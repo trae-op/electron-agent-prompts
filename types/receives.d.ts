@@ -15,6 +15,7 @@ type TEventPayloadReceive = {
   };
   task: {
     task: TTask;
+    contents: TMarkdownContent[];
   };
 };
 

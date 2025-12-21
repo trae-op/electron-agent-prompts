@@ -30,6 +30,19 @@ function addMarkdownContent(payload: {
   });
 }
 
+function getMarkdownContentByTaskId(taskId: string) {
+  const projectIdStore = getStore<string, string>("projectId");
+
+  if (projectIdStore === undefined) {
+    return;
+  }
+
+  const markdownContent = getElectronStorage("markdownContent") ?? {};
+  const projectMarkdown = markdownContent[projectIdStore] ?? {};
+
+  return projectMarkdown[taskId];
+}
+
 export function registerIpc(): void {
   ipcMainOn("windowTask", (_, { id }) => {
     const window = openWindow({
@@ -50,10 +63,12 @@ export function registerIpc(): void {
       }
 
       const taskFromCache = cacheTask(payload.taskId);
+      const markdownContents = getMarkdownContentByTaskId(payload.taskId);
 
       if (taskFromCache !== undefined) {
         event.reply("task", {
           task: taskFromCache,
+          contents: markdownContents ?? [],
         });
       }
 
@@ -61,6 +76,7 @@ export function registerIpc(): void {
       if (task !== undefined) {
         event.reply("task", {
           task,
+          contents: markdownContents ?? [],
         });
       }
     }
