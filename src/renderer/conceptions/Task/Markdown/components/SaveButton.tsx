@@ -1,11 +1,17 @@
 import Button from "@mui/material/Button";
 import SaveIcon from "@mui/icons-material/Save";
 import { useContentsSelector } from "../context";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
+import { useParams } from "react-router-dom";
 
-export const SaveButton = memo(({ taskId }: { taskId: string }) => {
+export const SaveButton = () => {
+  const { id: taskId } = useParams<{
+    id?: string;
+  }>();
+
   const contents = useContentsSelector();
   const handleSave = useCallback(async () => {
+    if (!taskId) return;
     await window.electron.invoke.markdownContent({
       taskId,
       contents,
@@ -22,6 +28,6 @@ export const SaveButton = memo(({ taskId }: { taskId: string }) => {
       Save
     </Button>
   );
-});
+};
 
 SaveButton.displayName = "SaveButton";

@@ -1,5 +1,4 @@
 import { lazy, Suspense } from "react";
-import { useParams } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import {
@@ -14,17 +13,9 @@ import { TitleModal } from "./InitModals";
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
 const Task = () => {
-  const { id } = useParams<{
-    id?: string;
-  }>();
-
-  if (id === undefined) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <MarkdownProvider>
-      <Subscriber taskId={id} />
+      <Subscriber />
       <TitleProvider>
         <Suspense fallback={<LoadingSpinner />}>
           <LazyTopPanel />
@@ -45,7 +36,7 @@ const Task = () => {
             <MarkdownContentList />
           </Stack>
           <Stack spacing={1}>
-            <SaveButton taskId={id} />
+            <SaveButton />
           </Stack>
         </Stack>
       </TitleProvider>
