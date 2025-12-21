@@ -12,19 +12,13 @@ export const TitleModal = () => {
   const addContentDispatch = useAddContentDispatch();
   const updateContentDispatch = useUpdateContentDispatch();
 
-  const handleSuccess = useCallback(
-    (data: TMarkdownContent) => {
-      addContentDispatch(data);
-    },
-    [addContentDispatch]
-  );
+  const handleSuccess = useCallback((data: TMarkdownContent) => {
+    addContentDispatch(data);
+  }, []);
 
-  const handleUpdate = useCallback(
-    (data: TMarkdownContent) => {
-      updateContentDispatch(data);
-    },
-    [updateContentDispatch]
-  );
+  const handleUpdate = useCallback((data: TMarkdownContent) => {
+    updateContentDispatch(data);
+  }, []);
 
   return (
     <TitleModalComponent

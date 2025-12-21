@@ -17,27 +17,24 @@ const items = [
 const ContainerTopPanel = () => {
   const { openModal } = useTitleModalActions();
 
-  const handleOpenModal = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      const target = event.target as HTMLElement;
-      const button = target.closest("button");
+  const handleOpenModal = useCallback((event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest("button");
 
-      if (!button) {
-        return;
-      }
+    if (!button) {
+      return;
+    }
 
-      const action = button.dataset.action;
+    const action = button.dataset.action;
 
-      if (action === "title") {
-        openModal();
-      }
+    if (action === "title") {
+      openModal();
+    }
 
-      if (action === "code" || action === "list") {
-        console.log(`Action: ${action}`);
-      }
-    },
-    [openModal]
-  );
+    if (action === "code" || action === "list") {
+      console.log(`Action: ${action}`);
+    }
+  }, []);
 
   return (
     <TopPanel
