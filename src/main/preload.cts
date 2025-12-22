@@ -26,6 +26,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("openUpdateApp", (payload) => {
         callback(payload);
       }),
+    subscribeUpdateTask: (
+      callback: (payload: TEventPayloadReceive["updateTask"]) => void
+    ) =>
+      ipcOn("updateTask", (payload) => {
+        callback(payload);
+      }),
     subscribeUser: (
       callback: (payload: TEventPayloadReceive["user"]) => void
     ) =>

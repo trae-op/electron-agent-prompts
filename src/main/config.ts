@@ -69,6 +69,9 @@ export const restApi = {
   urls: {
     base: process.env.BASE_REST_API,
     baseApi: "/api",
+    imageKit: {
+      uploadMarkdown: "/imagekit/upload",
+    },
     auth: {
       base: "/auth",
       google: "/google",

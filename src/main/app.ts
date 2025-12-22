@@ -21,6 +21,7 @@ import { registerIpc as registerIpcDeleteProject } from "./delete-project/ipc.js
 import { registerIpc as registerIpcProjects } from "./projects/ipc.js";
 import { registerIpc as registerIpcCreateTask } from "./create-task/ipc.js";
 import { registerIpc as registerIpcUpdateTask } from "./update-task/ipc.js";
+import { updateTask as updateTaskService } from "./update-task/service.js";
 import { registerIpc as registerIpcDeleteTask } from "./delete-task/ipc.js";
 import { registerIpc as registerIpcUploadFile } from "./upload-file/ipc.js";
 import { registerIpc as registerIpcTask } from "./task/ipc.js";
@@ -102,7 +103,9 @@ app.on("ready", async () => {
   registerIpcPreload();
   registerIpcAppVersion();
   registerIpcUpdater();
-  registerIpcTask();
+  registerIpcTask({
+    updateTask: updateTaskService,
+  });
 
   handleCloseEvents(mainWindow);
 });

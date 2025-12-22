@@ -7,7 +7,7 @@ type TEventPayloadInvoke = {
   updateTask: TTask | undefined;
   deleteTask: boolean;
   uploadFile: undefined;
-  markdownContent: undefined;
+  markdownContent: TTask | undefined;
 };
 
 type TEventSendInvoke = {

@@ -112,15 +112,16 @@ const ContentBlockWrapper = ({
         className="content-block__controls"
         sx={{
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 3,
+          right: 1,
           px: 1,
           py: 0.5,
-          bgcolor: (theme) => theme.palette.background.paper,
-          borderRadius: 1,
-          border: (theme) => `1px solid ${theme.palette.primary.main}`,
+          borderBottomLeftRadius: 3,
+          borderTopRightRadius: 3,
+          backgroundColor: (theme) =>
+            `color-mix(in srgb, color-mix(in srgb, black 20%, grey), ${theme.palette.background.paper})`,
           boxShadow: 1,
-          opacity: 0,
+          opacity: 1,
           visibility: "hidden",
           transform: "translateY(0)",
           transition:
@@ -180,6 +181,10 @@ const TitleItem = ({ content }: { content: string }) => {
       component={headingVariant}
       variant={headingVariant}
       fontWeight={700}
+      sx={{
+        position: "relative",
+        zIndex: 1,
+      }}
     >
       {text}
     </Typography>

@@ -1,6 +1,5 @@
 import { readFile } from "fs/promises";
-import path from "path/posix";
-
+import path from "node:path";
 import { put } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";

@@ -6,9 +6,12 @@ import {
 } from "../context";
 import { Popup } from "@composites/Popup";
 import { TDeleteProjectModalProps } from "./types";
+import { useNavigate } from "react-router-dom";
 
 export const DeleteProjectModal = memo(
   ({ onSuccess }: TDeleteProjectModalProps) => {
+    const navigate = useNavigate();
+
     const project = useDeleteProjectModalProjectSelector();
     const setProject = useSetDeleteProjectModalProjectDispatch();
 
@@ -24,13 +27,14 @@ export const DeleteProjectModal = memo(
           });
 
           if (response === true) {
+            await navigate("/window:main");
             onSuccess(project.id);
             setProject(undefined);
           }
 
           return undefined;
         },
-        [project?.id]
+        [project?.id, navigate]
       ),
       undefined
     );

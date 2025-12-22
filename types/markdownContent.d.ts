@@ -6,3 +6,8 @@ type TMarkdownContent = {
   id: string;
   position: number;
 };
+
+type TMarkdownUploadResponse = {
+  url?: string | null;
+  fileId?: string;
+};

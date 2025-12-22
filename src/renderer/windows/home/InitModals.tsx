@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   useAddNewProjectDispatch,
   useUpdateProjectDispatch,
@@ -40,12 +39,10 @@ export const UpdateProjectModalContainer = () => {
 };
 
 export const DeleteProjectModalContainer = () => {
-  const navigate = useNavigate();
   const removeProject = useRemoveProjectDispatch();
   const setTasks = useSetTasksDispatch();
 
   const onSuccess = useCallback(async (projectId: string) => {
-    await navigate("/window:main");
     removeProject(projectId);
     setTasks([]);
   }, []);
