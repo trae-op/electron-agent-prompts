@@ -8,7 +8,8 @@ import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 import { useContentsSelector } from "../context";
 import {
@@ -17,27 +18,40 @@ import {
   THeadingVariant,
 } from "./types";
 import Divider from "@mui/material/Divider";
+import {
+  normalizeHeading,
+  pickColor,
+  splitListItems,
+  tokenizeSegments,
+} from "../utils";
 
 export const MarkdownContentList = ({
   onUpdate,
   onDelete,
-  onMove,
+  onMoveUp,
+  onMoveDown,
 }: TContentActionHandlers) => {
   const contents = useContentsSelector();
 
   return (
     <Stack spacing={1.5} data-testid="markdown-content-list">
-      {contents.map((contentItem) => {
+      {contents.map((contentItem, index) => {
+        const isFirst = index === 0;
+        const isLast = index === contents.length - 1;
         const handleEdit = () => onUpdate?.(contentItem);
         const handleDelete = () => onDelete?.(contentItem);
-        const handleMove = () => onMove?.(contentItem);
+        const handleMoveUp = () => onMoveUp?.(contentItem);
+        const handleMoveDown = () => onMoveDown?.(contentItem);
 
         return (
           <ContentBlockWrapper
             key={contentItem.id}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onMove={handleMove}
+            onMoveUp={handleMoveUp}
+            onMoveDown={handleMoveDown}
+            disableMoveUp={isFirst}
+            disableMoveDown={isLast}
           >
             {renderContent(contentItem)}
           </ContentBlockWrapper>
@@ -65,7 +79,10 @@ const ContentBlockWrapper = ({
   children,
   onEdit,
   onDelete,
-  onMove,
+  onMoveUp,
+  onMoveDown,
+  disableMoveUp,
+  disableMoveDown,
 }: TContentBlockWrapperProps) => {
   return (
     <Box
@@ -83,6 +100,7 @@ const ContentBlockWrapper = ({
             opacity: 1,
             visibility: "visible",
             transform: "translateY(-2px)",
+            pointerEvents: "auto",
           },
         },
       }}
@@ -93,7 +111,7 @@ const ContentBlockWrapper = ({
         className="content-block__controls"
         sx={{
           position: "absolute",
-          top: -28,
+          top: 8,
           right: 8,
           px: 1,
           py: 0.5,
@@ -106,6 +124,8 @@ const ContentBlockWrapper = ({
           transform: "translateY(0)",
           transition:
             "opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease",
+          pointerEvents: "none",
+          zIndex: 2,
         }}
       >
         <IconButton
@@ -129,13 +149,21 @@ const ContentBlockWrapper = ({
           size="small"
           color="primary"
           disableRipple
-          aria-label="move content block"
-          sx={{
-            cursor: "move",
-          }}
-          onClick={onMove}
+          aria-label="move content block up"
+          onClick={onMoveUp}
+          disabled={disableMoveUp}
         >
-          <DragIndicatorIcon fontSize="small" />
+          <ArrowUpwardIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="primary"
+          disableRipple
+          aria-label="move content block down"
+          onClick={onMoveDown}
+          disabled={disableMoveDown}
+        >
+          <ArrowDownwardIcon fontSize="small" />
         </IconButton>
       </Stack>
       {children}
@@ -144,7 +172,7 @@ const ContentBlockWrapper = ({
 };
 
 const TitleItem = ({ content }: { content: string }) => {
-  const { headingVariant, text } = normalizeHeading(content);
+  const { headingVariant, text } = normalizeHeading<THeadingVariant>(content);
 
   return (
     <Typography
@@ -205,73 +233,6 @@ const CodeItem = ({ content }: { content: string }) => {
   );
 };
 
-type TTokenType =
-  | "keyword"
-  | "string"
-  | "number"
-  | "operator"
-  | "comment"
-  | "text";
-
-const keywordPattern =
-  /\b(const|let|var|function|return|if|else|type|interface|extends|implements|new|import|from|export|default|class|async|await|try|catch|finally|throw|switch|case|break|continue|for|while|do|of|in)\b/;
-
-const operatorPattern = /(===|==|=>|<=|>=|&&|\|\||!=|!==|[=+\-*/%!?<>])/;
-
-const codeTokenizer =
-  /(\/\/[^\n]*|\/\*[\s\S]*?\*\/|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b\d+(?:\.\d+)?\b|===|==|=>|<=|>=|&&|\|\||!=|!==|[=+\-*/%!?<>]|\b(?:const|let|var|function|return|if|else|type|interface|extends|implements|new|import|from|export|default|class|async|await|try|catch|finally|throw|switch|case|break|continue|for|while|do|of|in)\b)/g;
-
-function tokenizeSegments(
-  text: string
-): Array<{ value: string; type: TTokenType }> {
-  const segments: Array<{ value: string; type: TTokenType }> = [];
-  let lastIndex = 0;
-
-  for (const match of text.matchAll(codeTokenizer)) {
-    const matchText = match[0];
-    const start = match.index ?? 0;
-
-    if (start > lastIndex) {
-      segments.push({ value: text.slice(lastIndex, start), type: "text" });
-    }
-
-    segments.push({ value: matchText, type: detectType(matchText) });
-    lastIndex = start + matchText.length;
-  }
-
-  if (lastIndex < text.length) {
-    segments.push({ value: text.slice(lastIndex), type: "text" });
-  }
-
-  return segments;
-}
-
-function detectType(token: string): TTokenType {
-  if (/^\/\//.test(token) || /^\/\*/.test(token)) return "comment";
-  if (/^"/.test(token) || /^'/.test(token) || /^`/.test(token)) return "string";
-  if (keywordPattern.test(token)) return "keyword";
-  if (/^\d/.test(token)) return "number";
-  if (operatorPattern.test(token)) return "operator";
-  return "text";
-}
-
-function pickColor(type: TTokenType, theme: any): string | undefined {
-  switch (type) {
-    case "keyword":
-      return theme.palette.primary.main;
-    case "string":
-      return theme.palette.success.main;
-    case "number":
-      return theme.palette.info.main;
-    case "operator":
-      return theme.palette.warning.main;
-    case "comment":
-      return theme.palette.text.secondary;
-    default:
-      return undefined;
-  }
-}
-
 const ListItemBlock = ({ content }: { content: string }) => {
   const items = splitListItems(content);
 
@@ -287,27 +248,3 @@ const ListItemBlock = ({ content }: { content: string }) => {
     </Paper>
   );
 };
-
-function normalizeHeading(content: string): {
-  headingVariant: THeadingVariant;
-  text: string;
-} {
-  const match = content.match(/^(#{1,6})\s+(.*)$/);
-  if (!match) {
-    return { headingVariant: "h2", text: content };
-  }
-
-  const [, hashes, text] = match;
-  const depth = Math.min(hashes.length, 6);
-  const variant = `h${depth}` as THeadingVariant;
-
-  return { headingVariant: variant, text };
-}
-
-function splitListItems(content: string): string[] {
-  return content
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.replace(/^(?:[-*]\s+)?/, ""));
-}

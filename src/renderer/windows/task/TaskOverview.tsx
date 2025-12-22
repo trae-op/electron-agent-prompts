@@ -2,6 +2,8 @@ import { useCallback } from "react";
 import {
   MarkdownContentList,
   useDeleteContentDispatch,
+  useContentsSelector,
+  useSetContentsDispatch,
 } from "@conceptions/Task/Markdown";
 import {
   useSetContentDispatch,
@@ -30,6 +32,8 @@ const TaskOverview = () => {
   const setTextContent = useSetTextContentDispatch();
   const setTextModalOpen = useSetTextModalOpenDispatch();
   const deleteContent = useDeleteContentDispatch();
+  const contents = useContentsSelector();
+  const setContents = useSetContentsDispatch();
 
   const handleUpdateContent = useCallback(
     (content: TMarkdownContent): void => {
@@ -75,10 +79,53 @@ const TaskOverview = () => {
     [deleteContent]
   );
 
+  const moveContent = useCallback(
+    (contentId: string, direction: "up" | "down"): void => {
+      const currentIndex = contents.findIndex(({ id }) => id === contentId);
+
+      if (currentIndex === -1) return;
+
+      const targetIndex =
+        direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+      if (targetIndex < 0 || targetIndex >= contents.length) return;
+
+      const next = [...contents];
+      [next[currentIndex], next[targetIndex]] = [
+        next[targetIndex],
+        next[currentIndex],
+      ];
+
+      const reindexed = next.map((item, index) => ({
+        ...item,
+        position: index,
+      }));
+
+      setContents(reindexed);
+    },
+    [contents, setContents]
+  );
+
+  const handleMoveUp = useCallback(
+    (content: TMarkdownContent): void => {
+      moveContent(content.id, "up");
+    },
+    [moveContent]
+  );
+
+  const handleMoveDown = useCallback(
+    (content: TMarkdownContent): void => {
+      moveContent(content.id, "down");
+    },
+    [moveContent]
+  );
+
   return (
     <MarkdownContentList
       onUpdate={handleUpdateContent}
       onDelete={handleDeleteContent}
+      onMoveUp={handleMoveUp}
+      onMoveDown={handleMoveDown}
     />
   );
 };
