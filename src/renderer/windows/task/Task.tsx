@@ -9,7 +9,7 @@ import { Provider as TextProvider } from "@conceptions/Task/Text";
 import { Subscriber } from "./Subscriber";
 import { TitleModal, CodeModal, ListModal, TextModal } from "./InitModals";
 import TaskOverview from "./TaskOverview";
-import { SaveMarkdownContentListButton } from "./SaveMarkdownContentListButton";
+import { MarkdownContentListButtons } from "./MarkdownContentListButtons";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
@@ -43,8 +43,8 @@ const Task = () => {
                 >
                   <TaskOverview />
                 </Stack>
-                <Stack spacing={1}>
-                  <SaveMarkdownContentListButton />
+                <Stack spacing={1} width="100%" direction="row">
+                  <MarkdownContentListButtons />
                 </Stack>
               </Stack>
             </TextProvider>

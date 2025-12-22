@@ -93,7 +93,6 @@ const ContentBlockWrapper = ({
         py: 0.75,
         borderRadius: 1,
         border: "1px solid transparent",
-        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           borderColor: (theme) => theme.palette.primary.main,
           boxShadow: (theme) => `0 0 0 1px ${theme.palette.primary.main}`,
@@ -124,8 +123,6 @@ const ContentBlockWrapper = ({
           opacity: 1,
           visibility: "hidden",
           transform: "translateY(0)",
-          transition:
-            "opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease",
           pointerEvents: "none",
           zIndex: 2,
         }}
@@ -244,14 +241,15 @@ const ListItemBlock = ({ content }: { content: string }) => {
   const items = splitListItems(content);
 
   return (
-    <Paper variant="outlined">
+    <Paper variant="outlined" sx={{ border: 0 }}>
       <List
         dense
         disablePadding
         component={listStyle === "numbered" ? "ol" : "ul"}
         sx={{
           listStyleType: listStyle === "numbered" ? "decimal" : "disc",
-          pl: 3,
+          pl: 2,
+
           "& .markdown-list-item": {
             display: "list-item",
           },
@@ -260,7 +258,7 @@ const ListItemBlock = ({ content }: { content: string }) => {
         {items.map((item, index) => (
           <ListItem
             key={`${item}-${index}`}
-            sx={{ py: 0.5, px: 1 }}
+            sx={{ py: 0.5, px: 1, border: 0 }}
             className="markdown-list-item"
           >
             <ListItemText primary={item} />
