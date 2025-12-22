@@ -1,5 +1,8 @@
 import { useCallback } from "react";
-import { MarkdownContentList } from "@conceptions/Task/Markdown";
+import {
+  MarkdownContentList,
+  useDeleteContentDispatch,
+} from "@conceptions/Task/Markdown";
 import {
   useSetContentDispatch,
   useSetTitleModalOpenDispatch,
@@ -26,6 +29,7 @@ const TaskOverview = () => {
   const setListModalOpen = useSetListModalOpenDispatch();
   const setTextContent = useSetTextContentDispatch();
   const setTextModalOpen = useSetTextModalOpenDispatch();
+  const deleteContent = useDeleteContentDispatch();
 
   const handleUpdateContent = useCallback(
     (content: TMarkdownContent): void => {
@@ -64,7 +68,19 @@ const TaskOverview = () => {
     ]
   );
 
-  return <MarkdownContentList onUpdate={handleUpdateContent} />;
+  const handleDeleteContent = useCallback(
+    (content: TMarkdownContent): void => {
+      deleteContent(content.id);
+    },
+    [deleteContent]
+  );
+
+  return (
+    <MarkdownContentList
+      onUpdate={handleUpdateContent}
+      onDelete={handleDeleteContent}
+    />
+  );
 };
 
 export default TaskOverview;

@@ -32,6 +32,7 @@ const Task = () => {
               <CodeModal />
               <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
                 <Stack
+                  overflow="auto"
                   width="calc(100vw - 25px)"
                   height="calc(100vh - 120px)"
                   sx={{
