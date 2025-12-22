@@ -8,7 +8,7 @@ import {
   getElectronStorage,
 } from "../@shared/store.js";
 
-function addMarkdownContent(payload: {
+function saveMarkdownContent(payload: {
   taskId: string;
   contents: TMarkdownContent[];
 }) {
@@ -87,7 +87,7 @@ export function registerIpc(): void {
       return undefined;
     }
 
-    addMarkdownContent(payload);
+    saveMarkdownContent(payload);
 
     return undefined;
   });
