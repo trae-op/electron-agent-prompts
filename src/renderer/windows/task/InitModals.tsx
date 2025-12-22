@@ -2,6 +2,8 @@ import { useCallback } from "react";
 
 import { TitleModal as TitleModalComponent } from "@conceptions/Task/Title";
 import { CodeModal as CodeModalComponent } from "@conceptions/Task/Code";
+import { ListModal as ListModalComponent } from "@conceptions/Task/List";
+import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
 import {
   useAddContentDispatch,
   useContentsSelector,
@@ -57,6 +59,62 @@ export const CodeModal = () => {
 
   return (
     <CodeModalComponent
+      contents={contents}
+      onSuccess={handleSuccess}
+      onUpdate={handleUpdate}
+    />
+  );
+};
+
+export const ListModal = () => {
+  const contents = useContentsSelector();
+  const addContentDispatch = useAddContentDispatch();
+  const updateContentDispatch = useUpdateContentDispatch();
+
+  const handleSuccess = useCallback(
+    (data: TMarkdownContent) => {
+      addContentDispatch(data);
+    },
+    [addContentDispatch]
+  );
+
+  const handleUpdate = useCallback(
+    (data: TMarkdownContent) => {
+      updateContentDispatch(data);
+    },
+    [updateContentDispatch]
+  );
+
+  return (
+    <ListModalComponent
+      contents={contents}
+      onSuccess={handleSuccess}
+      onUpdate={handleUpdate}
+    />
+  );
+};
+
+export const TextModal = () => {
+  const contents = useContentsSelector();
+  const addContentDispatch = useAddContentDispatch();
+  const updateContentDispatch = useUpdateContentDispatch();
+
+  const handleSuccess = useCallback(
+    (data: TMarkdownContent) => {
+      addContentDispatch(data);
+    },
+    [addContentDispatch]
+  );
+
+  const handleUpdate = useCallback(
+    (data: TMarkdownContent) => {
+      updateContentDispatch(data);
+    },
+    [updateContentDispatch]
+  );
+
+  return (
+    <TextModalComponent
       contents={contents}
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}

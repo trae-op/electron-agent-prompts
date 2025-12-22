@@ -94,7 +94,11 @@ const PopupComponent = ({
             p: { xs: 3, sm: 4 },
             boxShadow: (theme) => theme.shadows[6],
             position: "relative",
-            overflow: "hidden",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            overflowX: "hidden",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Stack spacing={3}>

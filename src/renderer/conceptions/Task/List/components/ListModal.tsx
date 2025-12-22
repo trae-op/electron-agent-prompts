@@ -1,0 +1,236 @@
+import {
+  ChangeEvent,
+  memo,
+  useActionState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
+
+import { Popup } from "@composites/Popup";
+import {
+  useListModalOpenSelector,
+  useListContentValueSelector,
+  useSetListContentDispatch,
+} from "../context";
+import { useListModalActions } from "../hooks";
+import type { TListModalProps } from "./types";
+import { createId } from "@utils/generation";
+
+const buildInitialItems = (contentValue?: TMarkdownContent): string[] => {
+  if (!contentValue?.content) {
+    return [""];
+  }
+
+  const items = splitListItems(contentValue.content);
+  return items.length ? items : [""];
+};
+
+const Fields = memo(
+  ({
+    items,
+    onAddItem,
+    onChangeItem,
+    onRemoveItem,
+  }: {
+    items: string[];
+    onAddItem: () => void;
+    onChangeItem: (index: number, value: string) => void;
+    onRemoveItem: (index: number) => void;
+  }) => {
+    return (
+      <Stack spacing={1.75}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography component="h3" variant="subtitle1" fontWeight={600}>
+            List items
+          </Typography>
+          <Tooltip title="Add another item">
+            <IconButton
+              aria-label="add list item"
+              color="primary"
+              onClick={onAddItem}
+              size="small"
+            >
+              <AddCircleOutlineIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+        <Stack spacing={1.25}>
+          {items.map((value, index) => {
+            const onChange = (
+              event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => onChangeItem(index, event.target.value);
+
+            return (
+              <Stack
+                key={`list-item-${index}`}
+                direction="row"
+                alignItems="center"
+                spacing={1}
+              >
+                <TextField
+                  name="items"
+                  label={`Item ${index + 1}`}
+                  placeholder="Enter list item"
+                  value={value}
+                  onChange={onChange}
+                  autoComplete="off"
+                  autoFocus={index === 0}
+                  fullWidth
+                />
+                <IconButton
+                  aria-label="remove list item"
+                  color="inherit"
+                  onClick={() => onRemoveItem(index)}
+                  size="small"
+                  sx={{ mt: 0.5 }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            );
+          })}
+        </Stack>
+      </Stack>
+    );
+  }
+);
+
+export const ListModal = memo(
+  ({ onSuccess, onUpdate, contents }: TListModalProps) => {
+    const isOpen = useListModalOpenSelector();
+    const contentValue = useListContentValueSelector();
+
+    const { closeModal } = useListModalActions();
+    const setContent = useSetListContentDispatch();
+
+    const [items, setItems] = useState<string[]>(() =>
+      buildInitialItems(contentValue)
+    );
+
+    useEffect(() => {
+      setItems(buildInitialItems(contentValue));
+    }, [contentValue]);
+
+    const handleAddItem = useCallback(() => {
+      setItems((prev) => [...prev, ""]);
+    }, []);
+
+    const handleChangeItem = useCallback((index: number, value: string) => {
+      setItems((prev) => {
+        const next = [...prev];
+        next[index] = value;
+        return next;
+      });
+    }, []);
+
+    const handleRemoveItem = useCallback((index: number) => {
+      setItems((prev) => {
+        if (prev.length === 1) {
+          return [""];
+        }
+
+        return prev.filter((_, itemIndex) => itemIndex !== index);
+      });
+    }, []);
+
+    const handleClose = useCallback(() => {
+      setContent(undefined);
+      closeModal();
+    }, [closeModal, setContent]);
+
+    const position = useMemo(() => getNextPosition(contents), [contents]);
+
+    const [_, formAction] = useActionState(
+      useCallback(
+        async (_state: undefined, formData: FormData): Promise<undefined> => {
+          const rawItems = formData.getAll("items");
+          const normalizedItems = rawItems
+            .filter((item): item is string => typeof item === "string")
+            .map((item) => item.trim())
+            .filter(Boolean);
+          const isEditing = Boolean(contentValue);
+
+          if (normalizedItems.length === 0) {
+            return undefined;
+          }
+
+          const content: TMarkdownContent = {
+            id: contentValue?.id ?? createId(),
+            type: "list",
+            content: normalizedItems.map((item) => `- ${item}`).join("\n"),
+            position: contentValue?.position ?? position,
+          };
+
+          if (isEditing && onUpdate) {
+            onUpdate(content);
+          } else {
+            onSuccess(content);
+          }
+
+          handleClose();
+
+          return undefined;
+        },
+        [position, handleClose, onSuccess, onUpdate, contentValue]
+      ),
+      undefined
+    );
+
+    const modalTitle = contentValue ? "Edit list" : "Add list";
+    const confirmLabel = contentValue ? "Save List" : "Add List";
+    const confirmPendingLabel = contentValue ? "Saving..." : "Adding...";
+
+    return (
+      <Popup
+        title={modalTitle}
+        description="Add one or more bullet points for this task section."
+        isOpen={isOpen}
+        onClose={handleClose}
+        formAction={formAction}
+        confirmLabel={confirmLabel}
+        confirmPendingLabel={confirmPendingLabel}
+        formTestId="list-modal-form"
+        messageTestId="list-modal-message"
+        content={
+          <Fields
+            items={items}
+            onAddItem={handleAddItem}
+            onChangeItem={handleChangeItem}
+            onRemoveItem={handleRemoveItem}
+          />
+        }
+      />
+    );
+  }
+);
+
+ListModal.displayName = "ListModal";
+
+function splitListItems(content: string): string[] {
+  return content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.replace(/^(?:[-*]\s+)?/, ""));
+}
+
+function getNextPosition(contents: TMarkdownContent[]): number {
+  if (contents.length === 0) {
+    return 1;
+  }
+
+  const latestPosition = Math.max(
+    ...contents.map((contentItem) => contentItem.position)
+  );
+
+  return latestPosition + 1;
+}

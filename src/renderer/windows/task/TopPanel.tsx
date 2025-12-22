@@ -4,20 +4,26 @@ import IconButton from "@mui/material/IconButton";
 import TitleIcon from "@mui/icons-material/Title";
 import CodeIcon from "@mui/icons-material/Code";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import TextFieldsIcon from "@mui/icons-material/TextFields";
 
 import { useTitleModalActions } from "@conceptions/Task/Title";
 import { useCodeModalActions } from "@conceptions/Task/Code";
+import { useListModalActions } from "@conceptions/Task/List";
+import { useTextModalActions } from "@conceptions/Task/Text";
 import { TopPanel } from "@layouts/TopPanel";
 
 const items = [
   { id: "1", action: "title", label: "title", icon: <TitleIcon /> },
-  { id: "2", action: "list", label: "list", icon: <FormatListBulletedIcon /> },
-  { id: "3", action: "code", label: "code", icon: <CodeIcon /> },
+  { id: "2", action: "text", label: "text", icon: <TextFieldsIcon /> },
+  { id: "3", action: "list", label: "list", icon: <FormatListBulletedIcon /> },
+  { id: "4", action: "code", label: "code", icon: <CodeIcon /> },
 ];
 
 const ContainerTopPanel = () => {
   const { openModal: openTitleModal } = useTitleModalActions();
   const { openModal: openCodeModal } = useCodeModalActions();
+  const { openModal: openListModal } = useListModalActions();
+  const { openModal: openTextModal } = useTextModalActions();
 
   const handleOpenModal = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -34,11 +40,19 @@ const ContainerTopPanel = () => {
         openTitleModal();
       }
 
+      if (action === "text") {
+        openTextModal();
+      }
+
       if (action === "code") {
         openCodeModal();
       }
+
+      if (action === "list") {
+        openListModal();
+      }
     },
-    [openCodeModal, openTitleModal]
+    [openCodeModal, openListModal, openTextModal, openTitleModal]
   );
 
   return (
