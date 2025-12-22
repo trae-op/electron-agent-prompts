@@ -114,7 +114,7 @@ const ContentBlockWrapper = ({
           top: 3,
           right: 1,
           px: 1,
-          py: 0.5,
+          py: 0.2,
           borderBottomLeftRadius: 3,
           borderTopRightRadius: 3,
           backgroundColor: (theme) =>

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -41,6 +42,43 @@ export async function createMarkdownFile(
   return filePath;
 }
 
+export async function loadMarkdownContentFromTaskUrl(
+  task: TTask
+): Promise<TMarkdownContent[] | undefined> {
+  if (!task.url) {
+    return undefined;
+  }
+
+  const response = await get<string>(task.url, {
+    responseType: "text",
+  });
+
+  if (response.error !== undefined) {
+    showErrorMessages({
+      title: "Error request by loadMarkdownContentFromTaskUrl",
+      body: response.error.message,
+    });
+    return undefined;
+  }
+
+  if (typeof response.data !== "string") {
+    return undefined;
+  }
+
+  const parsedContents = parseMarkdownFileContent(response.data);
+
+  if (parsedContents.length === 0) {
+    return undefined;
+  }
+
+  saveMarkdownContent({
+    taskId: String(task.id),
+    contents: parsedContents,
+  });
+
+  return parsedContents;
+}
+
 export function saveMarkdownContent(payload: {
   taskId: string;
   contents: TMarkdownContent[];
@@ -74,4 +112,55 @@ export function getMarkdownContentByTaskId(taskId: string) {
   const projectMarkdown = markdownContent[projectIdStore] ?? {};
 
   return projectMarkdown[taskId];
+}
+
+function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
+  const sections = markdown
+    .split(/\r?\n{2,}/)
+    .map((section) => section.trim())
+    .filter(Boolean);
+
+  return sections.map((section, index) => ({
+    id: randomUUID(),
+    type: detectMarkdownContentType(section),
+    content: section,
+    position: index + 1,
+  }));
+}
+
+function detectMarkdownContentType(content: string): TTypesMarkdownContent {
+  const normalized = content.trim();
+
+  if (/^#{1,6}\s+/.test(normalized)) {
+    return "title";
+  }
+
+  const lines = normalized.split(/\r?\n/).map((line) => line.trim());
+  const isList =
+    lines.length > 0 && lines.every((line) => /^(-|\*|\d+\.)\s+/.test(line));
+
+  if (isList) {
+    return "list";
+  }
+
+  const newlineCount = lines.length - 1;
+  const codeSignals = [
+    ";",
+    "{",
+    "}",
+    "=>",
+    "function",
+    "const ",
+    "let ",
+    "var ",
+  ];
+  const hasCodeSignals = codeSignals.some((signal) =>
+    normalized.includes(signal)
+  );
+
+  if (newlineCount > 0 && hasCodeSignals) {
+    return "code";
+  }
+
+  return "text";
 }

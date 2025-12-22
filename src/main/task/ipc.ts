@@ -8,6 +8,7 @@ import {
   createMarkdownFile,
   getMarkdownContentByTaskId,
   getTask,
+  loadMarkdownContentFromTaskUrl,
   saveMarkdownContent,
 } from "./service.js";
 import { openWindow } from "./window.js";
@@ -40,7 +41,7 @@ export function registerIpc({
       }
 
       const taskFromCache = cacheTask(payload.taskId);
-      const markdownContents = getMarkdownContentByTaskId(payload.taskId);
+      let markdownContents = getMarkdownContentByTaskId(payload.taskId);
 
       if (taskFromCache !== undefined) {
         event.reply("task", {
@@ -50,6 +51,14 @@ export function registerIpc({
       }
 
       const task = await getTask(payload.taskId);
+
+      if (
+        (markdownContents === undefined || markdownContents.length === 0) &&
+        task?.url
+      ) {
+        markdownContents = await loadMarkdownContentFromTaskUrl(task);
+      }
+
       if (task !== undefined) {
         event.reply("task", {
           task,
