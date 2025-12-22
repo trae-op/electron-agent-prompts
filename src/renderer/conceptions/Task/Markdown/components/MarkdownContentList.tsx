@@ -21,6 +21,7 @@ import Divider from "@mui/material/Divider";
 import {
   normalizeHeading,
   pickColor,
+  detectListStyle,
   splitListItems,
   tokenizeSegments,
 } from "../utils";
@@ -234,13 +235,29 @@ const CodeItem = ({ content }: { content: string }) => {
 };
 
 const ListItemBlock = ({ content }: { content: string }) => {
+  const listStyle = detectListStyle(content);
   const items = splitListItems(content);
 
   return (
     <Paper variant="outlined">
-      <List dense disablePadding>
+      <List
+        dense
+        disablePadding
+        component={listStyle === "numbered" ? "ol" : "ul"}
+        sx={{
+          listStyleType: listStyle === "numbered" ? "decimal" : "disc",
+          pl: 3,
+          "& .markdown-list-item": {
+            display: "list-item",
+          },
+        }}
+      >
         {items.map((item, index) => (
-          <ListItem key={`${item}-${index}`} sx={{ py: 0.5, px: 2 }}>
+          <ListItem
+            key={`${item}-${index}`}
+            sx={{ py: 0.5, px: 1 }}
+            className="markdown-list-item"
+          >
             <ListItemText primary={item} />
           </ListItem>
         ))}

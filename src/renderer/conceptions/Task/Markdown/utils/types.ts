@@ -5,3 +5,5 @@ export type TTokenType =
   | "operator"
   | "comment"
   | "text";
+
+export type TListStyle = "bullet" | "numbered";

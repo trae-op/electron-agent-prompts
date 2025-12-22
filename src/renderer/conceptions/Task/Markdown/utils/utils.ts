@@ -1,4 +1,4 @@
-import { TTokenType } from "./types";
+import { TListStyle, TTokenType } from "./types";
 
 export function normalizeHeading<H>(content: string): {
   headingVariant: H;
@@ -21,7 +21,24 @@ export function splitListItems(content: string): string[] {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line) => line.replace(/^(?:[-*]\s+)?/, ""));
+    .map((line) => line.replace(/^(?:[-*]\s+|\d+\.\s+)?/, ""));
+}
+
+export function detectListStyle(content?: string): TListStyle {
+  if (!content) return "bullet";
+
+  const firstLine = content.split(/\r?\n/).find((line) => line.trim().length);
+  if (!firstLine) return "bullet";
+
+  return /^\d+\.\s+/.test(firstLine.trim()) ? "numbered" : "bullet";
+}
+
+export function buildListContent(items: string[], style: TListStyle): string {
+  return items
+    .map((item, index) =>
+      style === "numbered" ? `${index + 1}. ${item}` : `- ${item}`
+    )
+    .join("\n");
 }
 
 export function pickColor(type: TTokenType, theme: any): string | undefined {

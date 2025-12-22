@@ -12,6 +12,11 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import RadioGroup from "@mui/material/RadioGroup";
+import Radio from "@mui/material/Radio";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -24,6 +29,12 @@ import {
 import { useListModalActions } from "../hooks";
 import type { TListModalProps } from "./types";
 import { createId } from "@utils/generation";
+import {
+  buildListContent,
+  detectListStyle,
+  splitListItems,
+} from "@conceptions/Task/Markdown/utils";
+import type { TListStyle } from "@conceptions/Task/Markdown/utils/types";
 
 const buildInitialItems = (contentValue?: TMarkdownContent): string[] => {
   if (!contentValue?.content) {
@@ -40,12 +51,20 @@ const Fields = memo(
     onAddItem,
     onChangeItem,
     onRemoveItem,
+    listStyle,
+    onChangeListStyle,
   }: {
     items: string[];
     onAddItem: () => void;
     onChangeItem: (index: number, value: string) => void;
     onRemoveItem: (index: number) => void;
+    listStyle: TListStyle;
+    onChangeListStyle: (value: TListStyle) => void;
   }) => {
+    const handleListStyleChange = (event: ChangeEvent<HTMLInputElement>) => {
+      onChangeListStyle(event.target.value as TListStyle);
+    };
+
     return (
       <Stack spacing={1.75}>
         <Stack direction="row" alignItems="center" spacing={1}>
@@ -63,6 +82,26 @@ const Fields = memo(
             </IconButton>
           </Tooltip>
         </Stack>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">List style</FormLabel>
+          <RadioGroup
+            row
+            name="list-style"
+            value={listStyle}
+            onChange={handleListStyleChange}
+          >
+            <FormControlLabel
+              value="bullet"
+              control={<Radio size="small" />}
+              label="Bulleted"
+            />
+            <FormControlLabel
+              value="numbered"
+              control={<Radio size="small" />}
+              label="Numbered"
+            />
+          </RadioGroup>
+        </FormControl>
         <Stack spacing={1.25}>
           {items.map((value, index) => {
             const onChange = (
@@ -115,9 +154,13 @@ export const ListModal = memo(
     const [items, setItems] = useState<string[]>(() =>
       buildInitialItems(contentValue)
     );
+    const [listStyle, setListStyle] = useState<TListStyle>(() =>
+      detectListStyle(contentValue?.content)
+    );
 
     useEffect(() => {
       setItems(buildInitialItems(contentValue));
+      setListStyle(detectListStyle(contentValue?.content));
     }, [contentValue]);
 
     const handleAddItem = useCallback(() => {
@@ -166,7 +209,7 @@ export const ListModal = memo(
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "list",
-            content: normalizedItems.map((item) => `- ${item}`).join("\n"),
+            content: buildListContent(normalizedItems, listStyle),
             position: contentValue?.position ?? position,
           };
 
@@ -180,7 +223,7 @@ export const ListModal = memo(
 
           return undefined;
         },
-        [position, handleClose, onSuccess, onUpdate, contentValue]
+        [position, handleClose, onSuccess, onUpdate, contentValue, listStyle]
       ),
       undefined
     );
@@ -206,6 +249,8 @@ export const ListModal = memo(
             onAddItem={handleAddItem}
             onChangeItem={handleChangeItem}
             onRemoveItem={handleRemoveItem}
+            listStyle={listStyle}
+            onChangeListStyle={setListStyle}
           />
         }
       />
@@ -214,14 +259,6 @@ export const ListModal = memo(
 );
 
 ListModal.displayName = "ListModal";
-
-function splitListItems(content: string): string[] {
-  return content
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.replace(/^(?:[-*]\s+)?/, ""));
-}
 
 function getNextPosition(contents: TMarkdownContent[]): number {
   if (contents.length === 0) {
