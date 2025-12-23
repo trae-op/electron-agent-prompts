@@ -4,6 +4,7 @@ import { put } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";
 import { getStore, setStore } from "../@shared/store.js";
+import { cacheWindows } from "../@shared/control-window/cache.js";
 
 export async function updateTask(
   payload: TEventSendInvoke["updateTask"]
@@ -50,6 +51,13 @@ export async function updateTask(
     });
 
     return undefined;
+  }
+
+  if (data.fileId !== undefined) {
+    const hasCacheWindow = cacheWindows.has(`window:task/${id}`);
+    if (hasCacheWindow !== undefined) {
+      cacheWindows.delete(`window:task/${id}`);
+    }
   }
 
   setStore("uploadedFilePath", undefined);
