@@ -182,6 +182,15 @@ const TitleItem = ({ content }: { content: string }) => {
       sx={{
         position: "relative",
         zIndex: 1,
+        fontSize:
+          headingVariant === "h1"
+            ? "2rem"
+            : headingVariant === "h2"
+            ? "1.65rem"
+            : headingVariant === "h3"
+            ? "1.45rem"
+            : "1.25rem",
+        lineHeight: 1.2,
       }}
     >
       {inlineSegments}
