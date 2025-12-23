@@ -4,10 +4,12 @@ import { TitleModal as TitleModalComponent } from "@conceptions/Task/Title";
 import { CodeModal as CodeModalComponent } from "@conceptions/Task/Code";
 import { ListModal as ListModalComponent } from "@conceptions/Task/List";
 import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
+import { PositionModal as PositionModalComponent } from "@conceptions/Position";
 import { TextControlPanel } from "@conceptions/Task/TextControlPanel";
 import {
   useAddContentDispatch,
   useContentsSelector,
+  useSetContentsDispatch,
   useUpdateContentDispatch,
 } from "@conceptions/Task/Markdown";
 
@@ -37,6 +39,22 @@ export const TitleModal = () => {
       onUpdate={handleUpdate}
       controlPanel={<TextControlPanel />}
     />
+  );
+};
+
+export const PositionModal = () => {
+  const contents = useContentsSelector();
+  const setContents = useSetContentsDispatch();
+
+  const handleReorder = useCallback(
+    (data: TMarkdownContent[]) => {
+      setContents(data);
+    },
+    [setContents]
+  );
+
+  return (
+    <PositionModalComponent contents={contents} onReorder={handleReorder} />
   );
 };
 

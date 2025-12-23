@@ -21,6 +21,10 @@ import {
   useSetTextContentDispatch,
   useSetTextModalOpenDispatch,
 } from "@conceptions/Task/Text";
+import {
+  useSetPositionContentDispatch,
+  usePositionModalActions,
+} from "@conceptions/Position";
 
 const TaskOverview = () => {
   const setContent = useSetContentDispatch();
@@ -31,6 +35,8 @@ const TaskOverview = () => {
   const setListModalOpen = useSetListModalOpenDispatch();
   const setTextContent = useSetTextContentDispatch();
   const setTextModalOpen = useSetTextModalOpenDispatch();
+  const setPositionContent = useSetPositionContentDispatch();
+  const { openModal: openPositionModal } = usePositionModalActions();
   const deleteContent = useDeleteContentDispatch();
   const contents = useContentsSelector();
   const setContents = useSetContentsDispatch();
@@ -81,9 +87,10 @@ const TaskOverview = () => {
 
   const handlePositionContent = useCallback(
     (content: TMarkdownContent): void => {
-      // Implement the logic for positioning content here
+      setPositionContent(content);
+      openPositionModal();
     },
-    []
+    [openPositionModal, setPositionContent]
   );
 
   const moveContent = useCallback(

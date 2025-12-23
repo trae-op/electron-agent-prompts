@@ -6,8 +6,15 @@ import { Provider as CodeProvider } from "@conceptions/Task/Code";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Provider as ListProvider } from "@conceptions/Task/List";
 import { Provider as TextProvider } from "@conceptions/Task/Text";
+import { Provider as PositionProvider } from "@conceptions/Position";
 import { Subscriber } from "./Subscriber";
-import { TitleModal, CodeModal, ListModal, TextModal } from "./InitModals";
+import {
+  TitleModal,
+  CodeModal,
+  ListModal,
+  TextModal,
+  PositionModal,
+} from "./InitModals";
 import TaskOverview from "./TaskOverview";
 import { MarkdownContentListButtons } from "./MarkdownContentListButtons";
 
@@ -21,32 +28,35 @@ const Task = () => {
         <TitleProvider>
           <ListProvider>
             <TextProvider>
-              <Suspense fallback={<LoadingSpinner />}>
-                <LazyTopPanel />
-              </Suspense>
-              <TitleModal />
-              <ListModal />
-              <TextModal />
-              <CodeModal />
-              <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
-                <Stack
-                  overflow="auto"
-                  width="calc(100vw - 25px)"
-                  height="calc(100vh - 120px)"
-                  sx={{
-                    "&::-webkit-scrollbar": {
-                      width: 0,
-                    },
-                  }}
-                  direction="column"
-                  spacing={1}
-                >
-                  <TaskOverview />
+              <PositionProvider>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <LazyTopPanel />
+                </Suspense>
+                <TitleModal />
+                <ListModal />
+                <TextModal />
+                <CodeModal />
+                <PositionModal />
+                <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
+                  <Stack
+                    overflow="auto"
+                    width="calc(100vw - 25px)"
+                    height="calc(100vh - 120px)"
+                    sx={{
+                      "&::-webkit-scrollbar": {
+                        width: 0,
+                      },
+                    }}
+                    direction="column"
+                    spacing={1}
+                  >
+                    <TaskOverview />
+                  </Stack>
+                  <Stack spacing={1} width="100%" direction="row">
+                    <MarkdownContentListButtons />
+                  </Stack>
                 </Stack>
-                <Stack spacing={1} width="100%" direction="row">
-                  <MarkdownContentListButtons />
-                </Stack>
-              </Stack>
+              </PositionProvider>
             </TextProvider>
           </ListProvider>
         </TitleProvider>
