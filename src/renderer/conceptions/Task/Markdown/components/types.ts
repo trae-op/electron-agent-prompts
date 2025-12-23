@@ -17,11 +17,14 @@ export type TContentActionHandlers = {
   onDelete?: (content: TMarkdownContent) => void;
   onMoveUp?: (content: TMarkdownContent) => void;
   onMoveDown?: (content: TMarkdownContent) => void;
+  onPosition?: (content: TMarkdownContent) => void;
 };
 
 export type TContentBlockWrapperProps = {
   children: ReactNode;
+  index: number;
   onEdit?: () => void;
+  onPosition?: () => void;
   onDelete?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;

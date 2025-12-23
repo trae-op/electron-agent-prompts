@@ -10,6 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ControlCameraIcon from "@mui/icons-material/ControlCamera";
 
 import { useContentsSelector } from "../context";
 import {
@@ -25,12 +26,14 @@ import {
   splitListItems,
   tokenizeSegments,
 } from "../utils";
+import { useMemo } from "react";
 
 export const MarkdownContentList = ({
   onUpdate,
   onDelete,
   onMoveUp,
   onMoveDown,
+  onPosition,
 }: TContentActionHandlers) => {
   const contents = useContentsSelector();
 
@@ -43,12 +46,15 @@ export const MarkdownContentList = ({
         const handleDelete = () => onDelete?.(contentItem);
         const handleMoveUp = () => onMoveUp?.(contentItem);
         const handleMoveDown = () => onMoveDown?.(contentItem);
+        const handlePosition = () => onPosition?.(contentItem);
 
         return (
           <ContentBlockWrapper
             key={contentItem.id}
+            index={index}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onPosition={handlePosition}
             onMoveUp={handleMoveUp}
             onMoveDown={handleMoveDown}
             disableMoveUp={isFirst}
@@ -78,10 +84,12 @@ function renderContent(contentItem: TMarkdownContent) {
 
 const ContentBlockWrapper = ({
   children,
+  index,
   onEdit,
   onDelete,
   onMoveUp,
   onMoveDown,
+  onPosition,
   disableMoveUp,
   disableMoveDown,
 }: TContentBlockWrapperProps) => {
@@ -144,6 +152,26 @@ const ContentBlockWrapper = ({
           <DeleteIcon fontSize="small" />
         </IconButton>
         <Divider orientation="vertical" flexItem />
+        <Typography
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          variant="body2"
+          fontWeight={700}
+        >
+          <span>{index + 1}</span>
+        </Typography>
+        <IconButton
+          size="small"
+          color="primary"
+          aria-label="position content block"
+          onClick={onPosition}
+        >
+          <ControlCameraIcon fontSize="small" />
+        </IconButton>
+        <Divider orientation="vertical" flexItem />
         <IconButton
           size="small"
           color="primary"
@@ -173,6 +201,19 @@ const ContentBlockWrapper = ({
 const TitleItem = ({ content }: { content: string }) => {
   const { headingVariant, text } = normalizeHeading<THeadingVariant>(content);
   const inlineSegments = renderInlineSegments(text);
+  const fontSize = useMemo(() => {
+    switch (headingVariant) {
+      case "h1":
+        return "2rem";
+      case "h2":
+        return "1.65rem";
+      case "h3":
+        return "1.45rem";
+      case "h4":
+      default:
+        return "1.25rem";
+    }
+  }, [headingVariant]);
 
   return (
     <Typography
@@ -182,14 +223,7 @@ const TitleItem = ({ content }: { content: string }) => {
       sx={{
         position: "relative",
         zIndex: 1,
-        fontSize:
-          headingVariant === "h1"
-            ? "2rem"
-            : headingVariant === "h2"
-            ? "1.65rem"
-            : headingVariant === "h3"
-            ? "1.45rem"
-            : "1.25rem",
+        fontSize,
         lineHeight: 1.2,
       }}
     >

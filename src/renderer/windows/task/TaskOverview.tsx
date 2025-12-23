@@ -79,6 +79,13 @@ const TaskOverview = () => {
     [deleteContent]
   );
 
+  const handlePositionContent = useCallback(
+    (content: TMarkdownContent): void => {
+      // Implement the logic for positioning content here
+    },
+    []
+  );
+
   const moveContent = useCallback(
     (contentId: string, direction: "up" | "down"): void => {
       const currentIndex = contents.findIndex(({ id }) => id === contentId);
@@ -125,6 +132,7 @@ const TaskOverview = () => {
       onUpdate={handleUpdateContent}
       onDelete={handleDeleteContent}
       onMoveUp={handleMoveUp}
+      onPosition={handlePositionContent}
       onMoveDown={handleMoveDown}
     />
   );
