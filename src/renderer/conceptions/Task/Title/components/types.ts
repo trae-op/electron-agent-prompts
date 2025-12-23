@@ -1,7 +1,10 @@
+import { ReactNode } from "react";
+
 export type TTitleModalProps = {
   contents: TMarkdownContent[];
   onSuccess: (data: TMarkdownContent) => void;
   onUpdate?: (data: TMarkdownContent) => void;
+  controlPanel?: ReactNode;
 };
 
 export type THeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";

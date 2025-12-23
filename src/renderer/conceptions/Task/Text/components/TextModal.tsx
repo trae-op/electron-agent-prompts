@@ -1,4 +1,4 @@
-import { memo, useActionState, useCallback, useMemo } from "react";
+import { ReactNode, memo, useActionState, useCallback, useMemo } from "react";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
@@ -12,27 +12,36 @@ import { useTextModalActions } from "../hooks";
 import type { TTextModalProps } from "./types";
 import { createId } from "@utils/generation";
 
-const Fields = memo(({ contentValue }: { contentValue?: TMarkdownContent }) => {
-  return (
-    <Stack spacing={2.5}>
-      <TextField
-        name="text"
-        id="text-modal-textarea"
-        label="Text"
-        placeholder="Add supporting details"
-        autoFocus
-        fullWidth
-        multiline
-        minRows={4}
-        defaultValue={contentValue?.content ?? ""}
-        autoComplete="off"
-      />
-    </Stack>
-  );
-});
+const Fields = memo(
+  ({
+    contentValue,
+    controlPanel,
+  }: {
+    contentValue?: TMarkdownContent;
+    controlPanel?: ReactNode;
+  }) => {
+    return (
+      <Stack spacing={1}>
+        {Boolean(controlPanel) && controlPanel}
+        <TextField
+          name="text"
+          id="text-modal-textarea"
+          label="Text"
+          placeholder="Add supporting details"
+          autoFocus
+          fullWidth
+          multiline
+          minRows={4}
+          defaultValue={contentValue?.content ?? ""}
+          autoComplete="off"
+        />
+      </Stack>
+    );
+  }
+);
 
 export const TextModal = memo(
-  ({ onSuccess, onUpdate, contents }: TTextModalProps) => {
+  ({ onSuccess, onUpdate, contents, controlPanel }: TTextModalProps) => {
     const isOpen = useTextModalOpenSelector();
     const contentValue = useTextContentValueSelector();
 
@@ -95,7 +104,9 @@ export const TextModal = memo(
         confirmPendingLabel={confirmPendingLabel}
         formTestId="text-modal-form"
         messageTestId="text-modal-message"
-        content={<Fields contentValue={contentValue} />}
+        content={
+          <Fields contentValue={contentValue} controlPanel={controlPanel} />
+        }
       />
     );
   }

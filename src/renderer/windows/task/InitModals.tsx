@@ -4,6 +4,7 @@ import { TitleModal as TitleModalComponent } from "@conceptions/Task/Title";
 import { CodeModal as CodeModalComponent } from "@conceptions/Task/Code";
 import { ListModal as ListModalComponent } from "@conceptions/Task/List";
 import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
+import { TextControlPanel } from "@conceptions/Task/TextControlPanel";
 import {
   useAddContentDispatch,
   useContentsSelector,
@@ -34,6 +35,7 @@ export const TitleModal = () => {
       contents={contents}
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}
+      controlPanel={<TextControlPanel />}
     />
   );
 };
@@ -90,6 +92,7 @@ export const ListModal = () => {
       contents={contents}
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}
+      controlPanel={<TextControlPanel />}
     />
   );
 };
@@ -118,6 +121,7 @@ export const TextModal = () => {
       contents={contents}
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}
+      controlPanel={<TextControlPanel />}
     />
   );
 };

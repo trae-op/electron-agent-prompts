@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  ReactNode,
   memo,
   useActionState,
   useCallback,
@@ -11,12 +12,10 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -53,6 +52,7 @@ const Fields = memo(
     onRemoveItem,
     listStyle,
     onChangeListStyle,
+    controlPanel,
   }: {
     items: string[];
     onAddItem: () => void;
@@ -60,18 +60,59 @@ const Fields = memo(
     onRemoveItem: (index: number) => void;
     listStyle: TListStyle;
     onChangeListStyle: (value: TListStyle) => void;
+    controlPanel?: ReactNode;
   }) => {
     const handleListStyleChange = (event: ChangeEvent<HTMLInputElement>) => {
       onChangeListStyle(event.target.value as TListStyle);
     };
 
     return (
-      <Stack spacing={1.75}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography component="h3" variant="subtitle1" fontWeight={600}>
-            List items
-          </Typography>
-          <Tooltip title="Add another item">
+      <Stack spacing={1}>
+        <FormControl
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "row",
+          }}
+          component="fieldset"
+        >
+          <RadioGroup
+            row
+            name="list-style"
+            value={listStyle}
+            onChange={handleListStyleChange}
+          >
+            <FormControlLabel
+              value="bullet"
+              control={
+                <Radio
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    mr: 0.5,
+                  }}
+                  size="small"
+                />
+              }
+              label="Bulleted"
+            />
+            <FormControlLabel
+              value="numbered"
+              control={
+                <Radio
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    mr: 0.5,
+                  }}
+                  size="small"
+                />
+              }
+              label="Numbered"
+            />
+          </RadioGroup>
+
+          <Tooltip placement="top" arrow title="Add another item">
             <IconButton
               aria-label="add list item"
               color="primary"
@@ -81,26 +122,8 @@ const Fields = memo(
               <AddCircleOutlineIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-        </Stack>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">List style</FormLabel>
-          <RadioGroup
-            row
-            name="list-style"
-            value={listStyle}
-            onChange={handleListStyleChange}
-          >
-            <FormControlLabel
-              value="bullet"
-              control={<Radio size="small" />}
-              label="Bulleted"
-            />
-            <FormControlLabel
-              value="numbered"
-              control={<Radio size="small" />}
-              label="Numbered"
-            />
-          </RadioGroup>
+
+          {Boolean(controlPanel) && controlPanel}
         </FormControl>
         <Stack spacing={1.25}>
           {items.map((value, index) => {
@@ -144,7 +167,7 @@ const Fields = memo(
 );
 
 export const ListModal = memo(
-  ({ onSuccess, onUpdate, contents }: TListModalProps) => {
+  ({ onSuccess, onUpdate, contents, controlPanel }: TListModalProps) => {
     const isOpen = useListModalOpenSelector();
     const contentValue = useListContentValueSelector();
 
@@ -251,6 +274,7 @@ export const ListModal = memo(
             onRemoveItem={handleRemoveItem}
             listStyle={listStyle}
             onChangeListStyle={setListStyle}
+            controlPanel={controlPanel}
           />
         }
       />

@@ -172,6 +172,7 @@ const ContentBlockWrapper = ({
 
 const TitleItem = ({ content }: { content: string }) => {
   const { headingVariant, text } = normalizeHeading<THeadingVariant>(content);
+  const inlineSegments = renderInlineSegments(text);
 
   return (
     <Typography
@@ -183,15 +184,17 @@ const TitleItem = ({ content }: { content: string }) => {
         zIndex: 1,
       }}
     >
-      {text}
+      {inlineSegments}
     </Typography>
   );
 };
 
 const ParagraphItem = ({ content }: { content: string }) => {
+  const inlineSegments = renderInlineSegments(content);
+
   return (
-    <Typography variant="body1" color="text.primary">
-      {content}
+    <Typography variant="body1" color="text.primary" component="div">
+      {inlineSegments}
     </Typography>
   );
 };
@@ -261,10 +264,97 @@ const ListItemBlock = ({ content }: { content: string }) => {
             sx={{ py: 0.5, px: 1, border: 0 }}
             className="markdown-list-item"
           >
-            <ListItemText primary={item} />
+            <ListItemText
+              primary={
+                <Typography component="span" variant="body1">
+                  {renderInlineSegments(item)}
+                </Typography>
+              }
+            />
           </ListItem>
         ))}
       </List>
     </Paper>
   );
 };
+
+type TInlineSegment = {
+  type: "text" | "bold" | "code";
+  value: string;
+};
+
+function renderInlineSegments(content: string) {
+  const pattern = /(\*\*[^*]+?\*\*|`[^`]+?`)/g;
+  const segments: TInlineSegment[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({
+        type: "text",
+        value: content.slice(lastIndex, match.index),
+      });
+    }
+
+    const token = match[0];
+
+    if (token.startsWith("**")) {
+      segments.push({ type: "bold", value: token.slice(2, -2) });
+    } else if (token.startsWith("`")) {
+      segments.push({ type: "code", value: token.slice(1, -1) });
+    }
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < content.length) {
+    segments.push({ type: "text", value: content.slice(lastIndex) });
+  }
+
+  return segments.map((segment, index) => {
+    if (segment.type === "bold") {
+      return (
+        <Box
+          component="strong"
+          key={`${segment.type}-${index}`}
+          sx={{ fontWeight: 900 }}
+        >
+          {segment.value}
+        </Box>
+      );
+    }
+
+    if (segment.type === "code") {
+      return (
+        <Box
+          component="code"
+          key={`${segment.type}-${index}`}
+          sx={(theme) => ({
+            display: "inline-block",
+            px: 0.75,
+            py: 0.25,
+            borderRadius: 1,
+            fontSize: "0.95em",
+            fontFamily:
+              "Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace",
+            backgroundColor: theme.palette.action.hover,
+            border: `1px solid ${theme.palette.divider}`,
+          })}
+        >
+          {segment.value}
+        </Box>
+      );
+    }
+
+    return (
+      <Box
+        component="span"
+        key={`${segment.type}-${index}`}
+        sx={{ whiteSpace: "pre-wrap", display: "inline" }}
+      >
+        {segment.value}
+      </Box>
+    );
+  });
+}

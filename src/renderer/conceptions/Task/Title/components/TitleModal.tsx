@@ -1,8 +1,7 @@
-import { memo, useActionState, useCallback, useMemo } from "react";
+import { ReactNode, memo, useActionState, useCallback, useMemo } from "react";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
@@ -29,7 +28,13 @@ const headingOptions: THeadingOption[] = [
 ];
 
 export const Fields = memo(
-  ({ contentValue }: { contentValue?: TMarkdownContent }) => {
+  ({
+    contentValue,
+    controlPanel,
+  }: {
+    contentValue?: TMarkdownContent;
+    controlPanel?: ReactNode;
+  }) => {
     const selectedHeadingLevel = useMemo<THeadingLevel>(() => {
       if (!contentValue?.content) {
         return defaultHeadingLevel;
@@ -49,7 +54,8 @@ export const Fields = memo(
     }, [contentValue]);
 
     return (
-      <Stack spacing={2.5}>
+      <Stack spacing={1}>
+        {Boolean(controlPanel) && controlPanel}
         <TextField
           name="title"
           id="title-modal-title"
@@ -63,7 +69,6 @@ export const Fields = memo(
           autoComplete="off"
         />
         <FormControl component="fieldset">
-          <FormLabel component="legend">Heading level</FormLabel>
           <RadioGroup row name="heading" defaultValue={selectedHeadingLevel}>
             {headingOptions.map((option) => (
               <FormControlLabel
@@ -81,7 +86,7 @@ export const Fields = memo(
 );
 
 export const TitleModal = memo(
-  ({ onSuccess, onUpdate, contents }: TTitleModalProps) => {
+  ({ onSuccess, onUpdate, contents, controlPanel }: TTitleModalProps) => {
     const isOpen = useTitleModalOpenSelector();
     const contentValue = useContentValueSelector();
 
@@ -143,7 +148,9 @@ export const TitleModal = memo(
         confirmPendingLabel="Adding..."
         formTestId="title-modal-form"
         messageTestId="title-modal-message"
-        content={<Fields contentValue={contentValue} />}
+        content={
+          <Fields contentValue={contentValue} controlPanel={controlPanel} />
+        }
       />
     );
   }
