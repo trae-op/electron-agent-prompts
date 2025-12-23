@@ -51,6 +51,7 @@ export async function loadMarkdownContentFromTaskUrl(
 
   const response = await get<string>(task.url, {
     responseType: "text",
+    isCache: false,
   });
 
   if (response.error !== undefined) {
@@ -115,17 +116,85 @@ export function getMarkdownContentByTaskId(taskId: string) {
 }
 
 function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
-  const sections = markdown
-    .split(/\r?\n{2,}/)
-    .map((section) => section.trim())
-    .filter(Boolean);
+  const blocks: TMarkdownContent[] = [];
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
 
-  return sections.map((section, index) => ({
-    id: randomUUID(),
-    type: detectMarkdownContentType(section),
-    content: section,
-    position: index + 1,
-  }));
+  let textBuffer: string[] = [];
+  let codeBuffer: string[] = [];
+  let insideCode = false;
+
+  const pushBlock = (content: string, explicitType?: TTypesMarkdownContent) => {
+    const normalizedContent =
+      explicitType === "code"
+        ? content.replace(/^\n+|\n+$/g, "")
+        : content.trim();
+
+    if (!normalizedContent) {
+      return;
+    }
+
+    const type = explicitType ?? detectMarkdownContentType(normalizedContent);
+
+    blocks.push({
+      id: randomUUID(),
+      type,
+      content: normalizedContent,
+      position: blocks.length + 1,
+    });
+  };
+
+  const flushTextBuffer = () => {
+    if (textBuffer.length === 0) {
+      return;
+    }
+
+    const content = textBuffer.join("\n");
+    pushBlock(content);
+    textBuffer = [];
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (insideCode) {
+      if (trimmed.startsWith("```")) {
+        pushBlock(codeBuffer.join("\n"), "code");
+        codeBuffer = [];
+        insideCode = false;
+      } else {
+        codeBuffer.push(line);
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith("```")) {
+      flushTextBuffer();
+      insideCode = true;
+      codeBuffer = [];
+      continue;
+    }
+
+    if (trimmed === "") {
+      flushTextBuffer();
+      continue;
+    }
+
+    if (/^#{1,6}\s+/.test(trimmed)) {
+      flushTextBuffer();
+      pushBlock(trimmed, "title");
+      continue;
+    }
+
+    textBuffer.push(line);
+  }
+
+  if (insideCode) {
+    pushBlock(codeBuffer.join("\n"), "code");
+  } else {
+    flushTextBuffer();
+  }
+
+  return blocks;
 }
 
 function detectMarkdownContentType(content: string): TTypesMarkdownContent {
