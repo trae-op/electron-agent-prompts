@@ -24,7 +24,7 @@ import {
 import {
   useSetPositionContentDispatch,
   usePositionModalActions,
-} from "@conceptions/Position";
+} from "@conceptions/Task/Position";
 
 const TaskOverview = () => {
   const setContent = useSetContentDispatch();

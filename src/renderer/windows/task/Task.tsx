@@ -6,7 +6,7 @@ import { Provider as CodeProvider } from "@conceptions/Task/Code";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Provider as ListProvider } from "@conceptions/Task/List";
 import { Provider as TextProvider } from "@conceptions/Task/Text";
-import { Provider as PositionProvider } from "@conceptions/Position";
+import { Provider as PositionProvider } from "@conceptions/Task/Position";
 import { Subscriber } from "./Subscriber";
 import {
   TitleModal,

@@ -4,7 +4,7 @@ import { TitleModal as TitleModalComponent } from "@conceptions/Task/Title";
 import { CodeModal as CodeModalComponent } from "@conceptions/Task/Code";
 import { ListModal as ListModalComponent } from "@conceptions/Task/List";
 import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
-import { PositionModal as PositionModalComponent } from "@conceptions/Position";
+import { PositionModal as PositionModalComponent } from "@conceptions/Task/Position";
 import { TextControlPanel } from "@conceptions/Task/TextControlPanel";
 import {
   useAddContentDispatch,
