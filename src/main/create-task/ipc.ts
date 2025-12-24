@@ -3,7 +3,12 @@ import { createTask } from "./service.js";
 
 export function registerIpc({
   saveFoldersContent,
+  getFoldersContentByTaskId,
 }: {
+  getFoldersContentByTaskId: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => string[] | undefined;
   saveFoldersContent: (payload: {
     projectId: string;
     taskId: string;
@@ -17,6 +22,10 @@ export function registerIpc({
 
     const result = await createTask(payload);
 
+    if (result === undefined) {
+      return undefined;
+    }
+
     if (result !== undefined && payload.folderPaths !== undefined) {
       saveFoldersContent({
         projectId: payload.projectId,
@@ -25,6 +34,12 @@ export function registerIpc({
       });
     }
 
-    return result;
+    return {
+      ...result,
+      foldersContentFiles: getFoldersContentByTaskId(
+        String(result.id),
+        payload.projectId
+      ),
+    };
   });
 }

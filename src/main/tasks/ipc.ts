@@ -1,31 +1,8 @@
 import { ipcMainOn } from "../@shared/utils.js";
 import { cacheTasks } from "../@shared/cache-responses.js";
-import { getTasks } from "./service.js";
+import { foldersContentFiles, getTasks } from "./service.js";
 import { setStore } from "../@shared/store.js";
-
-type TGetFoldersContentByProjectId = {
-  getFoldersContentByProjectId: (projectId?: string | undefined) =>
-    | {
-        [key: string]: string[] | undefined;
-      }
-    | undefined;
-};
-
-function foldersContentFiles(
-  getFoldersContentByProjectId: TGetFoldersContentByProjectId["getFoldersContentByProjectId"],
-  tasks: TTaskWithFoldersContent[],
-  projectId: string
-) {
-  const foldersContentFiles = getFoldersContentByProjectId(projectId + "");
-
-  return tasks.map((task) => ({
-    ...task,
-    foldersContentFiles:
-      foldersContentFiles && foldersContentFiles[task.id + ""]
-        ? foldersContentFiles[task.id + ""]
-        : [],
-  }));
-}
+import { TGetFoldersContentByProjectId } from "./types.js";
 
 export function registerIpc({
   getFoldersContentByProjectId,

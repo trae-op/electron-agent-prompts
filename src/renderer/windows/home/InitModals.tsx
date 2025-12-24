@@ -53,7 +53,7 @@ export const DeleteProjectModalContainer = () => {
 export const CreateTaskModalContainer = () => {
   const addNewTask = useAddNewTaskDispatch();
 
-  const onSuccess = useCallback((data: TTask) => {
+  const onSuccess = useCallback((data: TTaskWithFoldersContent) => {
     addNewTask(data);
   }, []);
 
@@ -63,7 +63,7 @@ export const CreateTaskModalContainer = () => {
 export const UpdateTaskModalContainer = () => {
   const updateTask = useUpdateTaskDispatch();
 
-  const onSuccess = useCallback((data: TTask) => {
+  const onSuccess = useCallback((data: TTaskWithFoldersContent) => {
     updateTask(data);
   }, []);
 

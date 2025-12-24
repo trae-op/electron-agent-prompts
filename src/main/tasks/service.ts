@@ -2,6 +2,7 @@ import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";
 import { buildTasksEndpoint } from "../@shared/utils.js";
+import { TGetFoldersContentByProjectId } from "./types.js";
 
 export async function getTasks<R extends TTask[]>(
   projectId: number
@@ -18,4 +19,20 @@ export async function getTasks<R extends TTask[]>(
   }
 
   return response.data;
+}
+
+export function foldersContentFiles(
+  getFoldersContentByProjectId: TGetFoldersContentByProjectId["getFoldersContentByProjectId"],
+  tasks: TTaskWithFoldersContent[],
+  projectId: string
+) {
+  const foldersContentFiles = getFoldersContentByProjectId(projectId + "");
+
+  return tasks.map((task) => ({
+    ...task,
+    foldersContentFiles:
+      foldersContentFiles && foldersContentFiles[task.id + ""]
+        ? foldersContentFiles[task.id + ""]
+        : [],
+  }));
 }

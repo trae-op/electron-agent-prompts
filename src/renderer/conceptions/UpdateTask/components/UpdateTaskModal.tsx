@@ -41,21 +41,26 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const extractFolderPath = (file: File): string | undefined => {
+const extractFolderPath = (
+  file: File,
+  resolvedPath?: string
+): string | undefined => {
   const fileWithPath = file as File & {
     path?: string;
     webkitRelativePath?: string;
   };
 
-  if (typeof fileWithPath.path === "string") {
+  const absolutePath = resolvedPath ?? fileWithPath.path;
+
+  if (typeof absolutePath === "string") {
     const separatorIndex = Math.max(
-      fileWithPath.path.lastIndexOf("\\"),
-      fileWithPath.path.lastIndexOf("/")
+      absolutePath.lastIndexOf("\\"),
+      absolutePath.lastIndexOf("/")
     );
 
     return separatorIndex > 0
-      ? fileWithPath.path.slice(0, separatorIndex)
-      : fileWithPath.path;
+      ? absolutePath.slice(0, separatorIndex)
+      : absolutePath;
   }
 
   if (typeof fileWithPath.webkitRelativePath === "string") {
@@ -126,6 +131,13 @@ const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => {
+    if (inputRef.current !== null) {
+      inputRef.current.setAttribute("webkitdirectory", "");
+      inputRef.current.setAttribute("directory", "");
+    }
+  }, []);
+
   const handleFoldersChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { files } = event.target;
@@ -137,7 +149,10 @@ const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
       const folderSet = new Set(folders);
 
       Array.from(files).forEach((file) => {
-        const folderPath = extractFolderPath(file);
+        const folderPath = extractFolderPath(
+          file,
+          window.electron.invoke.resolveFilePath(file)
+        );
 
         if (folderPath !== undefined) {
           folderSet.add(folderPath);
@@ -209,7 +224,16 @@ const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
                     <FolderIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={folderName} secondary={folder} />
+                <ListItemText
+                  primary={folderName}
+                  secondary={folder}
+                  slotProps={{
+                    secondary: {
+                      noWrap: true,
+                      sx: { textOverflow: "ellipsis", overflow: "hidden" },
+                    },
+                  }}
+                />
               </ListItem>
             );
           })

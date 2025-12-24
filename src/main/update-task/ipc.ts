@@ -1,9 +1,15 @@
+import { getStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
 
 export function registerIpc({
   saveFoldersContent,
+  getFoldersContentByTaskId,
 }: {
+  getFoldersContentByTaskId: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => string[] | undefined;
   saveFoldersContent: (payload: {
     projectId: string;
     taskId: string;
@@ -17,6 +23,10 @@ export function registerIpc({
 
     const result = await updateTask(payload);
 
+    if (result === undefined) {
+      return undefined;
+    }
+
     if (result !== undefined && payload.folderPaths !== undefined) {
       const projectIdValue = payload.projectId ?? result.projectId;
 
@@ -29,6 +39,17 @@ export function registerIpc({
       }
     }
 
-    return result;
+    const projectIdStore = getStore<string, string>("projectId");
+    if (projectIdStore === undefined) {
+      return undefined;
+    }
+
+    return {
+      ...result,
+      foldersContentFiles: getFoldersContentByTaskId(
+        String(result.id),
+        projectIdStore
+      ),
+    };
   });
 }

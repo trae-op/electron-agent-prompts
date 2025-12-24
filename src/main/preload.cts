@@ -106,6 +106,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
       payload.path = filePath;
       return ipcInvoke("uploadFile", payload);
     },
+    resolveFilePath: (file) =>
+      electron.webUtils.getPathForFile(file) ?? undefined,
   },
 } satisfies Window["electron"]);
 

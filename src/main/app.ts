@@ -30,6 +30,7 @@ import {
   deleteFoldersContent as deleteFoldersContentService,
   deleteProjectFoldersContent as deleteProjectFoldersContentService,
   getFoldersContentByProjectId as getFoldersContentByProjectIdService,
+  getFoldersContentByTaskId as getFoldersContentByTaskIdService,
 } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
@@ -107,9 +108,11 @@ app.on("ready", async () => {
     deleteProjectFoldersContent: deleteProjectFoldersContentService,
   });
   registerIpcCreateTask({
+    getFoldersContentByTaskId: getFoldersContentByTaskIdService,
     saveFoldersContent: saveFoldersContentService,
   });
   registerIpcUpdateTask({
+    getFoldersContentByTaskId: getFoldersContentByTaskIdService,
     saveFoldersContent: saveFoldersContentService,
   });
   registerIpcDeleteTask({

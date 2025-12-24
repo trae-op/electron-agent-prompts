@@ -77,4 +77,5 @@ type TInvoke = {
   markdownContent: (
     payload: TEventSendInvoke["markdownContent"]
   ) => Promise<TEventPayloadInvoke["markdownContent"]>;
+  resolveFilePath: (file: File) => string | undefined;
 };
