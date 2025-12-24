@@ -4,6 +4,7 @@ import {
   useCallback,
   useState,
   useRef,
+  useEffect,
   ChangeEvent,
 } from "react";
 import { useFormStatus } from "react-dom";
@@ -11,7 +12,15 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FolderIcon from "@mui/icons-material/Folder";
 import { styled } from "@mui/material/styles";
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import IconButton from "@mui/material/IconButton";
 import { useParams } from "react-router-dom";
 
 import { Popup } from "@composites/Popup";
@@ -30,6 +39,34 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
+
+const extractFolderPath = (file: File): string | undefined => {
+  const fileWithPath = file as File & {
+    path?: string;
+    webkitRelativePath?: string;
+  };
+
+  if (typeof fileWithPath.path === "string") {
+    const separatorIndex = Math.max(
+      fileWithPath.path.lastIndexOf("\\"),
+      fileWithPath.path.lastIndexOf("/")
+    );
+
+    return separatorIndex > 0
+      ? fileWithPath.path.slice(0, separatorIndex)
+      : fileWithPath.path;
+  }
+
+  if (typeof fileWithPath.webkitRelativePath === "string") {
+    const separatorIndex = fileWithPath.webkitRelativePath.lastIndexOf("/");
+
+    return separatorIndex > 0
+      ? fileWithPath.webkitRelativePath.slice(0, separatorIndex)
+      : fileWithPath.webkitRelativePath;
+  }
+
+  return undefined;
+};
 
 const UploadFile = () => {
   const { pending } = useFormStatus();
@@ -76,7 +113,119 @@ const UploadFile = () => {
   );
 };
 
-const Fields = () => {
+type FoldersInputProps = {
+  folders: string[];
+  onChange: (folders: string[]) => void;
+};
+
+const FoldersInput = ({ folders, onChange }: FoldersInputProps) => {
+  const { pending } = useFormStatus();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (inputRef.current !== null) {
+      inputRef.current.setAttribute("webkitdirectory", "");
+      inputRef.current.setAttribute("directory", "");
+    }
+  }, []);
+
+  const handleFoldersChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { files } = event.target;
+
+      if (files === null) {
+        return;
+      }
+
+      const folderSet = new Set(folders);
+
+      Array.from(files).forEach((file) => {
+        const folderPath = extractFolderPath(file);
+
+        if (folderPath !== undefined) {
+          folderSet.add(folderPath);
+        }
+      });
+
+      onChange(Array.from(folderSet));
+      event.target.value = "";
+    },
+    [folders, onChange]
+  );
+
+  const handleRemoveFolder = useCallback(
+    (folder: string) => () => {
+      onChange(folders.filter((item) => item !== folder));
+    },
+    [folders, onChange]
+  );
+
+  return (
+    <Stack spacing={1} data-testid="create-task-folders">
+      <Button
+        component="label"
+        role={undefined}
+        variant="outlined"
+        tabIndex={-1}
+        startIcon={<FolderIcon />}
+        disabled={pending}
+        data-testid="create-task-folders-input"
+      >
+        {folders.length > 0 ? "Add more folders" : "Add folders"}
+        <VisuallyHiddenInput
+          type="file"
+          name="folders"
+          onChange={handleFoldersChange}
+          multiple
+          disabled={pending}
+          ref={inputRef}
+        />
+      </Button>
+      <List dense>
+        {folders.length === 0 ? (
+          <ListItem>
+            <ListItemText primary="No folders selected" />
+          </ListItem>
+        ) : (
+          folders.map((folder) => {
+            const folderName = folder.split(/[/\\]/).pop() ?? folder;
+
+            return (
+              <ListItem
+                key={folder}
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete folder"
+                    onClick={handleRemoveFolder(folder)}
+                    disabled={pending}
+                    data-testid={`create-task-folder-remove-${folderName}`}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemAvatar>
+                  <Avatar>
+                    <FolderIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={folderName} secondary={folder} />
+              </ListItem>
+            );
+          })
+        )}
+      </List>
+    </Stack>
+  );
+};
+
+type FieldsProps = {
+  folders: string[];
+  onFoldersChange: (folders: string[]) => void;
+};
+
+const Fields = ({ folders, onFoldersChange }: FieldsProps) => {
   const { pending } = useFormStatus();
 
   return (
@@ -93,6 +242,7 @@ const Fields = () => {
         disabled={pending}
       />
       <UploadFile />
+      <FoldersInput folders={folders} onChange={onFoldersChange} />
     </Stack>
   );
 };
@@ -101,6 +251,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   const { projectId } = useParams<{ projectId?: string }>();
   const isOpen = useCreateTaskModalOpenSelector();
   const { closeModal } = useCreateTaskModalActions();
+  const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
   const [_, formAction] = useActionState(
     useCallback(
@@ -115,23 +266,26 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
         const response = await window.electron.invoke.createTask({
           name,
           projectId,
+          folderPaths: selectedFolders,
         });
 
         if (response !== undefined) {
           closeModal();
           onSuccess(response);
+          setSelectedFolders([]);
         }
 
         return undefined;
       },
-      [closeModal, onSuccess, projectId]
+      [closeModal, onSuccess, projectId, selectedFolders]
     ),
     undefined
   );
 
   const handleClose = useCallback(() => {
     closeModal();
-  }, []);
+    setSelectedFolders([]);
+  }, [closeModal, setSelectedFolders]);
 
   return (
     <Popup
@@ -144,7 +298,12 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
       confirmPendingLabel="Creating..."
       formTestId="create-task-form"
       messageTestId="create-task-message"
-      content={<Fields />}
+      content={
+        <Fields
+          folders={selectedFolders}
+          onFoldersChange={setSelectedFolders}
+        />
+      }
     />
   );
 });

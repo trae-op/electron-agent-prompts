@@ -14,11 +14,18 @@ export type TCacheMarkdownContent = {
   };
 };
 
+export type TCacheFoldersContent = {
+  [key: string]: {
+    [key: string]: string[] | undefined;
+  };
+};
+
 type TElectronStore = {
   authToken: string;
   userId: string;
   response: TCacheResponse;
   markdownContent: TCacheMarkdownContent;
+  foldersContentFiles: TCacheFoldersContent;
 };
 
 const store = new Map<keyof TStore, TStore[keyof TStore]>();

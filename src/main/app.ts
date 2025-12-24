@@ -25,6 +25,11 @@ import { updateTask as updateTaskService } from "./update-task/service.js";
 import { registerIpc as registerIpcDeleteTask } from "./delete-task/ipc.js";
 import { registerIpc as registerIpcUploadFile } from "./upload-file/ipc.js";
 import { registerIpc as registerIpcTask } from "./task/ipc.js";
+import {
+  saveFoldersContent as saveFoldersContentService,
+  deleteFoldersContent as deleteFoldersContentService,
+  deleteProjectFoldersContent as deleteProjectFoldersContentService,
+} from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
 import { menu } from "./config.js";
@@ -95,10 +100,18 @@ app.on("ready", async () => {
   registerIpcTasks();
   registerIpcCreateProject();
   registerIpcUpdateProject();
-  registerIpcDeleteProject();
-  registerIpcCreateTask();
-  registerIpcUpdateTask();
-  registerIpcDeleteTask();
+  registerIpcDeleteProject({
+    deleteProjectFoldersContent: deleteProjectFoldersContentService,
+  });
+  registerIpcCreateTask({
+    saveFoldersContent: saveFoldersContentService,
+  });
+  registerIpcUpdateTask({
+    saveFoldersContent: saveFoldersContentService,
+  });
+  registerIpcDeleteTask({
+    deleteFoldersContent: deleteFoldersContentService,
+  });
   registerIpcUploadFile();
   registerIpcPreload();
   registerIpcAppVersion();

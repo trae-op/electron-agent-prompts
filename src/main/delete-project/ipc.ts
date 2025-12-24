@@ -18,7 +18,11 @@ function deleteMarkdownContents(projectId: string) {
   setElectronStorage("markdownContent", rest);
 }
 
-export function registerIpc(): void {
+export function registerIpc({
+  deleteProjectFoldersContent,
+}: {
+  deleteProjectFoldersContent: (projectId?: string) => void;
+}): void {
   ipcMainHandle("deleteProject", async (payload) => {
     if (payload === undefined) {
       return false;
@@ -26,6 +30,11 @@ export function registerIpc(): void {
 
     deleteMarkdownContents(payload.id);
 
-    return deleteProject(payload);
+    const result = await deleteProject(payload);
+    if (result) {
+      deleteProjectFoldersContent(String(payload.id));
+    }
+
+    return result;
   });
 }

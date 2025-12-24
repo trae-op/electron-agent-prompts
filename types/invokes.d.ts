@@ -27,6 +27,7 @@ type TEventSendInvoke = {
   createTask: {
     name: string;
     projectId: string;
+    folderPaths?: string[];
   };
   updateTask: {
     id: number;
@@ -34,6 +35,7 @@ type TEventSendInvoke = {
     projectId?: number;
     fileId?: string;
     url?: string | null;
+    folderPaths?: string[];
   };
   deleteTask: {
     id: number;

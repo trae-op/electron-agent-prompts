@@ -28,14 +28,27 @@ function deleteMarkdownContent(taskId: string) {
   });
 }
 
-export function registerIpc(): void {
+export function registerIpc({
+  deleteFoldersContent,
+}: {
+  deleteFoldersContent: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => void;
+}): void {
   ipcMainHandle("deleteTask", async (payload) => {
     if (payload === undefined) {
       return false;
     }
 
     deleteMarkdownContent(String(payload.id));
+    const result = await deleteTask(payload);
+    const projectId = getStore<string, string>("projectId");
 
-    return deleteTask(payload);
+    if (result) {
+      deleteFoldersContent(String(payload.id), projectId);
+    }
+
+    return result;
   });
 }

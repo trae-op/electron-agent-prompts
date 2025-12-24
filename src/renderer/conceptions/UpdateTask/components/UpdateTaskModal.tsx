@@ -1,10 +1,26 @@
-import { memo, useActionState, useCallback, useRef, ChangeEvent } from "react";
+import {
+  memo,
+  useActionState,
+  useCallback,
+  useRef,
+  ChangeEvent,
+  useState,
+  useEffect,
+} from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FolderIcon from "@mui/icons-material/Folder";
 import { styled } from "@mui/material/styles";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
 
 import { Popup } from "@composites/Popup";
 import {
@@ -25,9 +41,44 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
+const extractFolderPath = (file: File): string | undefined => {
+  const fileWithPath = file as File & {
+    path?: string;
+    webkitRelativePath?: string;
+  };
+
+  if (typeof fileWithPath.path === "string") {
+    const separatorIndex = Math.max(
+      fileWithPath.path.lastIndexOf("\\"),
+      fileWithPath.path.lastIndexOf("/")
+    );
+
+    return separatorIndex > 0
+      ? fileWithPath.path.slice(0, separatorIndex)
+      : fileWithPath.path;
+  }
+
+  if (typeof fileWithPath.webkitRelativePath === "string") {
+    const separatorIndex = fileWithPath.webkitRelativePath.lastIndexOf("/");
+
+    return separatorIndex > 0
+      ? fileWithPath.webkitRelativePath.slice(0, separatorIndex)
+      : fileWithPath.webkitRelativePath;
+  }
+
+  return undefined;
+};
+
 const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (inputRef.current !== null) {
+      inputRef.current.setAttribute("webkitdirectory", "");
+      inputRef.current.setAttribute("directory", "");
+    }
+  }, []);
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +116,116 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
   );
 };
 
-const Fields = () => {
+type FoldersInputProps = {
+  folders: string[];
+  onChange: (folders: string[]) => void;
+  onTouch: () => void;
+};
+
+const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
+  const { pending } = useFormStatus();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFoldersChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { files } = event.target;
+
+      if (files === null) {
+        return;
+      }
+
+      const folderSet = new Set(folders);
+
+      Array.from(files).forEach((file) => {
+        const folderPath = extractFolderPath(file);
+
+        if (folderPath !== undefined) {
+          folderSet.add(folderPath);
+        }
+      });
+
+      onChange(Array.from(folderSet));
+      event.target.value = "";
+      onTouch();
+    },
+    [folders, onChange, onTouch]
+  );
+
+  const handleRemoveFolder = useCallback(
+    (folder: string) => () => {
+      onChange(folders.filter((item) => item !== folder));
+      onTouch();
+    },
+    [folders, onChange, onTouch]
+  );
+
+  return (
+    <Stack spacing={1} data-testid="update-task-folders">
+      <Button
+        component="label"
+        role={undefined}
+        variant="outlined"
+        tabIndex={-1}
+        startIcon={<FolderIcon />}
+        disabled={pending}
+        data-testid="update-task-folders-input"
+      >
+        {folders.length > 0 ? "Add more folders" : "Add folders"}
+        <VisuallyHiddenInput
+          type="file"
+          name="folders"
+          onChange={handleFoldersChange}
+          multiple
+          disabled={pending}
+          ref={inputRef}
+        />
+      </Button>
+      <List dense>
+        {folders.length === 0 ? (
+          <ListItem>
+            <ListItemText primary="No folders selected" />
+          </ListItem>
+        ) : (
+          folders.map((folder) => {
+            const folderName = folder.split(/[/\\]/).pop() ?? folder;
+
+            return (
+              <ListItem
+                key={folder}
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete folder"
+                    onClick={handleRemoveFolder(folder)}
+                    disabled={pending}
+                    data-testid={`update-task-folder-remove-${folderName}`}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemAvatar>
+                  <Avatar>
+                    <FolderIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={folderName} secondary={folder} />
+              </ListItem>
+            );
+          })
+        )}
+      </List>
+    </Stack>
+  );
+};
+
+type FieldsProps = {
+  folders: string[];
+  onFoldersChange: (folders: string[]) => void;
+  onFoldersTouch: () => void;
+};
+
+const Fields = ({ folders, onFoldersChange, onFoldersTouch }: FieldsProps) => {
   const { pending } = useFormStatus();
   const task = useUpdateTaskModalTaskSelector();
 
@@ -89,6 +249,11 @@ const Fields = () => {
         disabled={pending}
       />
       <UploadFile defaultFileName={task.url ?? undefined} />
+      <FoldersInput
+        folders={folders}
+        onChange={onFoldersChange}
+        onTouch={onFoldersTouch}
+      />
     </Stack>
   );
 };
@@ -96,6 +261,13 @@ const Fields = () => {
 export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
   const task = useUpdateTaskModalTaskSelector();
   const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
+  const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
+  const [foldersTouched, setFoldersTouched] = useState(false);
+
+  useEffect(() => {
+    setSelectedFolders([]);
+    setFoldersTouched(false);
+  }, [task?.id]);
 
   const [_, formAction] = useActionState(
     useCallback(
@@ -113,23 +285,28 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
           projectId: task.projectId,
           fileId: task.fileId,
           url: task.url,
+          folderPaths: foldersTouched ? selectedFolders : undefined,
         });
 
         if (response !== undefined) {
           onSuccess(response);
           setUpdateTask(undefined);
+          setSelectedFolders([]);
+          setFoldersTouched(false);
         }
 
         return undefined;
       },
-      [onSuccess, setUpdateTask, task]
+      [foldersTouched, onSuccess, selectedFolders, setUpdateTask, task]
     ),
     undefined
   );
 
   const handleClose = useCallback(() => {
     setUpdateTask(undefined);
-  }, [setUpdateTask]);
+    setSelectedFolders([]);
+    setFoldersTouched(false);
+  }, [setFoldersTouched, setSelectedFolders, setUpdateTask]);
 
   return (
     <Popup
@@ -142,7 +319,13 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
       confirmPendingLabel="Saving..."
       formTestId="update-task-form"
       messageTestId="update-task-message"
-      content={<Fields />}
+      content={
+        <Fields
+          folders={selectedFolders}
+          onFoldersChange={setSelectedFolders}
+          onFoldersTouch={() => setFoldersTouched(true)}
+        />
+      }
     />
   );
 });
