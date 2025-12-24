@@ -5,6 +5,7 @@ import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";
 import { getStore, setStore } from "../@shared/store.js";
 import { cacheWindows } from "../@shared/control-window/cache.js";
+import { saveFileToStoredFolders } from "../task/service.js";
 
 export async function updateTask(
   payload: TEventSendInvoke["updateTask"]
@@ -15,14 +16,17 @@ export async function updateTask(
   const endpoint = `${restApi.urls.base}${restApi.urls.baseApi}${
     restApi.urls.tasks.base
   }${restApi.urls.tasks.byId(id + "")}`;
+  let fileBlob: Blob | undefined;
+  let fileName: string | undefined;
 
   const hasFile = typeof filePath === "string" && filePath.length > 0;
 
   if (hasFile && filePath !== undefined) {
     const fileBuffer = await readFile(filePath);
-    const blob = new Blob([fileBuffer]);
+    fileBlob = new Blob([fileBuffer]);
+    fileName = path.basename(filePath);
 
-    formData.append("file", blob, path.basename(filePath));
+    formData.append("file", fileBlob, fileName);
   }
 
   formData.append("name", data.name);
@@ -58,6 +62,18 @@ export async function updateTask(
     if (hasCacheWindow !== undefined) {
       cacheWindows.delete(`window:task/${id}`);
     }
+  }
+
+  if (
+    fileBlob !== undefined &&
+    fileName !== undefined &&
+    response.data !== undefined
+  ) {
+    await saveFileToStoredFolders({
+      file: fileBlob,
+      fileName,
+      taskId: `${response.data.id}`,
+    });
   }
 
   setStore("uploadedFilePath", undefined);

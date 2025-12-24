@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { get } from "../@shared/services/rest-api/service.js";
@@ -233,6 +233,62 @@ export function getFoldersContentByProjectId(projectId?: string) {
   const projectFolders = storage[projectKey] ?? {};
 
   return projectFolders;
+}
+
+export async function saveFileToStoredFolders(payload: {
+  file: Blob;
+  fileName: string;
+  taskId: string;
+}): Promise<void> {
+  const projectIdStore = getStore<string, string>("projectId");
+
+  if (projectIdStore === undefined) {
+    return;
+  }
+
+  const storage = getElectronStorage(FOLDERS_STORAGE_KEY);
+
+  if (storage === undefined) {
+    return;
+  }
+
+  const folders = storage[projectIdStore]?.[payload.taskId];
+
+  if (folders === undefined || folders.length === 0) {
+    return;
+  }
+
+  const normalizedFolders = normalizeFolders(folders);
+
+  if (normalizedFolders.length === 0) {
+    return;
+  }
+
+  const fileBuffer = Buffer.from(await payload.file.arrayBuffer());
+
+  const results = await Promise.allSettled(
+    normalizedFolders.map(async (folderPath) => {
+      await mkdir(folderPath, { recursive: true });
+
+      const destination = join(folderPath, payload.fileName);
+
+      await writeFile(destination, fileBuffer);
+    })
+  );
+
+  const failed = results.find(
+    (result): result is PromiseRejectedResult => result.status === "rejected"
+  );
+
+  if (failed !== undefined) {
+    showErrorMessages({
+      title: "Error saving file to folders",
+      body:
+        failed.reason instanceof Error
+          ? failed.reason.message
+          : String(failed.reason),
+    });
+  }
 }
 
 function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
