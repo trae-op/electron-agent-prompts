@@ -7,3 +7,7 @@ type TTask = {
   fileId: string;
   url: string | null;
 };
+
+type TTaskWithFoldersContent = TTask & {
+  foldersContentFiles?: string[];
+};

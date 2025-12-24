@@ -222,6 +222,19 @@ export function getFoldersContentByTaskId(taskId: string, projectId?: string) {
   return projectFolders[taskId];
 }
 
+export function getFoldersContentByProjectId(projectId?: string) {
+  const projectKey = projectId ?? getStore<string, string>("projectId");
+
+  if (projectKey === undefined) {
+    return;
+  }
+
+  const storage = getElectronStorage(FOLDERS_STORAGE_KEY) ?? {};
+  const projectFolders = storage[projectKey] ?? {};
+
+  return projectFolders;
+}
+
 function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
   const blocks: TMarkdownContent[] = [];
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
