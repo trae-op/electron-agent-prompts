@@ -5,17 +5,20 @@ import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 export const Context = createContext<TContext | null>(null);
 
 export function Provider({ children }: TProviderProps) {
-  const task = useRef<TTask | undefined>(undefined);
+  const task = useRef<TTaskWithFoldersContent | undefined>(undefined);
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
-  const getTask = useCallback((): TTask | undefined => {
+  const getTask = useCallback((): TTaskWithFoldersContent | undefined => {
     return task.current;
   }, []);
 
-  const setTask = useCallback((value: TTask | undefined): void => {
-    task.current = value;
-    subscribers.current.forEach((callback) => callback());
-  }, []);
+  const setTask = useCallback(
+    (value: TTaskWithFoldersContent | undefined): void => {
+      task.current = value;
+      subscribers.current.forEach((callback) => callback());
+    },
+    []
+  );
 
   const subscribe = useCallback((callback: TSubscriberCallback) => {
     subscribers.current.add(callback);

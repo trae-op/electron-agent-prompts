@@ -6,8 +6,7 @@ type TTask = {
   projectId: number;
   fileId: string;
   url: string | null;
-};
-
-type TTaskWithFoldersContent = TTask & {
   foldersContentFiles?: string[];
 };
+
+type TTaskWithFoldersContent = TTask;

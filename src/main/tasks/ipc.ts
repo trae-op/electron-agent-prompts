@@ -4,9 +4,11 @@ import { getTasks } from "./service.js";
 import { setStore } from "../@shared/store.js";
 
 type TGetFoldersContentByProjectId = {
-  getFoldersContentByProjectId: (
-    projectId?: string | undefined
-  ) => string[] | undefined;
+  getFoldersContentByProjectId: (projectId?: string | undefined) =>
+    | {
+        [key: string]: string[] | undefined;
+      }
+    | undefined;
 };
 
 function foldersContentFiles(
@@ -18,7 +20,10 @@ function foldersContentFiles(
 
   return tasks.map((task) => ({
     ...task,
-    foldersContentFiles,
+    foldersContentFiles:
+      foldersContentFiles && foldersContentFiles[task.id + ""]
+        ? foldersContentFiles[task.id + ""]
+        : [],
   }));
 }
 
@@ -43,6 +48,9 @@ export function registerIpc({
       const tasksFromCache = cacheTasks(projectId);
 
       if (tasksFromCache !== undefined) {
+        // const foldersContent = getFoldersContentByProjectId(projectId + "");
+        // console.log("foldersContentFiles", foldersContent);
+
         event.reply("tasks", {
           tasks: foldersContentFiles(
             getFoldersContentByProjectId,

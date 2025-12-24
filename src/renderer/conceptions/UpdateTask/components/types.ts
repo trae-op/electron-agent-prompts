@@ -8,3 +8,9 @@ export type TUpdateTaskFormProps = {
   isPending: boolean;
   handleClose: () => void;
 };
+
+export type TFieldsProps = {
+  folders: string[];
+  onFoldersChange: (folders: string[]) => void;
+  onFoldersTouch: () => void;
+};

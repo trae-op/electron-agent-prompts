@@ -27,7 +27,7 @@ import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
 } from "../context";
-import { TUpdateTaskModalProps } from "./types";
+import { TFieldsProps, TUpdateTaskModalProps } from "./types";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -219,13 +219,7 @@ const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
   );
 };
 
-type FieldsProps = {
-  folders: string[];
-  onFoldersChange: (folders: string[]) => void;
-  onFoldersTouch: () => void;
-};
-
-const Fields = ({ folders, onFoldersChange, onFoldersTouch }: FieldsProps) => {
+const Fields = ({ folders, onFoldersChange, onFoldersTouch }: TFieldsProps) => {
   const { pending } = useFormStatus();
   const task = useUpdateTaskModalTaskSelector();
 
@@ -265,9 +259,9 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
   const [foldersTouched, setFoldersTouched] = useState(false);
 
   useEffect(() => {
-    setSelectedFolders([]);
+    setSelectedFolders(task?.foldersContentFiles ?? []);
     setFoldersTouched(false);
-  }, [task?.id]);
+  }, [task?.id, task?.foldersContentFiles]);
 
   const [_, formAction] = useActionState(
     useCallback(
@@ -291,7 +285,6 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
         if (response !== undefined) {
           onSuccess(response);
           setUpdateTask(undefined);
-          setSelectedFolders([]);
           setFoldersTouched(false);
         }
 
@@ -308,6 +301,10 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
     setFoldersTouched(false);
   }, [setFoldersTouched, setSelectedFolders, setUpdateTask]);
 
+  const handleFoldersTouch = useCallback(() => {
+    setFoldersTouched(true);
+  }, []);
+
   return (
     <Popup
       title="Update task"
@@ -323,7 +320,7 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
         <Fields
           folders={selectedFolders}
           onFoldersChange={setSelectedFolders}
-          onFoldersTouch={() => setFoldersTouched(true)}
+          onFoldersTouch={handleFoldersTouch}
         />
       }
     />
