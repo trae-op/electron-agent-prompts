@@ -34,22 +34,21 @@ const ContainerTopPanel = () => {
         return;
       }
 
-      const action = button.dataset.action;
-
-      if (action === "title") {
-        openTitleModal();
-      }
-
-      if (action === "text") {
-        openTextModal();
-      }
-
-      if (action === "code") {
-        openCodeModal();
-      }
-
-      if (action === "list") {
-        openListModal();
+      switch (button.dataset.action) {
+        case "title":
+          openTitleModal();
+          break;
+        case "text":
+          openTextModal();
+          break;
+        case "code":
+          openCodeModal();
+          break;
+        case "list":
+          openListModal();
+          break;
+        default:
+          break;
       }
     },
     [openCodeModal, openListModal, openTextModal, openTitleModal]

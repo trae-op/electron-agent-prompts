@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, type MouseEvent } from "react";
 import {
   MarkdownContentList,
   useDeleteContentDispatch,
@@ -25,6 +25,7 @@ import {
   useSetPositionContentDispatch,
   usePositionModalActions,
 } from "@conceptions/Task/Position";
+import Stack from "@mui/material/Stack";
 
 const TaskOverview = () => {
   const setContent = useSetContentDispatch();
@@ -43,27 +44,23 @@ const TaskOverview = () => {
 
   const handleUpdateContent = useCallback(
     (content: TMarkdownContent): void => {
-      if (content.type === "title") {
-        setContent(content);
-        setTitleModalOpen(true);
-        return;
-      }
-
-      if (content.type === "code") {
-        setCodeContent(content);
-        setCodeModalOpen(true);
-        return;
-      }
-
-      if (content.type === "list") {
-        setListContent(content);
-        setListModalOpen(true);
-        return;
-      }
-
-      if (content.type === "text") {
-        setTextContent(content);
-        setTextModalOpen(true);
+      switch (content.type) {
+        case "title":
+          setContent(content);
+          setTitleModalOpen(true);
+          break;
+        case "code":
+          setCodeContent(content);
+          setCodeModalOpen(true);
+          break;
+        case "list":
+          setListContent(content);
+          setListModalOpen(true);
+          break;
+        case "text":
+          setTextContent(content);
+          setTextModalOpen(true);
+          break;
       }
     },
     [
@@ -134,14 +131,72 @@ const TaskOverview = () => {
     [moveContent]
   );
 
+  const handleEvents = useCallback(
+    (event: MouseEvent<HTMLDivElement>): void => {
+      const target = event.target as HTMLElement;
+      const button = target.closest<HTMLButtonElement>("button");
+
+      if (!button) {
+        return;
+      }
+
+      const dataset = button.dataset;
+      const action = dataset.action;
+      const contentId = dataset.contentId;
+
+      if (!action || !contentId) {
+        return;
+      }
+
+      const content = contents.find(({ id }) => id === contentId);
+
+      if (!content) {
+        return;
+      }
+
+      switch (action) {
+        case "edit": {
+          handleUpdateContent(content);
+          break;
+        }
+        case "delete": {
+          handleDeleteContent(content);
+          break;
+        }
+        case "move-up": {
+          handleMoveUp(content);
+          break;
+        }
+        case "move-down": {
+          handleMoveDown(content);
+          break;
+        }
+        case "position": {
+          handlePositionContent(content);
+          break;
+        }
+        default:
+          break;
+      }
+    },
+    [
+      contents,
+      handleDeleteContent,
+      handleMoveDown,
+      handleMoveUp,
+      handlePositionContent,
+      handleUpdateContent,
+    ]
+  );
+
   return (
-    <MarkdownContentList
-      onUpdate={handleUpdateContent}
-      onDelete={handleDeleteContent}
-      onMoveUp={handleMoveUp}
-      onPosition={handlePositionContent}
-      onMoveDown={handleMoveDown}
-    />
+    <Stack
+      spacing={1.5}
+      data-testid="markdown-content-list"
+      onClick={handleEvents}
+    >
+      <MarkdownContentList />
+    </Stack>
   );
 };
 

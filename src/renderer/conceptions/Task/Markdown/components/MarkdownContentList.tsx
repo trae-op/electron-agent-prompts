@@ -13,11 +13,7 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ControlCameraIcon from "@mui/icons-material/ControlCamera";
 
 import { useContentsSelector } from "../context";
-import {
-  TContentActionHandlers,
-  TContentBlockWrapperProps,
-  THeadingVariant,
-} from "./types";
+import { TContentBlockWrapperProps, THeadingVariant } from "./types";
 import Divider from "@mui/material/Divider";
 import {
   normalizeHeading,
@@ -28,44 +24,25 @@ import {
 } from "../utils";
 import { useMemo } from "react";
 
-export const MarkdownContentList = ({
-  onUpdate,
-  onDelete,
-  onMoveUp,
-  onMoveDown,
-  onPosition,
-}: TContentActionHandlers) => {
+export const MarkdownContentList = () => {
   const contents = useContentsSelector();
 
-  return (
-    <Stack spacing={1.5} data-testid="markdown-content-list">
-      {contents.map((contentItem, index) => {
-        const isFirst = index === 0;
-        const isLast = index === contents.length - 1;
-        const handleEdit = () => onUpdate?.(contentItem);
-        const handleDelete = () => onDelete?.(contentItem);
-        const handleMoveUp = () => onMoveUp?.(contentItem);
-        const handleMoveDown = () => onMoveDown?.(contentItem);
-        const handlePosition = () => onPosition?.(contentItem);
+  return contents.map((contentItem, index) => {
+    const isFirst = index === 0;
+    const isLast = index === contents.length - 1;
 
-        return (
-          <ContentBlockWrapper
-            key={contentItem.id}
-            index={index}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onPosition={handlePosition}
-            onMoveUp={handleMoveUp}
-            onMoveDown={handleMoveDown}
-            disableMoveUp={isFirst}
-            disableMoveDown={isLast}
-          >
-            {renderContent(contentItem)}
-          </ContentBlockWrapper>
-        );
-      })}
-    </Stack>
-  );
+    return (
+      <ContentBlockWrapper
+        key={contentItem.id}
+        index={index}
+        contentId={contentItem.id}
+        disableMoveUp={isFirst}
+        disableMoveDown={isLast}
+      >
+        {renderContent(contentItem)}
+      </ContentBlockWrapper>
+    );
+  });
 };
 
 function renderContent(contentItem: TMarkdownContent) {
@@ -85,11 +62,7 @@ function renderContent(contentItem: TMarkdownContent) {
 const ContentBlockWrapper = ({
   children,
   index,
-  onEdit,
-  onDelete,
-  onMoveUp,
-  onMoveDown,
-  onPosition,
+  contentId,
   disableMoveUp,
   disableMoveDown,
 }: TContentBlockWrapperProps) => {
@@ -139,7 +112,8 @@ const ContentBlockWrapper = ({
           size="small"
           color="primary"
           aria-label="edit content block"
-          onClick={onEdit}
+          data-action="edit"
+          data-content-id={contentId}
         >
           <EditIcon fontSize="small" />
         </IconButton>
@@ -147,7 +121,8 @@ const ContentBlockWrapper = ({
           size="small"
           color="error"
           aria-label="delete content block"
-          onClick={onDelete}
+          data-action="delete"
+          data-content-id={contentId}
         >
           <DeleteIcon fontSize="small" />
         </IconButton>
@@ -167,7 +142,8 @@ const ContentBlockWrapper = ({
           size="small"
           color="primary"
           aria-label="position content block"
-          onClick={onPosition}
+          data-action="position"
+          data-content-id={contentId}
         >
           <ControlCameraIcon fontSize="small" />
         </IconButton>
@@ -177,7 +153,8 @@ const ContentBlockWrapper = ({
           color="primary"
           disableRipple
           aria-label="move content block up"
-          onClick={onMoveUp}
+          data-action="move-up"
+          data-content-id={contentId}
           disabled={disableMoveUp}
         >
           <ArrowUpwardIcon fontSize="small" />
@@ -187,7 +164,8 @@ const ContentBlockWrapper = ({
           color="primary"
           disableRipple
           aria-label="move content block down"
-          onClick={onMoveDown}
+          data-action="move-down"
+          data-content-id={contentId}
           disabled={disableMoveDown}
         >
           <ArrowDownwardIcon fontSize="small" />
