@@ -7,3 +7,8 @@ export type TCreateTaskFormProps = {
   isPending: boolean;
   handleClose: () => void;
 };
+
+export type TFoldersInputProps = {
+  folders: string[];
+  onChange: (folders: string[]) => void;
+};

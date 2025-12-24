@@ -25,7 +25,7 @@ import { useParams } from "react-router-dom";
 
 import { Popup } from "@composites/Popup";
 import { useCreateTaskModalActions } from "../hooks";
-import { TCreateTaskModalProps } from "./types";
+import { TCreateTaskModalProps, TFoldersInputProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
 
 const VisuallyHiddenInput = styled("input")({
@@ -118,12 +118,7 @@ const UploadFile = () => {
   );
 };
 
-type FoldersInputProps = {
-  folders: string[];
-  onChange: (folders: string[]) => void;
-};
-
-const FoldersInput = ({ folders, onChange }: FoldersInputProps) => {
+const FoldersInput = ({ folders, onChange }: TFoldersInputProps) => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
