@@ -28,14 +28,15 @@ const Task = () => {
         <TitleProvider>
           <ListProvider>
             <TextProvider>
+              <Suspense fallback={<LoadingSpinner />}>
+                <LazyTopPanel />
+              </Suspense>
+
+              <TitleModal />
+              <ListModal />
+              <TextModal />
+              <CodeModal />
               <PositionProvider>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <LazyTopPanel />
-                </Suspense>
-                <TitleModal />
-                <ListModal />
-                <TextModal />
-                <CodeModal />
                 <PositionModal />
                 <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
                   <Stack
