@@ -31,6 +31,7 @@ import {
   deleteProjectFoldersContent as deleteProjectFoldersContentService,
   getFoldersContentByProjectId as getFoldersContentByProjectIdService,
   getFoldersContentByTaskId as getFoldersContentByTaskIdService,
+  saveFileToStoredFolders as saveFileToStoredFoldersService,
 } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
@@ -110,10 +111,12 @@ app.on("ready", async () => {
   registerIpcCreateTask({
     getFoldersContentByTaskId: getFoldersContentByTaskIdService,
     saveFoldersContent: saveFoldersContentService,
+    saveFileToStoredFolders: saveFileToStoredFoldersService,
   });
   registerIpcUpdateTask({
     getFoldersContentByTaskId: getFoldersContentByTaskIdService,
     saveFoldersContent: saveFoldersContentService,
+    saveFileToStoredFolders: saveFileToStoredFoldersService,
   });
   registerIpcDeleteTask({
     deleteFoldersContent: deleteFoldersContentService,

@@ -27,7 +27,11 @@ import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
 } from "../context";
-import { TFieldsProps, TUpdateTaskModalProps } from "./types";
+import {
+  TFieldsProps,
+  TFoldersInputProps,
+  TUpdateTaskModalProps,
+} from "./types";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -74,16 +78,12 @@ const extractFolderPath = (
   return undefined;
 };
 
-const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
+const UploadFile = () => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (inputRef.current !== null) {
-      inputRef.current.setAttribute("webkitdirectory", "");
-      inputRef.current.setAttribute("directory", "");
-    }
-  }, []);
+  const [selectedFileName, setSelectedFileName] = useState<
+    string | undefined
+  >();
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -95,8 +95,9 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
           file,
         });
       }
+      setSelectedFileName(file?.name ?? undefined);
     },
-    [defaultFileName]
+    []
   );
 
   return (
@@ -109,6 +110,7 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
       disabled={pending}
       data-testid="update-task-upload"
     >
+      {selectedFileName ?? "No file selected"}
       <VisuallyHiddenInput
         type="file"
         name="file"
@@ -121,13 +123,7 @@ const UploadFile = ({ defaultFileName }: { defaultFileName?: string }) => {
   );
 };
 
-type FoldersInputProps = {
-  folders: string[];
-  onChange: (folders: string[]) => void;
-  onTouch: () => void;
-};
-
-const FoldersInput = ({ folders, onChange, onTouch }: FoldersInputProps) => {
+const FoldersInput = ({ folders, onChange, onTouch }: TFoldersInputProps) => {
   const { pending } = useFormStatus();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -266,7 +262,7 @@ const Fields = ({ folders, onFoldersChange, onFoldersTouch }: TFieldsProps) => {
         fullWidth
         disabled={pending}
       />
-      <UploadFile defaultFileName={task.url ?? undefined} />
+      <UploadFile />
       <FoldersInput
         folders={folders}
         onChange={onFoldersChange}

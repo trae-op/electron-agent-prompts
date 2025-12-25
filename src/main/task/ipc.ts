@@ -18,9 +18,14 @@ import { getWindow } from "../@shared/control-window/receive.js";
 export function registerIpc({
   updateTask,
 }: {
-  updateTask: (
-    payload: TEventSendInvoke["updateTask"]
-  ) => Promise<TTask | undefined>;
+  updateTask: (payload: TEventSendInvoke["updateTask"]) => Promise<
+    | {
+        task: TTask;
+        fileBlob: Blob | undefined;
+        fileName: string | undefined;
+      }
+    | undefined
+  >;
 }): void {
   ipcMainOn("windowTask", (_, { id }) => {
     const window = openWindow({
@@ -110,7 +115,7 @@ export function registerIpc({
       mainWindow !== undefined
     ) {
       ipcWebContentsSend("updateTask", mainWindow.webContents, {
-        task: result,
+        task: result.task,
       });
       taskWindow.hide();
     }

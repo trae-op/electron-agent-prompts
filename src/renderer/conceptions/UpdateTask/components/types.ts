@@ -14,3 +14,9 @@ export type TFieldsProps = {
   onFoldersChange: (folders: string[]) => void;
   onFoldersTouch: () => void;
 };
+
+export type TFoldersInputProps = {
+  folders: string[];
+  onChange: (folders: string[]) => void;
+  onTouch: () => void;
+};

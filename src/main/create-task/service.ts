@@ -4,11 +4,17 @@ import { post } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { restApi } from "../config.js";
 import { getStore, setStore } from "../@shared/store.js";
-import { saveFileToStoredFolders } from "../task/service.js";
 
 export async function createTask(
   payload: TEventSendInvoke["createTask"]
-): Promise<TTask | undefined> {
+): Promise<
+  | {
+      task: TTask;
+      fileBlob: Blob | undefined;
+      fileName: string | undefined;
+    }
+  | undefined
+> {
   const formData = new FormData();
   const filePath = getStore<string, string>("uploadedFilePath");
   let fileBlob: Blob | undefined;
@@ -44,18 +50,15 @@ export async function createTask(
     return undefined;
   }
 
-  if (
-    fileBlob !== undefined &&
-    fileName !== undefined &&
-    response.data !== undefined
-  ) {
-    await saveFileToStoredFolders({
-      file: fileBlob,
-      fileName,
-      taskId: String(response.data.id),
-    });
+  if (!response.data) {
+    return undefined;
   }
 
   setStore("uploadedFilePath", undefined);
-  return response.data;
+
+  return {
+    task: response.data,
+    fileBlob,
+    fileName,
+  };
 }

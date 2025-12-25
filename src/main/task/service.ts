@@ -1,3 +1,4 @@
+import axios from "axios";
 import { randomUUID } from "node:crypto";
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -5,6 +6,7 @@ import { tmpdir } from "node:os";
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { buildTaskEndpoint } from "../@shared/utils.js";
+import { restApi } from "../config.js";
 import { buildMarkdownDocument } from "./utils.js";
 import {
   getElectronStorage,
@@ -116,6 +118,47 @@ export function getMarkdownContentByTaskId(taskId: string) {
 }
 
 const FOLDERS_STORAGE_KEY = "foldersContentFiles";
+
+async function downloadFileFromUrl(url?: string): Promise<Buffer | undefined> {
+  if (url === undefined || url.trim().length === 0) {
+    return undefined;
+  }
+
+  try {
+    const resolvedUrl = new URL(url, restApi.urls.base).toString();
+    const token = getElectronStorage("authToken");
+    const headers: Record<string, string> = {};
+
+    if (typeof token === "string" && token.length > 0) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await axios.get<ArrayBuffer>(resolvedUrl, {
+      responseType: "arraybuffer",
+      headers,
+    });
+
+    return Buffer.from(response.data);
+  } catch (error) {
+    showErrorMessages({
+      title: "Error downloading file",
+      body: error instanceof Error ? error.message : String(error),
+    });
+
+    return undefined;
+  }
+}
+
+async function resolveFileBuffer(payload: {
+  file?: Blob;
+  url?: string;
+}): Promise<Buffer | undefined> {
+  if (payload.file !== undefined) {
+    return Buffer.from(await payload.file.arrayBuffer());
+  }
+
+  return downloadFileFromUrl(payload.url);
+}
 
 function normalizeFolders(folders: string[]): string[] {
   return Array.from(
@@ -246,13 +289,11 @@ export async function saveFileToStoredFolders(payload: {
     return;
   }
 
-  const storage = getElectronStorage(FOLDERS_STORAGE_KEY);
+  const folders = getFoldersContentByTaskId(payload.taskId, projectIdStore);
 
-  if (storage === undefined) {
+  if (folders === undefined) {
     return;
   }
-
-  const folders = storage[projectIdStore]?.[payload.taskId];
 
   if (folders === undefined || folders.length === 0) {
     return;

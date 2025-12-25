@@ -5,7 +5,13 @@ import { updateTask } from "./service.js";
 export function registerIpc({
   saveFoldersContent,
   getFoldersContentByTaskId,
+  saveFileToStoredFolders,
 }: {
+  saveFileToStoredFolders(payload: {
+    file: Blob;
+    fileName: string;
+    taskId: string;
+  }): Promise<void>;
   getFoldersContentByTaskId: (
     taskId: string,
     projectId?: string | undefined
@@ -17,7 +23,7 @@ export function registerIpc({
   }) => void;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
-    if (payload === undefined) {
+    if (payload === undefined || payload.projectId === undefined) {
       return undefined;
     }
 
@@ -27,13 +33,13 @@ export function registerIpc({
       return undefined;
     }
 
-    if (result !== undefined && payload.folderPaths !== undefined) {
-      const projectIdValue = payload.projectId ?? result.projectId;
+    if (result.task !== undefined && payload.folderPaths !== undefined) {
+      const projectIdValue = payload.projectId ?? result.task.projectId;
 
       if (projectIdValue !== undefined) {
         saveFoldersContent({
           projectId: `${projectIdValue}`,
-          taskId: `${result.id}`,
+          taskId: `${result.task.id}`,
           folders: payload.folderPaths,
         });
       }
@@ -44,10 +50,22 @@ export function registerIpc({
       return undefined;
     }
 
+    if (
+      result.fileBlob !== undefined &&
+      result.fileName !== undefined &&
+      result.task !== undefined
+    ) {
+      await saveFileToStoredFolders({
+        file: result.fileBlob,
+        fileName: result.fileName,
+        taskId: String(result.task.id),
+      });
+    }
+
     return {
-      ...result,
+      ...result.task,
       foldersContentFiles: getFoldersContentByTaskId(
-        String(result.id),
+        String(result.task.id),
         projectIdStore
       ),
     };
