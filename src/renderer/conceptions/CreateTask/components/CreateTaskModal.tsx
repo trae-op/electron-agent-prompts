@@ -11,7 +11,6 @@ import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import { styled } from "@mui/material/styles";
@@ -27,6 +26,7 @@ import { Popup } from "@composites/Popup";
 import { useCreateTaskModalActions } from "../hooks";
 import { TCreateTaskModalProps, TFoldersInputProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
+import { UploadFile } from "@components/UploadFile";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -71,51 +71,6 @@ const extractFolderPath = (
   }
 
   return undefined;
-};
-
-const UploadFile = () => {
-  const { pending } = useFormStatus();
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedFileName, setSelectedFileName] = useState<
-    string | undefined
-  >();
-
-  const handleFileChange = useCallback(
-    async (event: ChangeEvent<HTMLInputElement>) => {
-      const { files } = event.target;
-      const file = files !== null && files.length > 0 ? files[0] : undefined;
-
-      if (file !== undefined) {
-        await window.electron.invoke.uploadFile({
-          file,
-        });
-      }
-      setSelectedFileName(file?.name ?? undefined);
-    },
-    []
-  );
-
-  return (
-    <Button
-      component="label"
-      role={undefined}
-      variant="contained"
-      tabIndex={-1}
-      startIcon={<CloudUploadIcon />}
-      disabled={pending}
-      data-testid="create-task-upload"
-    >
-      {selectedFileName ?? "No file selected"}
-      <VisuallyHiddenInput
-        type="file"
-        name="file"
-        onChange={handleFileChange}
-        multiple={false}
-        disabled={pending}
-        ref={inputRef}
-      />
-    </Button>
-  );
 };
 
 const FoldersInput = ({ folders, onChange }: TFoldersInputProps) => {
