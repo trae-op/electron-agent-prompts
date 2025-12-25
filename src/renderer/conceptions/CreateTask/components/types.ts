@@ -8,7 +8,7 @@ export type TCreateTaskFormProps = {
   handleClose: () => void;
 };
 
-export type TFoldersInputProps = {
+export type TFieldsProps = {
   folders: string[];
-  onChange: (folders: string[]) => void;
+  onFoldersChange: (folders: string[]) => void;
 };

@@ -12,11 +12,4 @@ export type TUpdateTaskFormProps = {
 export type TFieldsProps = {
   folders: string[];
   onFoldersChange: (folders: string[]) => void;
-  onFoldersTouch: () => void;
-};
-
-export type TFoldersInputProps = {
-  folders: string[];
-  onChange: (folders: string[]) => void;
-  onTouch: () => void;
 };
