@@ -26,12 +26,15 @@ import { registerIpc as registerIpcDeleteTask } from "./delete-task/ipc.js";
 import { registerIpc as registerIpcUploadFile } from "./upload-file/ipc.js";
 import { registerIpc as registerIpcTask } from "./task/ipc.js";
 import {
-  saveFoldersContent as saveFoldersContentService,
-  deleteFoldersContent as deleteFoldersContentService,
-  deleteProjectFoldersContent as deleteProjectFoldersContentService,
-  getFoldersContentByProjectId as getFoldersContentByProjectIdService,
-  getFoldersContentByTaskId as getFoldersContentByTaskIdService,
-  saveFileToStoredFolders as saveFileToStoredFoldersService,
+  saveFoldersContent,
+  deleteFoldersContent,
+  deleteProjectFoldersContent,
+  getFoldersContentByProjectId,
+  getFoldersContentByTaskId,
+  saveFileToStoredFolders,
+  buildMarkdownContentsFromBlob,
+  getMarkdownContentByProjectId,
+  saveMarkdownContent,
 } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
@@ -101,25 +104,31 @@ app.on("ready", async () => {
   registerIpcUser();
   registerIpcProjects();
   registerIpcTasks({
-    getFoldersContentByProjectId: getFoldersContentByProjectIdService,
+    getFoldersContentByProjectId,
   });
   registerIpcCreateProject();
   registerIpcUpdateProject();
   registerIpcDeleteProject({
-    deleteProjectFoldersContent: deleteProjectFoldersContentService,
+    deleteProjectFoldersContent,
   });
   registerIpcCreateTask({
-    getFoldersContentByTaskId: getFoldersContentByTaskIdService,
-    saveFoldersContent: saveFoldersContentService,
-    saveFileToStoredFolders: saveFileToStoredFoldersService,
+    getFoldersContentByTaskId,
+    saveFoldersContent,
+    saveFileToStoredFolders,
+    buildMarkdownContentsFromBlob,
+    getMarkdownContentByProjectId,
+    saveMarkdownContent,
   });
   registerIpcUpdateTask({
-    getFoldersContentByTaskId: getFoldersContentByTaskIdService,
-    saveFoldersContent: saveFoldersContentService,
-    saveFileToStoredFolders: saveFileToStoredFoldersService,
+    getFoldersContentByTaskId,
+    saveFoldersContent,
+    saveFileToStoredFolders,
+    buildMarkdownContentsFromBlob,
+    getMarkdownContentByProjectId,
+    saveMarkdownContent,
   });
   registerIpcDeleteTask({
-    deleteFoldersContent: deleteFoldersContentService,
+    deleteFoldersContent,
   });
   registerIpcUploadFile();
   registerIpcPreload();

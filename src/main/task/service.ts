@@ -117,48 +117,17 @@ export function getMarkdownContentByTaskId(taskId: string) {
   return projectMarkdown[taskId];
 }
 
+export function getMarkdownContentByProjectId(projectId?: string) {
+  if (projectId === undefined) {
+    return;
+  }
+
+  const markdownContent = getElectronStorage("markdownContent") ?? {};
+
+  return markdownContent[projectId] ?? {};
+}
+
 const FOLDERS_STORAGE_KEY = "foldersContentFiles";
-
-async function downloadFileFromUrl(url?: string): Promise<Buffer | undefined> {
-  if (url === undefined || url.trim().length === 0) {
-    return undefined;
-  }
-
-  try {
-    const resolvedUrl = new URL(url, restApi.urls.base).toString();
-    const token = getElectronStorage("authToken");
-    const headers: Record<string, string> = {};
-
-    if (typeof token === "string" && token.length > 0) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await axios.get<ArrayBuffer>(resolvedUrl, {
-      responseType: "arraybuffer",
-      headers,
-    });
-
-    return Buffer.from(response.data);
-  } catch (error) {
-    showErrorMessages({
-      title: "Error downloading file",
-      body: error instanceof Error ? error.message : String(error),
-    });
-
-    return undefined;
-  }
-}
-
-async function resolveFileBuffer(payload: {
-  file?: Blob;
-  url?: string;
-}): Promise<Buffer | undefined> {
-  if (payload.file !== undefined) {
-    return Buffer.from(await payload.file.arrayBuffer());
-  }
-
-  return downloadFileFromUrl(payload.url);
-}
 
 function normalizeFolders(folders: string[]): string[] {
   return Array.from(
@@ -276,6 +245,22 @@ export function getFoldersContentByProjectId(projectId?: string) {
   const projectFolders = storage[projectKey] ?? {};
 
   return projectFolders;
+}
+
+export async function buildMarkdownContentsFromBlob(
+  fileBlob: Blob
+): Promise<TMarkdownContent[]> {
+  try {
+    const markdownText = await fileBlob.text();
+    return parseMarkdownFileContent(markdownText);
+  } catch (error) {
+    showErrorMessages({
+      title: "Error parsing markdown file",
+      body: error instanceof Error ? error.message : String(error),
+    });
+
+    return [];
+  }
 }
 
 export async function saveFileToStoredFolders(payload: {
