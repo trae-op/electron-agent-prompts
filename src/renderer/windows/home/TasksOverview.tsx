@@ -1,12 +1,44 @@
-import { memo, useCallback } from "react";
+import { lazy, memo, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
-import { TaskList, useTasksSelector } from "@conceptions/Tasks";
+import {
+  TaskList,
+  useSetTasksDispatch,
+  useTasksSelector,
+} from "@conceptions/Tasks";
 import { useSetDeleteTaskModalTaskDispatch } from "@conceptions/DeleteTask";
 
 import { useSetUpdateTaskModalTaskDispatch } from "@conceptions/UpdateTask";
 import { CreateTaskButton } from "@conceptions/CreateTask";
+
+const SearchTasksLazy = lazy(async () => {
+  const module = await import(
+    "../../composites/SearchTasks/components/SearchTasks"
+  );
+
+  return { default: module.default };
+});
+
+export const TasksControl = memo(({ tasks }: { tasks: TTask[] }) => {
+  const { projectId } = useParams<{ projectId?: string }>();
+  const setTasks = useSetTasksDispatch();
+  const handleSearchTasks = useCallback((searchedTasks: TTask[]) => {
+    setTasks(searchedTasks);
+  }, []);
+
+  if (projectId === undefined) {
+    return null;
+  }
+
+  return (
+    <Stack direction="row" spacing={0.1} alignItems="center">
+      <SearchTasksLazy items={tasks} handlerSearch={handleSearchTasks} />
+      <CreateTaskButton />
+    </Stack>
+  );
+});
 
 export const TasksOverview = memo(() => {
   const tasks = useTasksSelector();
@@ -27,7 +59,8 @@ export const TasksOverview = memo(() => {
 
   return (
     <Box width="100%">
-      <CreateTaskButton />
+      <TasksControl tasks={tasks} />
+
       <Stack
         height="calc(100vh - 88px)"
         overflow="auto"
