@@ -86,7 +86,9 @@ export function registerIpc({
       ...result.task,
       content:
         projectMarkdownContent !== undefined
-          ? projectMarkdownContent[String(result.task?.id)]
+          ? projectMarkdownContent[String(result.task?.id)]?.map(
+              (task) => task.content
+            ) ?? []
           : undefined,
       foldersContentFiles: getFoldersContentByTaskId(
         String(result.task.id),

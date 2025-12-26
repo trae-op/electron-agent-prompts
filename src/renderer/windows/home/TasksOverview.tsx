@@ -21,7 +21,8 @@ const SearchTasksLazy = lazy(async () => {
   return { default: module.default };
 });
 
-export const TasksControl = memo(({ tasks }: { tasks: TTask[] }) => {
+export const TasksControl = () => {
+  const tasks = useTasksSelector();
   const { projectId } = useParams<{ projectId?: string }>();
   const setTasks = useSetTasksDispatch();
   const handleSearchTasks = useCallback((searchedTasks: TTask[]) => {
@@ -38,10 +39,9 @@ export const TasksControl = memo(({ tasks }: { tasks: TTask[] }) => {
       <CreateTaskButton />
     </Stack>
   );
-});
+};
 
 export const TasksOverview = memo(() => {
-  const tasks = useTasksSelector();
   const setDeleteTask = useSetDeleteTaskModalTaskDispatch();
   const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
 
@@ -59,7 +59,7 @@ export const TasksOverview = memo(() => {
 
   return (
     <Box width="100%">
-      <TasksControl tasks={tasks} />
+      <TasksControl />
 
       <Stack
         height="calc(100vh - 88px)"
@@ -72,7 +72,6 @@ export const TasksOverview = memo(() => {
         data-testid="tasks-overview"
       >
         <TaskList
-          tasks={tasks}
           onOpen={handleOpenTask}
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}

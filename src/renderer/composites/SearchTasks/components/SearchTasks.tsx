@@ -8,13 +8,7 @@ import {
 } from "react";
 import TextField from "@mui/material/TextField";
 import { matchSorter } from "match-sorter";
-
 import type { TSearchTasksProps } from "./types";
-
-const searchKeys = [
-  (task: TTask) => task.name,
-  (task: TTask) => task.content?.[0]?.content ?? "",
-];
 
 const SearchTasks = memo(({ items, handlerSearch }: TSearchTasksProps) => {
   const [query, setQuery] = useState("");
@@ -24,7 +18,7 @@ const SearchTasks = memo(({ items, handlerSearch }: TSearchTasksProps) => {
     if (!query) {
       sourceItemsRef.current = items;
     }
-  }, []);
+  }, [query, items]);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -36,7 +30,7 @@ const SearchTasks = memo(({ items, handlerSearch }: TSearchTasksProps) => {
       }
 
       const filteredTasks = matchSorter(items, normalized, {
-        keys: searchKeys,
+        keys: ["name", "content.0"],
       });
 
       handlerSearch(filteredTasks);

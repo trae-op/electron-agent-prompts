@@ -54,6 +54,7 @@ export const CreateTaskModalContainer = () => {
   const addNewTask = useAddNewTaskDispatch();
 
   const onSuccess = useCallback((data: TTaskWithFoldersContent) => {
+    console.log("CreateTaskModalContainer onSuccess", data);
     addNewTask(data);
   }, []);
 
@@ -64,6 +65,7 @@ export const UpdateTaskModalContainer = () => {
   const updateTask = useUpdateTaskDispatch();
 
   const onSuccess = useCallback((data: TTaskWithFoldersContent) => {
+    console.log("UpdateTaskModalContainer onSuccess", data);
     updateTask(data);
   }, []);
 

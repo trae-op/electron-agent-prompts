@@ -1,12 +1,46 @@
 import { ipcMainOn } from "../@shared/utils.js";
 import { cacheTasks } from "../@shared/cache-responses.js";
-import { foldersContentFiles, getTasks } from "./service.js";
-import { setStore } from "../@shared/store.js";
+import { getTasks } from "./service.js";
+import { getElectronStorage, getStore, setStore } from "../@shared/store.js";
 import { TGetFoldersContentByProjectId } from "./types.js";
 
 export function registerIpc({
   getFoldersContentByProjectId,
 }: TGetFoldersContentByProjectId): void {
+  const tasksCollect = (tasks: TTask[]) => {
+    const projectIdStore = getStore<string, string>("projectId");
+
+    if (projectIdStore === undefined) {
+      return;
+    }
+
+    const foldersContentFiles = getFoldersContentByProjectId(projectIdStore);
+
+    const markdownContent = (getElectronStorage("markdownContent") ??
+      {}) as Record<string, Record<string, TMarkdownContent[]>>;
+    const projectMarkdown =
+      markdownContent[projectIdStore] ??
+      ({} as Record<string, TMarkdownContent[]>);
+
+    const content: Record<string, string[]> = {};
+    for (const key in projectMarkdown) {
+      if (projectMarkdown[key] !== undefined) {
+        content[key] = projectMarkdown[key].map(
+          (item: TMarkdownContent) => item.content
+        );
+      }
+    }
+
+    return tasks.map((task) => ({
+      ...task,
+      content: content[task.id + ""] ?? [],
+      foldersContentFiles:
+        foldersContentFiles && foldersContentFiles[task.id + ""]
+          ? foldersContentFiles[task.id + ""]
+          : [],
+    }));
+  };
+
   ipcMainOn(
     "tasks",
     async (
@@ -25,15 +59,8 @@ export function registerIpc({
       const tasksFromCache = cacheTasks(projectId);
 
       if (tasksFromCache !== undefined) {
-        // const foldersContent = getFoldersContentByProjectId(projectId + "");
-        // console.log("foldersContentFiles", foldersContent);
-
         event.reply("tasks", {
-          tasks: foldersContentFiles(
-            getFoldersContentByProjectId,
-            tasksFromCache,
-            projectId + ""
-          ),
+          tasks: tasksCollect(tasksFromCache),
         });
       }
 
@@ -41,11 +68,7 @@ export function registerIpc({
 
       if (tasks !== undefined) {
         event.reply("tasks", {
-          tasks: foldersContentFiles(
-            getFoldersContentByProjectId,
-            tasks,
-            projectId + ""
-          ),
+          tasks: tasksCollect(tasks),
         });
       }
     }

@@ -7,7 +7,7 @@ type TTask = {
   fileId: string;
   url: string | null;
   foldersContentFiles?: string[];
-  content?: TMarkdownContent[];
+  content?: string[];
 };
 
 type TTaskWithFoldersContent = TTask;
