@@ -6,7 +6,6 @@ import { tmpdir } from "node:os";
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
 import { buildTaskEndpoint } from "../@shared/utils.js";
-import { restApi } from "../config.js";
 import { buildMarkdownDocument } from "./utils.js";
 import {
   getElectronStorage,
