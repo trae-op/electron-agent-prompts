@@ -118,10 +118,10 @@ export function registerIpc({
       return undefined;
     }
 
-    if (result.fileBlob !== undefined && result.fileName !== undefined) {
+    if (result.fileBlob !== undefined) {
       await saveFileToStoredFolders({
         file: result.fileBlob,
-        fileName: result.fileName,
+        fileName: task.name,
         taskId: String(result.task.id),
       });
     }

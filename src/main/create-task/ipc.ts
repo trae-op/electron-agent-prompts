@@ -45,7 +45,11 @@ export function registerIpc({
       return undefined;
     }
 
-    if (result.task !== undefined && payload.folderPaths !== undefined) {
+    if (result.task === undefined) {
+      return undefined;
+    }
+
+    if (payload.folderPaths !== undefined) {
       saveFoldersContent({
         projectId: payload.projectId,
         taskId: String(result.task.id),
@@ -53,19 +57,15 @@ export function registerIpc({
       });
     }
 
-    if (
-      result.fileBlob !== undefined &&
-      result.fileName !== undefined &&
-      result.task !== undefined
-    ) {
+    if (result.fileBlob !== undefined) {
       await saveFileToStoredFolders({
         file: result.fileBlob,
-        fileName: result.fileName,
+        fileName: result.task.name,
         taskId: String(result.task.id),
       });
     }
 
-    if (result.fileBlob !== undefined && result.task !== undefined) {
+    if (result.fileBlob !== undefined) {
       const markdownContents = await buildMarkdownContentsFromBlob(
         result.fileBlob
       );

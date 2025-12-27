@@ -2,21 +2,6 @@ import { getStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
 
-function getFileNameFromUrl(url?: string | null): string | undefined {
-  if (url === undefined || url === null) {
-    return undefined;
-  }
-
-  try {
-    const { pathname } = new URL(url);
-    const parts = pathname.split("/").filter(Boolean);
-    return parts.pop();
-  } catch (error) {
-    const parts = url.split("/").filter(Boolean);
-    return parts.pop();
-  }
-}
-
 export function registerIpc({
   saveFoldersContent,
   getFoldersContentByTaskId,
@@ -63,7 +48,11 @@ export function registerIpc({
       return undefined;
     }
 
-    if (result.task !== undefined && payload.folderPaths !== undefined) {
+    if (result.task === undefined) {
+      return undefined;
+    }
+
+    if (payload.folderPaths !== undefined) {
       const projectIdValue = payload.projectId ?? result.task.projectId;
 
       if (projectIdValue !== undefined) {
@@ -80,17 +69,12 @@ export function registerIpc({
       return undefined;
     }
 
-    const resolvedFileName =
-      result.fileName ?? getFileNameFromUrl(result.task?.url);
+    const resolvedFileName = result.task?.name;
     const resolvedFileBlob =
       result.fileBlob ??
-      (result.task?.url ? await downloadByUrl(result.task.url) : undefined);
+      (result.task.url ? await downloadByUrl(result.task.url) : undefined);
 
-    if (
-      resolvedFileBlob !== undefined &&
-      resolvedFileName !== undefined &&
-      result.task !== undefined
-    ) {
+    if (resolvedFileBlob !== undefined && resolvedFileName !== undefined) {
       await saveFileToStoredFolders({
         file: resolvedFileBlob,
         fileName: resolvedFileName,
@@ -98,7 +82,7 @@ export function registerIpc({
       });
     }
 
-    if (resolvedFileBlob !== undefined && result.task !== undefined) {
+    if (resolvedFileBlob !== undefined) {
       const markdownContents = await buildMarkdownContentsFromBlob(
         resolvedFileBlob
       );
@@ -118,7 +102,7 @@ export function registerIpc({
       ...result.task,
       content:
         projectMarkdownContent !== undefined
-          ? projectMarkdownContent[String(result.task?.id)]?.map(
+          ? projectMarkdownContent[String(result.task.id)]?.map(
               (task) => task.content
             ) ?? []
           : undefined,
