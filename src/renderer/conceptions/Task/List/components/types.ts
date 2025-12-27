@@ -6,3 +6,15 @@ export type TListModalProps = {
   onUpdate?: (data: TMarkdownContent) => void;
   controlPanel?: ReactNode;
 };
+
+type TListStyle = "bullet" | "numbered";
+
+export type TFieldsProps = {
+  items: string[];
+  onAddItem: () => void;
+  onChangeItem: (index: number, value: string) => void;
+  onRemoveItem: (index: number) => void;
+  listStyle: TListStyle;
+  onChangeListStyle: (value: TListStyle) => void;
+  controlPanel?: ReactNode;
+};

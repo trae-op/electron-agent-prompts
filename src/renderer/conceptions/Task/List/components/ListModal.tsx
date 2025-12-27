@@ -1,6 +1,5 @@
 import {
   ChangeEvent,
-  ReactNode,
   memo,
   useActionState,
   useCallback,
@@ -26,7 +25,7 @@ import {
   useSetListContentDispatch,
 } from "../context";
 import { useListModalActions } from "../hooks";
-import type { TListModalProps } from "./types";
+import type { TFieldsProps, TListModalProps } from "./types";
 import { createId } from "@utils/generation";
 import {
   buildListContent,
@@ -44,6 +43,11 @@ const buildInitialItems = (contentValue?: TMarkdownContent): string[] => {
   return items.length ? items : [""];
 };
 
+const listStyleOptions = [
+  { value: "bullet", label: "Bullet" },
+  { value: "numbered", label: "Numbered" },
+];
+
 const Fields = memo(
   ({
     items,
@@ -53,15 +57,7 @@ const Fields = memo(
     listStyle,
     onChangeListStyle,
     controlPanel,
-  }: {
-    items: string[];
-    onAddItem: () => void;
-    onChangeItem: (index: number, value: string) => void;
-    onRemoveItem: (index: number) => void;
-    listStyle: TListStyle;
-    onChangeListStyle: (value: TListStyle) => void;
-    controlPanel?: ReactNode;
-  }) => {
+  }: TFieldsProps) => {
     const handleListStyleChange = (event: ChangeEvent<HTMLInputElement>) => {
       onChangeListStyle(event.target.value as TListStyle);
     };
@@ -73,45 +69,10 @@ const Fields = memo(
             display: "flex",
             alignItems: "center",
             flexDirection: "row",
+            // gap: 1,
           }}
           component="fieldset"
         >
-          <RadioGroup
-            row
-            name="list-style"
-            value={listStyle}
-            onChange={handleListStyleChange}
-          >
-            <FormControlLabel
-              value="bullet"
-              control={
-                <Radio
-                  sx={{
-                    width: 30,
-                    height: 30,
-                    mr: 0.5,
-                  }}
-                  size="small"
-                />
-              }
-              label="Bulleted"
-            />
-            <FormControlLabel
-              value="numbered"
-              control={
-                <Radio
-                  sx={{
-                    width: 30,
-                    height: 30,
-                    mr: 0.5,
-                  }}
-                  size="small"
-                />
-              }
-              label="Numbered"
-            />
-          </RadioGroup>
-
           <Tooltip placement="top" arrow title="Add another item">
             <IconButton
               aria-label="add list item"
@@ -122,8 +83,34 @@ const Fields = memo(
               <AddCircleOutlineIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-
           {Boolean(controlPanel) && controlPanel}
+          <RadioGroup
+            row
+            name="list-style"
+            value={listStyle}
+            sx={{
+              "& .MuiFormControlLabel-root": { mx: 0 },
+            }}
+            onChange={handleListStyleChange}
+          >
+            {listStyleOptions.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={
+                  <Radio
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      mx: 0.5,
+                    }}
+                    size="small"
+                  />
+                }
+                label={option.label}
+              />
+            ))}
+          </RadioGroup>
         </FormControl>
         <Stack spacing={1.25}>
           {items.map((value, index) => {
