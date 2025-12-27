@@ -9,6 +9,7 @@ import {
   getMarkdownContentByTaskId,
   getTask,
   loadMarkdownContentFromTaskUrl,
+  saveFileToStoredFolders,
   saveMarkdownContent,
 } from "./service.js";
 import { openWindow } from "./window.js";
@@ -109,11 +110,23 @@ export function registerIpc({
       url: task.url,
     });
 
-    if (
-      result !== undefined &&
-      taskWindow !== undefined &&
-      mainWindow !== undefined
-    ) {
+    if (result === undefined) {
+      return undefined;
+    }
+
+    if (result.task === undefined) {
+      return undefined;
+    }
+
+    if (result.fileBlob !== undefined && result.fileName !== undefined) {
+      await saveFileToStoredFolders({
+        file: result.fileBlob,
+        fileName: result.fileName,
+        taskId: String(result.task.id),
+      });
+    }
+
+    if (taskWindow !== undefined && mainWindow !== undefined) {
       ipcWebContentsSend("updateTask", mainWindow.webContents, {
         task: result.task,
       });
