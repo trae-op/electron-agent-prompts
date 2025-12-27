@@ -35,6 +35,7 @@ import {
   buildMarkdownContentsFromBlob,
   getMarkdownContentByProjectId,
   saveMarkdownContent,
+  downloadByUrl,
 } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
@@ -126,6 +127,7 @@ app.on("ready", async () => {
     buildMarkdownContentsFromBlob,
     getMarkdownContentByProjectId,
     saveMarkdownContent,
+    downloadByUrl,
   });
   registerIpcDeleteTask({
     deleteFoldersContent,

@@ -31,6 +31,30 @@ export async function getTask<R extends TTask>(
   return response.data;
 }
 
+export async function downloadByUrl(url: string): Promise<Blob | undefined> {
+  try {
+    const response = await axios.get<ArrayBuffer>(url, {
+      responseType: "arraybuffer",
+    });
+
+    const headerContentType = response.headers["content-type"];
+    const contentType = Array.isArray(headerContentType)
+      ? headerContentType[0]
+      : headerContentType ?? "application/octet-stream";
+
+    return new Blob([response.data], {
+      type: contentType,
+    });
+  } catch (error) {
+    showErrorMessages({
+      title: "Error downloading file",
+      body: error instanceof Error ? error.message : String(error),
+    });
+
+    return undefined;
+  }
+}
+
 export async function createMarkdownFile(
   taskId: string,
   contents: TMarkdownContent[]

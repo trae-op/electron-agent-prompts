@@ -2,6 +2,21 @@ import { getStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
 
+function getFileNameFromUrl(url?: string | null): string | undefined {
+  if (url === undefined || url === null) {
+    return undefined;
+  }
+
+  try {
+    const { pathname } = new URL(url);
+    const parts = pathname.split("/").filter(Boolean);
+    return parts.pop();
+  } catch (error) {
+    const parts = url.split("/").filter(Boolean);
+    return parts.pop();
+  }
+}
+
 export function registerIpc({
   saveFoldersContent,
   getFoldersContentByTaskId,
@@ -9,6 +24,7 @@ export function registerIpc({
   buildMarkdownContentsFromBlob,
   getMarkdownContentByProjectId,
   saveMarkdownContent,
+  downloadByUrl,
 }: {
   buildMarkdownContentsFromBlob(fileBlob: Blob): Promise<TMarkdownContent[]>;
   getMarkdownContentByProjectId(projectId?: string | undefined):
@@ -34,6 +50,7 @@ export function registerIpc({
     taskId: string;
     folders: string[];
   }) => void;
+  downloadByUrl: (url: string) => Promise<Blob | undefined>;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
     if (payload === undefined || payload.projectId === undefined) {
@@ -63,21 +80,27 @@ export function registerIpc({
       return undefined;
     }
 
+    const resolvedFileName =
+      result.fileName ?? getFileNameFromUrl(result.task?.url);
+    const resolvedFileBlob =
+      result.fileBlob ??
+      (result.task?.url ? await downloadByUrl(result.task.url) : undefined);
+
     if (
-      result.fileBlob !== undefined &&
-      result.fileName !== undefined &&
+      resolvedFileBlob !== undefined &&
+      resolvedFileName !== undefined &&
       result.task !== undefined
     ) {
       await saveFileToStoredFolders({
-        file: result.fileBlob,
-        fileName: result.fileName,
+        file: resolvedFileBlob,
+        fileName: resolvedFileName,
         taskId: String(result.task.id),
       });
     }
 
-    if (result.fileBlob !== undefined && result.task !== undefined) {
+    if (resolvedFileBlob !== undefined && result.task !== undefined) {
       const markdownContents = await buildMarkdownContentsFromBlob(
-        result.fileBlob
+        resolvedFileBlob
       );
 
       if (markdownContents.length > 0) {
