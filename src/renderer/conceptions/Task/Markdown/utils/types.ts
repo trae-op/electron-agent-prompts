@@ -7,3 +7,8 @@ export type TTokenType =
   | "text";
 
 export type TListStyle = "bullet" | "numbered";
+
+export type TListItemContent = {
+  value: string;
+  subitems: string[];
+};

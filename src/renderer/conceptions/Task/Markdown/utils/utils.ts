@@ -1,4 +1,6 @@
-import { TListStyle, TTokenType } from "./types";
+import { TListItemContent, TListStyle, TTokenType } from "./types";
+
+const SUBLIST_INDENT = 2;
 
 export function normalizeHeading<H>(content: string): {
   headingVariant: H;
@@ -16,12 +18,53 @@ export function normalizeHeading<H>(content: string): {
   return { headingVariant: variant, text };
 }
 
+export function parseListContent(content: string): TListItemContent[] {
+  const normalizedLines = content
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/\t/g, "  "))
+    .filter((line) => line.trim().length > 0);
+
+  const items: TListItemContent[] = [];
+  let current: TListItemContent | undefined;
+
+  for (const rawLine of normalizedLines) {
+    const match = rawLine.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+
+    if (match === null) {
+      if (current !== undefined) {
+        current.subitems.push(rawLine.trim());
+      } else {
+        current = { value: rawLine.trim(), subitems: [] };
+        items.push(current);
+      }
+      continue;
+    }
+
+    const [, indentRaw, , text] = match;
+    const indent = indentRaw.length;
+    const value = text.trim();
+    const isSubItem = indent >= SUBLIST_INDENT;
+
+    if (isSubItem && current !== undefined) {
+      current.subitems.push(value);
+      continue;
+    }
+
+    const nextItem: TListItemContent = {
+      value,
+      subitems: [],
+    };
+
+    current = nextItem;
+    items.push(nextItem);
+  }
+
+  return items;
+}
+
 export function splitListItems(content: string): string[] {
-  return content
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => line.replace(/^(?:[-*]\s+|\d+\.\s+)?/, ""));
+  return parseListContent(content).map((item) => item.value);
 }
 
 export function detectListStyle(content?: string): TListStyle {
@@ -33,11 +76,26 @@ export function detectListStyle(content?: string): TListStyle {
   return /^\d+\.\s+/.test(firstLine.trim()) ? "numbered" : "bullet";
 }
 
-export function buildListContent(items: string[], style: TListStyle): string {
+export function buildListContent(
+  items: TListItemContent[],
+  style: TListStyle
+): string {
+  const indent = " ".repeat(SUBLIST_INDENT);
+
   return items
-    .map((item, index) =>
-      style === "numbered" ? `${index + 1}. ${item}` : `- ${item}`
-    )
+    .map((item, index) => {
+      const mainLine =
+        style === "numbered"
+          ? `${index + 1}. ${item.value}`
+          : `- ${item.value}`;
+      const subLines = (item.subitems ?? [])
+        .filter((subitem) => subitem.trim().length > 0)
+        .map((subitem) => `${indent}- ${subitem.trim()}`);
+
+      return subLines.length > 0
+        ? `${mainLine}\n${subLines.join("\n")}`
+        : mainLine;
+    })
     .join("\n");
 }
 

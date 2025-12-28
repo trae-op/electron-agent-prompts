@@ -25,22 +25,45 @@ import {
   useSetListContentDispatch,
 } from "../context";
 import { useListModalActions } from "../hooks";
-import type { TFieldsProps, TListModalProps } from "./types";
+import type { TFieldsProps, TListItemDraft, TListModalProps } from "./types";
 import { createId } from "@utils/generation";
 import {
   buildListContent,
   detectListStyle,
-  splitListItems,
+  parseListContent,
 } from "@conceptions/Task/Markdown/utils";
-import type { TListStyle } from "@conceptions/Task/Markdown/utils/types";
+import type {
+  TListItemContent,
+  TListStyle,
+} from "@conceptions/Task/Markdown/utils/types";
 
-const buildInitialItems = (contentValue?: TMarkdownContent): string[] => {
+const createEmptyListItem = (): TListItemDraft => ({
+  id: createId(),
+  value: "",
+  subitems: [],
+});
+
+const buildInitialItems = (
+  contentValue?: TMarkdownContent
+): TListItemDraft[] => {
   if (!contentValue?.content) {
-    return [""];
+    return [createEmptyListItem()];
   }
 
-  const items = splitListItems(contentValue.content);
-  return items.length ? items : [""];
+  const parsed = parseListContent(contentValue.content);
+
+  if (parsed.length === 0) {
+    return [createEmptyListItem()];
+  }
+
+  return parsed.map((item) => ({
+    id: createId(),
+    value: item.value,
+    subitems: item.subitems.map((subitem) => ({
+      id: createId(),
+      value: subitem,
+    })),
+  }));
 };
 
 const listStyleOptions = [
@@ -54,6 +77,9 @@ const Fields = memo(
     onAddItem,
     onChangeItem,
     onRemoveItem,
+    onAddSubItem,
+    onChangeSubItem,
+    onRemoveSubItem,
     listStyle,
     onChangeListStyle,
     controlPanel,
@@ -69,7 +95,6 @@ const Fields = memo(
             display: "flex",
             alignItems: "center",
             flexDirection: "row",
-            // gap: 1,
           }}
           component="fieldset"
         >
@@ -113,37 +138,82 @@ const Fields = memo(
           </RadioGroup>
         </FormControl>
         <Stack spacing={1.25}>
-          {items.map((value, index) => {
+          {items.map((item, index) => {
             const onChange = (
               event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
             ) => onChangeItem(index, event.target.value);
 
             return (
-              <Stack
-                key={`list-item-${index}`}
-                direction="row"
-                alignItems="center"
-                spacing={1}
-              >
-                <TextField
-                  name="items"
-                  label={`Item ${index + 1}`}
-                  placeholder="Enter list item"
-                  value={value}
-                  onChange={onChange}
-                  autoComplete="off"
-                  autoFocus={index === 0}
-                  fullWidth
-                />
-                <IconButton
-                  aria-label="remove list item"
-                  color="inherit"
-                  onClick={() => onRemoveItem(index)}
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
+              <Stack key={item.id} spacing={0.75}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <TextField
+                    name="items"
+                    label={`Item ${index + 1}`}
+                    placeholder="Enter list item"
+                    value={item.value}
+                    onChange={onChange}
+                    autoComplete="off"
+                    autoFocus={index === 0}
+                    fullWidth
+                  />
+                  <IconButton
+                    aria-label="remove list item"
+                    color="inherit"
+                    onClick={() => onRemoveItem(index)}
+                    size="small"
+                    sx={{ mt: 0.5 }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+
+                <Stack spacing={0.75} pl={5}>
+                  {item.subitems.map((subitem, subIndex) => {
+                    const handleChangeSubItem = (
+                      event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+                    ) => onChangeSubItem(index, subIndex, event.target.value);
+
+                    return (
+                      <Stack
+                        key={subitem.id}
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                      >
+                        <TextField
+                          name="subitems"
+                          label={`Subitem ${subIndex + 1}`}
+                          placeholder="Enter sub item"
+                          value={subitem.value}
+                          onChange={handleChangeSubItem}
+                          autoComplete="off"
+                          fullWidth
+                        />
+                        <IconButton
+                          aria-label="remove sub item"
+                          color="inherit"
+                          onClick={() => onRemoveSubItem(index, subIndex)}
+                          size="small"
+                          sx={{ mt: 0.5 }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    );
+                  })}
+
+                  <Tooltip placement="right" arrow title="Add sub item">
+                    <IconButton
+                      aria-label="add sub item"
+                      color="primary"
+                      onClick={() => onAddSubItem(index)}
+                      size="small"
+                      sx={{ width: "fit-content" }}
+                    >
+                      <AddCircleOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
             );
           })}
@@ -161,7 +231,7 @@ export const ListModal = memo(
     const { closeModal } = useListModalActions();
     const setContent = useSetListContentDispatch();
 
-    const [items, setItems] = useState<string[]>(() =>
+    const [items, setItems] = useState<TListItemDraft[]>(() =>
       buildInitialItems(contentValue)
     );
     const [listStyle, setListStyle] = useState<TListStyle>(() =>
@@ -174,13 +244,19 @@ export const ListModal = memo(
     }, [contentValue]);
 
     const handleAddItem = useCallback(() => {
-      setItems((prev) => [...prev, ""]);
+      setItems((prev) => [...prev, createEmptyListItem()]);
     }, []);
 
     const handleChangeItem = useCallback((index: number, value: string) => {
       setItems((prev) => {
         const next = [...prev];
-        next[index] = value;
+        const target = next[index];
+
+        if (!target) {
+          return prev;
+        }
+
+        next[index] = { ...target, value };
         return next;
       });
     }, []);
@@ -188,12 +264,86 @@ export const ListModal = memo(
     const handleRemoveItem = useCallback((index: number) => {
       setItems((prev) => {
         if (prev.length === 1) {
-          return [""];
+          return [createEmptyListItem()];
         }
 
         return prev.filter((_, itemIndex) => itemIndex !== index);
       });
     }, []);
+
+    const handleAddSubItem = useCallback((parentIndex: number) => {
+      setItems((prev) => {
+        const next = [...prev];
+        const target = next[parentIndex];
+
+        if (!target) {
+          return prev;
+        }
+
+        const updated = {
+          ...target,
+          subitems: [...target.subitems, { id: createId(), value: "" }],
+        };
+
+        next[parentIndex] = updated;
+        return next;
+      });
+    }, []);
+
+    const handleChangeSubItem = useCallback(
+      (parentIndex: number, subIndex: number, value: string) => {
+        setItems((prev) => {
+          const next = [...prev];
+          const target = next[parentIndex];
+
+          if (!target) {
+            return prev;
+          }
+
+          const subitems = [...target.subitems];
+          const subTarget = subitems[subIndex];
+
+          if (!subTarget) {
+            return prev;
+          }
+
+          subitems[subIndex] = { ...subTarget, value };
+
+          next[parentIndex] = {
+            ...target,
+            subitems,
+          };
+
+          return next;
+        });
+      },
+      []
+    );
+
+    const handleRemoveSubItem = useCallback(
+      (parentIndex: number, subIndex: number) => {
+        setItems((prev) => {
+          const next = [...prev];
+          const target = next[parentIndex];
+
+          if (!target) {
+            return prev;
+          }
+
+          const subitems = target.subitems.filter(
+            (_subitem, currentIndex) => currentIndex !== subIndex
+          );
+
+          next[parentIndex] = {
+            ...target,
+            subitems,
+          };
+
+          return next;
+        });
+      },
+      []
+    );
 
     const handleClose = useCallback(() => {
       setContent(undefined);
@@ -204,18 +354,34 @@ export const ListModal = memo(
 
     const [_, formAction] = useActionState(
       useCallback(
-        async (_state: undefined, formData: FormData): Promise<undefined> => {
-          const rawItems = formData.getAll("items");
-          const normalizedItems = rawItems
-            .filter((item): item is string => typeof item === "string")
-            .map((item) => item.trim())
-            .filter(Boolean);
-          const isEditing = Boolean(contentValue);
+        async (_state: undefined, _formData: FormData): Promise<undefined> => {
+          const normalizedItems: TListItemContent[] = items
+            .map((item) => {
+              const value = item.value.trim();
+              const subitems = item.subitems
+                .map((subitem) => subitem.value.trim())
+                .filter(Boolean);
+
+              if (!value && subitems.length === 0) {
+                return undefined;
+              }
+
+              if (!value) {
+                return undefined;
+              }
+
+              return {
+                value,
+                subitems,
+              };
+            })
+            .filter((item): item is TListItemContent => item !== undefined);
 
           if (normalizedItems.length === 0) {
             return undefined;
           }
 
+          const isEditing = Boolean(contentValue);
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "list",
@@ -233,7 +399,15 @@ export const ListModal = memo(
 
           return undefined;
         },
-        [position, handleClose, onSuccess, onUpdate, contentValue, listStyle]
+        [
+          items,
+          contentValue,
+          listStyle,
+          position,
+          handleClose,
+          onSuccess,
+          onUpdate,
+        ]
       ),
       undefined
     );
@@ -259,6 +433,9 @@ export const ListModal = memo(
             onAddItem={handleAddItem}
             onChangeItem={handleChangeItem}
             onRemoveItem={handleRemoveItem}
+            onAddSubItem={handleAddSubItem}
+            onChangeSubItem={handleChangeSubItem}
+            onRemoveSubItem={handleRemoveSubItem}
             listStyle={listStyle}
             onChangeListStyle={setListStyle}
             controlPanel={controlPanel}

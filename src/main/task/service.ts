@@ -349,21 +349,22 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
   let insideCode = false;
 
   const pushBlock = (content: string, explicitType?: TTypesMarkdownContent) => {
-    const normalizedContent =
-      explicitType === "code"
-        ? content.replace(/^\n+|\n+$/g, "")
-        : content.trim();
+    const trimmedContent = trimEmptyBoundaryLines(content);
 
-    if (!normalizedContent) {
+    if (!trimmedContent) {
       return;
     }
 
-    const type = explicitType ?? detectMarkdownContentType(normalizedContent);
+    const type = explicitType ?? detectMarkdownContentType(trimmedContent);
+    const storedContent =
+      type === "code" || type === "list"
+        ? trimmedContent
+        : trimmedContent.trim();
 
     blocks.push({
       id: randomUUID(),
       type,
-      content: normalizedContent,
+      content: storedContent,
       position: blocks.length + 1,
     });
   };
@@ -422,6 +423,20 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
   return blocks;
 }
 
+function trimEmptyBoundaryLines(content: string): string {
+  const lines = content.replace(/\r\n/g, "\n").split("\n");
+
+  while (lines.length > 0 && lines[0].trim() === "") {
+    lines.shift();
+  }
+
+  while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
+    lines.pop();
+  }
+
+  return lines.join("\n");
+}
+
 function detectMarkdownContentType(content: string): TTypesMarkdownContent {
   const normalized = content.trim();
 
@@ -429,7 +444,10 @@ function detectMarkdownContentType(content: string): TTypesMarkdownContent {
     return "title";
   }
 
-  const lines = normalized.split(/\r?\n/).map((line) => line.trim());
+  const lines = normalized
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
   const isList =
     lines.length > 0 && lines.every((line) => /^(-|\*|\d+\.)\s+/.test(line));
 

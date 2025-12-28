@@ -19,10 +19,11 @@ import {
   normalizeHeading,
   pickColor,
   detectListStyle,
-  splitListItems,
+  parseListContent,
   tokenizeSegments,
 } from "../utils";
 import { useMemo } from "react";
+import { type TListItemContent, type TListStyle } from "../utils/types";
 
 export const MarkdownContentList = () => {
   const contents = useContentsSelector();
@@ -262,7 +263,7 @@ const CodeItem = ({ content }: { content: string }) => {
 
 const ListItemBlock = ({ content }: { content: string }) => {
   const listStyle = detectListStyle(content);
-  const items = splitListItems(content);
+  const items = parseListContent(content);
 
   return (
     <Paper variant="outlined" sx={{ border: 0 }}>
@@ -280,22 +281,67 @@ const ListItemBlock = ({ content }: { content: string }) => {
         }}
       >
         {items.map((item, index) => (
-          <ListItem
-            key={`${item}-${index}`}
-            sx={{ py: 0.5, px: 1, border: 0 }}
-            className="markdown-list-item"
-          >
-            <ListItemText
-              primary={
-                <Typography component="span" variant="body1">
-                  {renderInlineSegments(item)}
-                </Typography>
-              }
-            />
-          </ListItem>
+          <ListItemRow
+            key={`${item.value}-${index}`}
+            item={item}
+            listStyle={listStyle}
+          />
         ))}
       </List>
     </Paper>
+  );
+};
+
+const ListItemRow = ({
+  item,
+  listStyle,
+}: {
+  item: TListItemContent;
+  listStyle: TListStyle;
+}) => {
+  return (
+    <ListItem sx={{ py: 0.5, px: 1, border: 0 }} className="markdown-list-item">
+      <ListItemText
+        primary={
+          <Typography component="span" variant="body1">
+            {renderInlineSegments(item.value)}
+          </Typography>
+        }
+      />
+
+      {item.subitems.length > 0 && (
+        <List
+          dense
+          disablePadding
+          component="ul"
+          sx={{
+            listStyleType: listStyle === "numbered" ? "disc" : "circle",
+            pl: 3,
+            mt: 0.5,
+            width: "100%",
+            "& .markdown-list-item": {
+              display: "list-item",
+            },
+          }}
+        >
+          {item.subitems.map((subitem, subIndex) => (
+            <ListItem
+              key={`${subitem}-${subIndex}`}
+              sx={{ py: 0.25, px: 1, border: 0 }}
+              className="markdown-list-item"
+            >
+              <ListItemText
+                primary={
+                  <Typography component="span" variant="body2">
+                    {renderInlineSegments(subitem)}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </ListItem>
   );
 };
 
