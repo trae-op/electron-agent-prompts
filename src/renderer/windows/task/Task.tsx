@@ -53,7 +53,7 @@ const Task = () => {
                   >
                     <TaskOverview />
                   </Stack>
-                  <Stack spacing={1} width="100%" direction="row">
+                  <Stack width="100%" direction="row">
                     <MarkdownContentListButtons />
                   </Stack>
                 </Stack>
