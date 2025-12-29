@@ -18,11 +18,11 @@ vi.mock("./ProjectListItem", () => ({
   },
 }));
 
-const createProject = (id: string, updated: string): TProject => ({
+const createProject = (id: string, created: string): TProject => ({
   id,
   name: `Project ${id}`,
-  created: new Date("2024-01-01T00:00:00.000Z"),
-  updated: new Date(updated),
+  created: new Date(created),
+  updated: new Date("2024-01-01T00:00:00.000Z"),
   countTasks: 0,
 });
 

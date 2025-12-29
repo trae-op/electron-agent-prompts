@@ -116,6 +116,7 @@ describe("UpdateProjectModal", () => {
       expect(updateProjectMock).toHaveBeenCalledWith({
         id: initialProject.id,
         name: "Updated Name",
+        isGeneral: false,
       });
     });
 
@@ -163,6 +164,7 @@ describe("UpdateProjectModal", () => {
       expect(updateProjectMock).toHaveBeenCalledWith({
         id: project.id,
         name: "New Name",
+        isGeneral: false,
       });
     });
 
