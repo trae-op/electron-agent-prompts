@@ -1,4 +1,9 @@
-type TTypesMarkdownContent = "text" | "code" | "list" | "title";
+type TTypesMarkdownContent =
+  | "text"
+  | "code"
+  | "list"
+  | "title"
+  | "architecture";
 
 type TMarkdownContent = {
   type: TTypesMarkdownContent;

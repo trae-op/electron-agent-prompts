@@ -22,6 +22,10 @@ import {
   useSetTextModalOpenDispatch,
 } from "@conceptions/Task/Text";
 import {
+  useSetArchitectureContentDispatch,
+  useSetArchitectureModalOpenDispatch,
+} from "@conceptions/Task/Architecture";
+import {
   useSetPositionContentDispatch,
   usePositionModalActions,
 } from "@conceptions/Task/Position";
@@ -36,6 +40,8 @@ const TaskOverview = () => {
   const setListModalOpen = useSetListModalOpenDispatch();
   const setTextContent = useSetTextContentDispatch();
   const setTextModalOpen = useSetTextModalOpenDispatch();
+  const setArchitectureContent = useSetArchitectureContentDispatch();
+  const setArchitectureModalOpen = useSetArchitectureModalOpenDispatch();
   const setPositionContent = useSetPositionContentDispatch();
   const { openModal: openPositionModal } = usePositionModalActions();
   const deleteContent = useDeleteContentDispatch();
@@ -61,6 +67,10 @@ const TaskOverview = () => {
           setTextContent(content);
           setTextModalOpen(true);
           break;
+        case "architecture":
+          setArchitectureContent(content);
+          setArchitectureModalOpen(true);
+          break;
       }
     },
     [
@@ -72,6 +82,8 @@ const TaskOverview = () => {
       setListModalOpen,
       setTextContent,
       setTextModalOpen,
+      setArchitectureContent,
+      setArchitectureModalOpen,
     ]
   );
 

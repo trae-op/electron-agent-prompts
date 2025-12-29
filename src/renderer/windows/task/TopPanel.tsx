@@ -5,11 +5,13 @@ import TitleIcon from "@mui/icons-material/Title";
 import CodeIcon from "@mui/icons-material/Code";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 
 import { useTitleModalActions } from "@conceptions/Task/Title";
 import { useCodeModalActions } from "@conceptions/Task/Code";
 import { useListModalActions } from "@conceptions/Task/List";
 import { useTextModalActions } from "@conceptions/Task/Text";
+import { useArchitectureModalActions } from "@conceptions/Task/Architecture";
 import { TopPanel } from "@layouts/TopPanel";
 
 const items = [
@@ -17,6 +19,12 @@ const items = [
   { id: "2", action: "text", label: "text", icon: <TextFieldsIcon /> },
   { id: "3", action: "list", label: "list", icon: <FormatListBulletedIcon /> },
   { id: "4", action: "code", label: "code", icon: <CodeIcon /> },
+  {
+    id: "5",
+    action: "architecture",
+    label: "architecture",
+    icon: <AccountTreeIcon />,
+  },
 ];
 
 const ContainerTopPanel = () => {
@@ -24,6 +32,7 @@ const ContainerTopPanel = () => {
   const { openModal: openCodeModal } = useCodeModalActions();
   const { openModal: openListModal } = useListModalActions();
   const { openModal: openTextModal } = useTextModalActions();
+  const { openModal: openArchitectureModal } = useArchitectureModalActions();
 
   const handleOpenModal = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -41,11 +50,20 @@ const ContainerTopPanel = () => {
         case "text":
           openTextModal();
           break;
+        case "architecture":
+          openArchitectureModal();
+          break;
         case "code":
           openCodeModal();
           break;
         case "list":
-          openListModal();
+          [
+            openArchitectureModal,
+            openCodeModal,
+            openListModal,
+            openTextModal,
+            openTitleModal,
+          ];
           break;
         default:
           break;

@@ -347,6 +347,7 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
   let textBuffer: string[] = [];
   let codeBuffer: string[] = [];
   let insideCode = false;
+  let codeBlockType: TTypesMarkdownContent | undefined;
 
   const pushBlock = (content: string, explicitType?: TTypesMarkdownContent) => {
     const trimmedContent = trimEmptyBoundaryLines(content);
@@ -384,9 +385,10 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
 
     if (insideCode) {
       if (trimmed.startsWith("```")) {
-        pushBlock(codeBuffer.join("\n"), "code");
+        pushBlock(codeBuffer.join("\n"), codeBlockType ?? "code");
         codeBuffer = [];
         insideCode = false;
+        codeBlockType = undefined;
       } else {
         codeBuffer.push(line);
       }
@@ -397,6 +399,7 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
       flushTextBuffer();
       insideCode = true;
       codeBuffer = [];
+      codeBlockType = parseFenceType(trimmed);
       continue;
     }
 
@@ -415,12 +418,22 @@ function parseMarkdownFileContent(markdown: string): TMarkdownContent[] {
   }
 
   if (insideCode) {
-    pushBlock(codeBuffer.join("\n"), "code");
+    pushBlock(codeBuffer.join("\n"), codeBlockType ?? "code");
   } else {
     flushTextBuffer();
   }
 
   return blocks;
+}
+
+function parseFenceType(line: string): TTypesMarkdownContent {
+  const language = line.slice(3).trim().toLowerCase();
+
+  if (language === "architecture") {
+    return "architecture";
+  }
+
+  return "code";
 }
 
 function trimEmptyBoundaryLines(content: string): string {
@@ -448,6 +461,14 @@ function detectMarkdownContentType(content: string): TTypesMarkdownContent {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
+  const hasArchitectureSymbols =
+    normalized.includes("├──") ||
+    normalized.includes("└──") ||
+    normalized.includes("│");
+
+  if (hasArchitectureSymbols) {
+    return "architecture";
+  }
   const isList =
     lines.length > 0 && lines.every((line) => /^(-|\*|\d+\.)\s+/.test(line));
 

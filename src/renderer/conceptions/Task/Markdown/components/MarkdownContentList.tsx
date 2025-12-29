@@ -52,6 +52,8 @@ function renderContent(contentItem: TMarkdownContent) {
       return <TitleItem content={contentItem.content} />;
     case "code":
       return <CodeItem content={contentItem.content} />;
+    case "architecture":
+      return <ArchitectureItem content={contentItem.content} />;
     case "list":
       return <ListItemBlock content={contentItem.content} />;
     case "text":
@@ -256,6 +258,36 @@ const CodeItem = ({ content }: { content: string }) => {
             {segment.value}
           </Box>
         ))}
+      </Box>
+    </Paper>
+  );
+};
+
+const ArchitectureItem = ({ content }: { content: string }) => {
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        bgcolor: (theme) =>
+          theme.palette.mode === "dark"
+            ? theme.palette.grey[900]
+            : theme.palette.grey[50],
+        borderColor: (theme) => theme.palette.divider,
+      }}
+    >
+      <Box
+        component="pre"
+        sx={{
+          m: 0,
+          p: 2,
+          fontFamily:
+            "Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace",
+          fontSize: 14,
+          lineHeight: 1.5,
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {content}
       </Box>
     </Paper>
   );
