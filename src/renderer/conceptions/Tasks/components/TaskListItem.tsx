@@ -133,19 +133,6 @@ export const TaskListItem = memo(
                     {updatedLabel}
                   </Typography>
                 </Stack>
-                <Stack direction="row" spacing={0.3} alignItems="center">
-                  <ChatBubbleOutlineRoundedIcon
-                    fontSize="inherit"
-                    color="primary"
-                  />
-                  <Typography
-                    fontSize={12}
-                    component="span"
-                    color="text.secondary"
-                  >
-                    {task.projectId}
-                  </Typography>
-                </Stack>
 
                 <Stack direction="row" spacing={0.3} alignItems="center">
                   <EditDocumentIcon

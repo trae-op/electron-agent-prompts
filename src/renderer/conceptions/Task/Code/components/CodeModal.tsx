@@ -18,7 +18,7 @@ const Fields = memo(({ contentValue }: { contentValue?: TMarkdownContent }) => {
       <TextField
         name="code"
         id="code-modal-textarea"
-        label="JavaScript code"
+        label="Code"
         placeholder={`const main = () => {\n  return 42;\n};`}
         autoFocus
         fullWidth

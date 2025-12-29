@@ -169,7 +169,6 @@ export const ArchitectureModal = () => {
       contents={contents}
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}
-      controlPanel={<TextControlPanel />}
     />
   );
 };

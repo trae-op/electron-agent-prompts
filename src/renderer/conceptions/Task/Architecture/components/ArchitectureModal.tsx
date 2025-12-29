@@ -92,9 +92,16 @@ const NodeFields = memo(
         onChangeNodeName(node.id, event.target.value),
       [node.id, onChangeNodeName]
     );
+    const handlerRemoveNode = useCallback(() => {
+      onRemoveNode(node.id);
+    }, [node.id, onRemoveNode]);
+
+    const handlerAddChild = useCallback(() => {
+      onAddChild(node.id);
+    }, [node.id, onAddChild]);
 
     return (
-      <Stack spacing={0.75} pl={depth * 2.5}>
+      <Stack spacing={0.75}>
         <Stack direction="row" alignItems="center" spacing={1}>
           <TextField
             name="architecture-item"
@@ -109,7 +116,7 @@ const NodeFields = memo(
           <IconButton
             aria-label="remove architecture item"
             color="inherit"
-            onClick={() => onRemoveNode(node.id)}
+            onClick={handlerRemoveNode}
             size="small"
             sx={{ mt: 0.5 }}
           >
@@ -134,7 +141,7 @@ const NodeFields = memo(
             <IconButton
               aria-label="add nested item"
               color="primary"
-              onClick={() => onAddChild(node.id)}
+              onClick={handlerAddChild}
               size="small"
               sx={{ width: "fit-content" }}
             >
@@ -210,12 +217,7 @@ const Fields = memo(
 );
 
 export const ArchitectureModal = memo(
-  ({
-    onSuccess,
-    onUpdate,
-    contents,
-    controlPanel,
-  }: TArchitectureModalProps) => {
+  ({ onSuccess, onUpdate, contents }: TArchitectureModalProps) => {
     const isOpen = useArchitectureModalOpenSelector();
     const contentValue = useArchitectureContentValueSelector();
 
@@ -334,7 +336,6 @@ export const ArchitectureModal = memo(
             onAddNode={handleAddNode}
             onRemoveNode={handleRemoveNode}
             onAddChild={handleAddChild}
-            controlPanel={controlPanel}
           />
         }
       />

@@ -57,13 +57,7 @@ const ContainerTopPanel = () => {
           openCodeModal();
           break;
         case "list":
-          [
-            openArchitectureModal,
-            openCodeModal,
-            openListModal,
-            openTextModal,
-            openTitleModal,
-          ];
+          openListModal();
           break;
         default:
           break;

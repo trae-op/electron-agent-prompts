@@ -4,7 +4,6 @@ export type TArchitectureModalProps = {
   contents: TMarkdownContent[];
   onSuccess: (data: TMarkdownContent) => void;
   onUpdate?: (data: TMarkdownContent) => void;
-  controlPanel?: ReactNode;
 };
 
 export type TArchitectureNodeDraft = {
