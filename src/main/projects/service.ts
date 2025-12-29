@@ -16,6 +16,7 @@ export async function getProjects<R extends TProject[]>(): Promise<
     showErrorMessages({
       title: "Error request by getProjects",
       body: response.error.message,
+      isDialog: false,
     });
   }
 

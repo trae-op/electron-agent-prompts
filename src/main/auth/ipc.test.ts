@@ -6,9 +6,8 @@ type THandler = (...args: any[]) => unknown;
 
 let handlers: Record<string, THandler> = {};
 let ipcMainOnMock: Mock;
-let ipcWebContentsSendMock: Mock;
+let ipcWebContentsBroadcastMock: Mock;
 let openWindowMock: Mock;
-let getWindowMock: Mock;
 let getElectronStorageMock: Mock;
 let setElectronStorageMock: Mock;
 let cacheUserMock: Mock;
@@ -19,17 +18,12 @@ vi.mock("../@shared/utils.js", () => {
   ipcMainOnMock = vi.fn((channel: string, handler: THandler) => {
     handlers[channel] = handler;
   });
-  ipcWebContentsSendMock = vi.fn();
+  ipcWebContentsBroadcastMock = vi.fn();
 
   return {
     ipcMainOn: ipcMainOnMock,
-    ipcWebContentsSend: ipcWebContentsSendMock,
+    ipcWebContentsBroadcast: ipcWebContentsBroadcastMock,
   };
-});
-
-vi.mock("../@shared/control-window/receive.js", () => {
-  getWindowMock = vi.fn();
-  return { getWindow: getWindowMock };
 });
 
 vi.mock("./window.js", () => {
@@ -90,9 +84,6 @@ describe("registerIpc", () => {
   });
 
   it("sends auth state during checkAuth when user is cached", () => {
-    const mainWindow = { webContents: {} } as const;
-
-    getWindowMock.mockReturnValue(mainWindow);
     getElectronStorageMock.mockReturnValue("user-123");
     cacheUserMock.mockReturnValue({ id: "user-123" });
 
@@ -102,13 +93,9 @@ describe("registerIpc", () => {
     handler?.();
 
     expect(cacheUserMock).toHaveBeenCalledWith("user-123");
-    expect(ipcWebContentsSendMock).toHaveBeenCalledWith(
-      "auth",
-      mainWindow.webContents,
-      {
-        isAuthenticated: true,
-      }
-    );
+    expect(ipcWebContentsBroadcastMock).toHaveBeenCalledWith("auth", {
+      isAuthenticated: true,
+    });
   });
 
   it("opens auth window and handles user-exists redirect", () => {
@@ -120,9 +107,6 @@ describe("registerIpc", () => {
     };
 
     openWindowMock.mockReturnValue(windowStub);
-
-    const mainWindow = { webContents: {} };
-    getWindowMock.mockReturnValue(mainWindow);
 
     const handler = handlers.windowAuth;
     expect(handler).toBeTypeOf("function");
@@ -148,7 +132,7 @@ describe("registerIpc", () => {
       title: messagesMock.auth.userAlreadyExists,
       body: "Already registered\nEmail: user@example.com",
     });
-    expect(ipcWebContentsSendMock).not.toHaveBeenCalled();
+    expect(ipcWebContentsBroadcastMock).not.toHaveBeenCalled();
   });
 
   it("stores credentials and notifies main window on verify redirect", () => {
@@ -160,9 +144,6 @@ describe("registerIpc", () => {
     };
 
     openWindowMock.mockReturnValue(windowStub);
-
-    const mainWindow = { webContents: {} };
-    getWindowMock.mockReturnValue(mainWindow);
 
     const handler = handlers.windowAuth;
     handler?.({}, { provider: "google" as keyof TLessProviders });
@@ -183,13 +164,9 @@ describe("registerIpc", () => {
       "abc123"
     );
     expect(setElectronStorageMock).toHaveBeenNthCalledWith(2, "userId", "789");
-    expect(ipcWebContentsSendMock).toHaveBeenCalledWith(
-      "auth",
-      mainWindow.webContents,
-      {
-        isAuthenticated: true,
-      }
-    );
+    expect(ipcWebContentsBroadcastMock).toHaveBeenCalledWith("auth", {
+      isAuthenticated: true,
+    });
     expect(windowStub.close).toHaveBeenCalledTimes(1);
     expect(showErrorMessagesMock).not.toHaveBeenCalled();
   });
@@ -203,9 +180,6 @@ describe("registerIpc", () => {
     };
 
     openWindowMock.mockReturnValue(windowStub);
-
-    const mainWindow = { webContents: {} };
-    getWindowMock.mockReturnValue(mainWindow);
 
     const handler = handlers.windowAuth;
     handler?.({}, { provider: "google" as keyof TLessProviders });
@@ -224,7 +198,7 @@ describe("registerIpc", () => {
       body: "Token=abc123\nUserId: null",
     });
     expect(setElectronStorageMock).not.toHaveBeenCalled();
-    expect(ipcWebContentsSendMock).not.toHaveBeenCalled();
+    expect(ipcWebContentsBroadcastMock).not.toHaveBeenCalled();
     expect(windowStub.close).toHaveBeenCalledTimes(1);
   });
 });

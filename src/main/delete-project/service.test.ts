@@ -51,7 +51,7 @@ describe("deleteProject", () => {
       restApi.urls.projects.base
     }${restApi.urls.projects.byId(payload.id)}`;
 
-    expect(del).toHaveBeenCalledWith(expectedUrl);
+    expect(del).toHaveBeenCalledWith(expectedUrl, payload.id);
     expect(result).toBe(true);
     expect(showErrorMessages).not.toHaveBeenCalled();
   });

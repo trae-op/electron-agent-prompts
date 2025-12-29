@@ -18,6 +18,7 @@ export async function getUserById<R extends TUser>(
     showErrorMessages({
       title: "Error request by getUserById",
       body: response.error.message,
+      isDialog: false,
     });
   }
 
