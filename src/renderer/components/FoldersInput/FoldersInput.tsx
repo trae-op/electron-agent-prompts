@@ -146,7 +146,7 @@ export const FoldersInput = ({ folders, onChange }: TFoldersInputProps) => {
                     aria-label="delete folder"
                     onClick={handleRemoveFolder(folder)}
                     disabled={pending}
-                    data-testid={`create-task-folder-remove-${folderName}`}
+                    data-testid={`folder-remove-${folderName}`}
                   >
                     <DeleteIcon />
                   </IconButton>

@@ -46,7 +46,7 @@ export const UploadFile = () => {
       tabIndex={-1}
       startIcon={<CloudUploadIcon />}
       disabled={pending}
-      data-testid="create-task-upload"
+      data-testid="file-upload"
     >
       {selectedFileName ?? "No file selected"}
       <VisuallyHiddenInput
