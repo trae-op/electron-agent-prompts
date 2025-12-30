@@ -1,15 +1,10 @@
 import { ReactNode } from "react";
+import { TArchitectureNodeDraft } from "../utils/type";
 
 export type TArchitectureModalProps = {
   contents: TMarkdownContent[];
   onSuccess: (data: TMarkdownContent) => void;
   onUpdate?: (data: TMarkdownContent) => void;
-};
-
-export type TArchitectureNodeDraft = {
-  id: string;
-  name: string;
-  children: TArchitectureNodeDraft[];
 };
 
 export type TFieldsProps = {

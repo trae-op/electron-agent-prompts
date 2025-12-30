@@ -1,22 +1,13 @@
+import {
+  TArchitectureNode,
+  TArchitectureNodeInput,
+  TParsedArchitecture,
+} from "./type";
+
 const BRANCH = "├── ";
 const LAST_BRANCH = "└── ";
 const CONTINUE_PREFIX = "│   ";
 const EMPTY_PREFIX = "    ";
-
-export type TArchitectureNode = {
-  name: string;
-  children: TArchitectureNode[];
-};
-
-export type TArchitectureNodeInput = {
-  name: string;
-  children?: TArchitectureNodeInput[];
-};
-
-export type TParsedArchitecture = {
-  rootPath: string;
-  nodes: TArchitectureNode[];
-};
 
 export function normalizeRootPath(value: string): string {
   const trimmed = value.trim();
