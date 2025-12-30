@@ -7,6 +7,7 @@ type TEventPayloadInvoke = {
   updateTask: TTask | undefined;
   deleteTask: boolean;
   uploadFile: undefined;
+  uploadConnectionInstructionFile: undefined;
   markdownContent: TTask | undefined;
 };
 
@@ -44,6 +45,11 @@ type TEventSendInvoke = {
     file: Blob;
     path?: string;
   };
+  uploadConnectionInstructionFile: {
+    file: Blob;
+    path?: string;
+    ide?: string;
+  };
   markdownContent: {
     taskId: string;
     contents: TMarkdownContent[];
@@ -73,6 +79,9 @@ type TInvoke = {
   uploadFile: (
     payload: TEventSendInvoke["uploadFile"]
   ) => Promise<TEventPayloadInvoke["uploadFile"]>;
+  uploadConnectionInstructionFile: (
+    payload: TEventSendInvoke["uploadConnectionInstructionFile"]
+  ) => Promise<TEventPayloadInvoke["uploadConnectionInstructionFile"]>;
   markdownContent: (
     payload: TEventSendInvoke["markdownContent"]
   ) => Promise<TEventPayloadInvoke["markdownContent"]>;

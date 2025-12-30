@@ -1,7 +1,7 @@
 import axios from "axios";
 import { randomUUID } from "node:crypto";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { get } from "../@shared/services/rest-api/service.js";
 import { showErrorMessages } from "../@shared/services/error-messages.js";
@@ -11,6 +11,7 @@ import {
   getElectronStorage,
   getStore,
   setElectronStorage,
+  setStore,
 } from "../@shared/store.js";
 
 export async function getTask<R extends TTask>(
@@ -152,6 +153,13 @@ export function getMarkdownContentByProjectId(projectId?: string) {
 
 const FOLDERS_STORAGE_KEY = "foldersContentFiles";
 
+const CONNECTION_INSTRUCTION_STORAGE_KEY = "connectionInstructionFiles";
+
+type TConnectionInstructionEntry = {
+  path: string;
+  ide?: string;
+};
+
 function normalizeFolders(folders: string[]): string[] {
   return Array.from(
     new Set(
@@ -270,6 +278,246 @@ export function getFoldersContentByProjectId(projectId?: string) {
   return projectFolders;
 }
 
+function normalizeConnectionInstructionPath(path?: string): string | undefined {
+  const normalizedPath = path?.trim();
+
+  if (normalizedPath === undefined || normalizedPath.length === 0) {
+    return undefined;
+  }
+
+  return normalizedPath;
+}
+
+export function saveConnectionInstruction(payload: {
+  projectId: string;
+  taskId: string;
+  path?: string;
+  ide?: string;
+}) {
+  const normalizedPath = normalizeConnectionInstructionPath(payload.path);
+  const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
+  const projectInstructions = storage[payload.projectId] ?? {};
+
+  if (normalizedPath === undefined) {
+    if (projectInstructions[payload.taskId] === undefined) {
+      return;
+    }
+
+    delete projectInstructions[payload.taskId];
+
+    if (Object.keys(projectInstructions).length === 0) {
+      const { [payload.projectId]: _, ...restProjects } = storage;
+      setElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY, restProjects);
+      return;
+    }
+
+    setElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY, {
+      ...storage,
+      [payload.projectId]: projectInstructions,
+    });
+
+    return;
+  }
+
+  setElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY, {
+    ...storage,
+    [payload.projectId]: {
+      ...projectInstructions,
+      [payload.taskId]: {
+        path: normalizedPath,
+        ide: payload.ide ?? "vs-code",
+      },
+    },
+  });
+}
+
+export function deleteConnectionInstruction(
+  taskId: string,
+  projectId?: string
+) {
+  const projectKey = projectId ?? getStore<string, string>("projectId");
+
+  if (projectKey === undefined) {
+    return;
+  }
+
+  const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
+  const projectInstructions = storage[projectKey];
+
+  if (
+    projectInstructions === undefined ||
+    projectInstructions[taskId] === undefined
+  ) {
+    return;
+  }
+
+  const { [taskId]: _, ...restTasks } = projectInstructions;
+
+  if (Object.keys(restTasks).length === 0) {
+    const { [projectKey]: __, ...restProjects } = storage;
+    setElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY, restProjects);
+    return;
+  }
+
+  setElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY, {
+    ...storage,
+    [projectKey]: restTasks,
+  });
+}
+
+export function getConnectionInstructionByTaskId(
+  taskId: string,
+  projectId?: string
+): TConnectionInstructionEntry | undefined {
+  const projectKey = projectId ?? getStore<string, string>("projectId");
+
+  if (projectKey === undefined) {
+    return;
+  }
+
+  const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
+  const projectInstructions = storage[projectKey] ?? {};
+
+  return projectInstructions[taskId];
+}
+
+export function getConnectionInstructionByProjectId(projectId?: string) {
+  const projectKey = projectId ?? getStore<string, string>("projectId");
+
+  if (projectKey === undefined) {
+    return;
+  }
+
+  const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
+
+  return storage[projectKey];
+}
+
+export async function connectionInstruction(): Promise<void> {
+  const uploadInstruction = getStore<{ path?: string; ide?: string }, string>(
+    "uploadConnectionInstructionFile"
+  );
+
+  const normalizedPath = normalizeConnectionInstructionPath(
+    uploadInstruction?.path
+  );
+
+  if (normalizedPath === undefined) {
+    return;
+  }
+
+  const ide = uploadInstruction?.ide ?? "vs-code";
+
+  switch (ide) {
+    case "vs-code": {
+      await applyVsCodeConnectionInstruction(normalizedPath);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+async function applyVsCodeConnectionInstruction(filePath: string) {
+  try {
+    const fileContent = await readFile(filePath, "utf8");
+
+    let parsed: Record<string, unknown>;
+
+    try {
+      parsed = JSON.parse(fileContent) as Record<string, unknown>;
+    } catch (error) {
+      showErrorMessages({
+        title: "Error parsing connection instruction file",
+        body: error instanceof Error ? error.message : String(error),
+      });
+
+      return;
+    }
+
+    const instructions = normalizeInstructionEntries(
+      parsed["github.copilot.chat.codeGeneration.instructions"]
+    );
+
+    const projectRoot = resolve(dirname(filePath), "..");
+    const savedFiles = getStore<string[], string>("lastSavedFilePaths") ?? [];
+    const projectFiles = savedFiles
+      .filter((savedPath) => isPathInsideRoot(savedPath, projectRoot))
+      .map(
+        (savedPath) =>
+          `./${normalizePathSeparator(relative(projectRoot, savedPath))}`
+      );
+
+    const existingFiles = new Set(
+      instructions.map((entry) => normalizePathSeparator(entry.file))
+    );
+
+    for (const projectFile of projectFiles) {
+      const normalizedProjectFile = normalizePathSeparator(projectFile);
+
+      if (!existingFiles.has(normalizedProjectFile)) {
+        instructions.push({ file: projectFile + ".md" });
+        existingFiles.add(normalizedProjectFile);
+      }
+    }
+
+    parsed["github.copilot.chat.codeGeneration.instructions"] = instructions;
+
+    await writeFile(filePath, JSON.stringify(parsed, null, 2), "utf8");
+  } catch (error) {
+    showErrorMessages({
+      title: "Error applying connection instruction",
+      body: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+type TInstructionEntry = {
+  file: string;
+};
+
+function normalizePathSeparator(pathStr: string): string {
+  return pathStr.replace(/\\/g, "/");
+}
+
+function isPathInsideRoot(targetPath: string, rootPath: string): boolean {
+  const normalizedRoot = normalizePathSeparator(resolve(rootPath));
+  const normalizedTarget = normalizePathSeparator(resolve(targetPath));
+  const rootWithSlash = normalizedRoot.endsWith("/")
+    ? normalizedRoot
+    : `${normalizedRoot}/`;
+
+  return normalizedTarget.toLowerCase().startsWith(rootWithSlash.toLowerCase());
+}
+
+function normalizeInstructionEntries(value: unknown): TInstructionEntry[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (typeof item === "string") {
+          return { file: item };
+        }
+
+        if (
+          typeof item === "object" &&
+          item !== null &&
+          typeof (item as { file?: unknown }).file === "string"
+        ) {
+          return { file: (item as { file: string }).file };
+        }
+
+        return undefined;
+      })
+      .filter((entry): entry is TInstructionEntry => entry !== undefined);
+  }
+
+  if (typeof value === "string") {
+    return [{ file: value }];
+  }
+
+  return [];
+}
+
 export async function buildMarkdownContentsFromBlob(
   fileBlob: Blob
 ): Promise<TMarkdownContent[]> {
@@ -315,15 +563,18 @@ export async function saveFileToStoredFolders(payload: {
 
   const fileBuffer = Buffer.from(await payload.file.arrayBuffer());
 
+  const destinations = normalizedFolders.map((folderPath) =>
+    join(folderPath, payload.fileName)
+  );
+
   const results = await Promise.allSettled(
-    normalizedFolders.map(async (folderPath) => {
-      await mkdir(folderPath, { recursive: true });
-
-      const destination = join(folderPath, payload.fileName);
-
+    destinations.map(async (destination) => {
+      await mkdir(dirname(destination), { recursive: true });
       await writeFile(destination, fileBuffer);
     })
   );
+
+  setStore("lastSavedFilePaths", destinations);
 
   const failed = results.find(
     (result): result is PromiseRejectedResult => result.status === "rejected"

@@ -30,8 +30,13 @@ function deleteMarkdownContent(taskId: string) {
 
 export function registerIpc({
   deleteFoldersContent,
+  deleteConnectionInstruction,
 }: {
   deleteFoldersContent: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => void;
+  deleteConnectionInstruction: (
     taskId: string,
     projectId?: string | undefined
   ) => void;
@@ -47,6 +52,7 @@ export function registerIpc({
 
     if (result) {
       deleteFoldersContent(String(payload.id), projectId);
+      deleteConnectionInstruction(String(payload.id), projectId);
     }
 
     return result;

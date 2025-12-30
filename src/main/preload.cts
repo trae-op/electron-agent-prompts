@@ -106,6 +106,11 @@ electron.contextBridge.exposeInMainWorld("electron", {
       payload.path = filePath;
       return ipcInvoke("uploadFile", payload);
     },
+    uploadConnectionInstructionFile: (payload) => {
+      const filePath = electron.webUtils.getPathForFile(payload.file);
+      payload.path = filePath;
+      return ipcInvoke("uploadConnectionInstructionFile", payload);
+    },
     resolveFilePath: (file) =>
       electron.webUtils.getPathForFile(file) ?? undefined,
   },

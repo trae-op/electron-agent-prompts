@@ -1,3 +1,4 @@
+import { getStore, setStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { createTask } from "./service.js";
 
@@ -8,6 +9,9 @@ export function registerIpc({
   buildMarkdownContentsFromBlob,
   getMarkdownContentByProjectId,
   saveMarkdownContent,
+  saveConnectionInstruction,
+  getConnectionInstructionByTaskId,
+  connectionInstruction,
 }: {
   buildMarkdownContentsFromBlob(fileBlob: Blob): Promise<TMarkdownContent[]>;
   getMarkdownContentByProjectId(projectId?: string | undefined):
@@ -33,6 +37,17 @@ export function registerIpc({
     taskId: string;
     folders: string[];
   }) => void;
+  saveConnectionInstruction: (payload: {
+    projectId: string;
+    taskId: string;
+    path?: string;
+    ide?: string;
+  }) => void;
+  getConnectionInstructionByTaskId: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => { path: string; ide?: string } | undefined;
+  connectionInstruction: () => Promise<void>;
 }): void {
   ipcMainHandle("createTask", async (payload) => {
     if (payload === undefined || payload.projectId === undefined) {
@@ -78,7 +93,33 @@ export function registerIpc({
       }
     }
 
+    const connectionInstructionStore = getStore<
+      { path?: string; ide?: string },
+      string
+    >("uploadConnectionInstructionFile");
+
+    if (connectionInstructionStore?.path) {
+      saveConnectionInstruction({
+        projectId: payload.projectId,
+        taskId: String(result.task.id),
+        path: connectionInstructionStore.path,
+        ide: connectionInstructionStore.ide,
+      });
+
+      await connectionInstruction();
+    }
+
+    setStore("uploadConnectionInstructionFile", {
+      path: "",
+      ide: connectionInstructionStore?.ide ?? "vs-code",
+    });
+
     const projectMarkdownContent = getMarkdownContentByProjectId(
+      payload.projectId
+    );
+
+    const connectionInstructionPayload = getConnectionInstructionByTaskId(
+      String(result.task.id),
       payload.projectId
     );
 
@@ -94,6 +135,8 @@ export function registerIpc({
         String(result.task.id),
         payload.projectId
       ),
+      pathConnectionInstruction: connectionInstructionPayload?.path,
+      ide: connectionInstructionPayload?.ide,
     };
   });
 }

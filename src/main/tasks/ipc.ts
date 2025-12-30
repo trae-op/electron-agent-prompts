@@ -6,6 +6,7 @@ import { TGetFoldersContentByProjectId } from "./types.js";
 
 export function registerIpc({
   getFoldersContentByProjectId,
+  getConnectionInstructionByProjectId,
 }: TGetFoldersContentByProjectId): void {
   const tasksCollect = (tasks: TTask[]) => {
     const projectIdStore = getStore<string, string>("projectId");
@@ -31,6 +32,9 @@ export function registerIpc({
       }
     }
 
+    const connectionInstructions =
+      getConnectionInstructionByProjectId(projectIdStore);
+
     return tasks.map((task) => ({
       ...task,
       content: content[task.id + ""] ?? [],
@@ -38,6 +42,8 @@ export function registerIpc({
         foldersContentFiles && foldersContentFiles[task.id + ""]
           ? foldersContentFiles[task.id + ""]
           : [],
+      pathConnectionInstruction: connectionInstructions?.[task.id + ""]?.path,
+      ide: connectionInstructions?.[task.id + ""]?.ide,
     }));
   };
 

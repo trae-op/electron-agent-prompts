@@ -9,6 +9,7 @@ import { TCreateTaskModalProps, TFieldsProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
+import { ConnectInstruction } from "@components/ConnectInstruction";
 
 const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
   const { pending } = useFormStatus();
@@ -27,6 +28,7 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         disabled={pending}
       />
       <UploadFile />
+      <ConnectInstruction />
       <FoldersInput folders={folders} onChange={onFoldersChange} />
     </Stack>
   );

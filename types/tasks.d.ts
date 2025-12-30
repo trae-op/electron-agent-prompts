@@ -7,6 +7,8 @@ type TTask = {
   fileId: string;
   url: string | null;
   foldersContentFiles?: string[];
+  pathConnectionInstruction?: string;
+  ide?: string;
   content?: string[];
 };
 

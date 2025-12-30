@@ -10,6 +10,7 @@ import {
 } from "../context";
 import { TFieldsProps, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
+import { ConnectInstruction } from "@components/ConnectInstruction";
 import { FoldersInput } from "@components/FoldersInput";
 
 const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
@@ -36,6 +37,10 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         disabled={pending}
       />
       <UploadFile />
+      <ConnectInstruction
+        initialPath={task.pathConnectionInstruction}
+        initialIde={task.ide}
+      />
       <FoldersInput folders={folders} onChange={onFoldersChange} />
     </Stack>
   );

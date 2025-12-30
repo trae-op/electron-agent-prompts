@@ -24,6 +24,7 @@ import { registerIpc as registerIpcUpdateTask } from "./update-task/ipc.js";
 import { updateTask as updateTaskService } from "./update-task/service.js";
 import { registerIpc as registerIpcDeleteTask } from "./delete-task/ipc.js";
 import { registerIpc as registerIpcUploadFile } from "./upload-file/ipc.js";
+import { registerIpc as registerIpcUploadConnectionInstructionFile } from "./upload-connection-instruction-file/ipc.js";
 import { registerIpc as registerIpcTask } from "./task/ipc.js";
 import {
   saveFoldersContent,
@@ -36,6 +37,11 @@ import {
   getMarkdownContentByProjectId,
   saveMarkdownContent,
   downloadByUrl,
+  saveConnectionInstruction,
+  deleteConnectionInstruction,
+  getConnectionInstructionByProjectId,
+  getConnectionInstructionByTaskId,
+  connectionInstruction,
 } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
@@ -106,6 +112,7 @@ app.on("ready", async () => {
   registerIpcProjects();
   registerIpcTasks({
     getFoldersContentByProjectId,
+    getConnectionInstructionByProjectId,
   });
   registerIpcCreateProject();
   registerIpcUpdateProject();
@@ -119,6 +126,9 @@ app.on("ready", async () => {
     buildMarkdownContentsFromBlob,
     getMarkdownContentByProjectId,
     saveMarkdownContent,
+    saveConnectionInstruction,
+    getConnectionInstructionByTaskId,
+    connectionInstruction,
   });
   registerIpcUpdateTask({
     getFoldersContentByTaskId,
@@ -128,11 +138,17 @@ app.on("ready", async () => {
     getMarkdownContentByProjectId,
     saveMarkdownContent,
     downloadByUrl,
+    saveConnectionInstruction,
+    deleteConnectionInstruction,
+    getConnectionInstructionByTaskId,
+    connectionInstruction,
   });
   registerIpcDeleteTask({
     deleteFoldersContent,
+    deleteConnectionInstruction,
   });
   registerIpcUploadFile();
+  registerIpcUploadConnectionInstructionFile();
   registerIpcPreload();
   registerIpcAppVersion();
   registerIpcUpdater();

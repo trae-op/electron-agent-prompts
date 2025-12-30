@@ -20,12 +20,24 @@ export type TCacheFoldersContent = {
   };
 };
 
+export type TConnectionInstructionFiles = {
+  [projectId: string]: {
+    [taskId: string]:
+      | {
+          path: string;
+          ide?: string;
+        }
+      | undefined;
+  };
+};
+
 type TElectronStore = {
   authToken: string;
   userId: string;
   response: TCacheResponse;
   markdownContent: TCacheMarkdownContent;
   foldersContentFiles: TCacheFoldersContent;
+  connectionInstructionFiles: TConnectionInstructionFiles;
 };
 
 const store = new Map<keyof TStore, TStore[keyof TStore]>();

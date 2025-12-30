@@ -1,4 +1,4 @@
-import { getStore } from "../@shared/store.js";
+import { getStore, setStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
 
@@ -10,6 +10,10 @@ export function registerIpc({
   getMarkdownContentByProjectId,
   saveMarkdownContent,
   downloadByUrl,
+  saveConnectionInstruction,
+  deleteConnectionInstruction: _deleteConnectionInstruction,
+  getConnectionInstructionByTaskId,
+  connectionInstruction,
 }: {
   buildMarkdownContentsFromBlob(fileBlob: Blob): Promise<TMarkdownContent[]>;
   getMarkdownContentByProjectId(projectId?: string | undefined):
@@ -36,6 +40,18 @@ export function registerIpc({
     folders: string[];
   }) => void;
   downloadByUrl: (url: string) => Promise<Blob | undefined>;
+  saveConnectionInstruction: (payload: {
+    projectId: string;
+    taskId: string;
+    path?: string;
+    ide?: string;
+  }) => void;
+  deleteConnectionInstruction: (taskId: string, projectId?: string) => void;
+  getConnectionInstructionByTaskId: (
+    taskId: string,
+    projectId?: string | undefined
+  ) => { path: string; ide?: string } | undefined;
+  connectionInstruction: () => Promise<void>;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
     if (payload === undefined || payload.projectId === undefined) {
@@ -63,6 +79,8 @@ export function registerIpc({
         });
       }
     }
+
+    const projectIdValue = payload.projectId ?? result.task.projectId;
 
     const projectIdStore = getStore<string, string>("projectId");
     if (projectIdStore === undefined) {
@@ -95,8 +113,40 @@ export function registerIpc({
       }
     }
 
+    const connectionInstructionStore = getStore<
+      { path?: string; ide?: string },
+      string
+    >("uploadConnectionInstructionFile");
+
+    const connectionInstructionProjectId = projectIdValue ?? projectIdStore;
+
+    if (
+      connectionInstructionStore?.path !== undefined &&
+      connectionInstructionStore.path.trim().length > 0 &&
+      connectionInstructionProjectId !== undefined
+    ) {
+      saveConnectionInstruction({
+        projectId: String(connectionInstructionProjectId),
+        taskId: String(result.task.id),
+        path: connectionInstructionStore.path,
+        ide: connectionInstructionStore.ide,
+      });
+
+      await connectionInstruction();
+    }
+
+    setStore("uploadConnectionInstructionFile", {
+      path: "",
+      ide: connectionInstructionStore?.ide ?? "vs-code",
+    });
+
     const projectMarkdownContent =
       getMarkdownContentByProjectId(projectIdStore);
+
+    const connectionInstructionPayload = getConnectionInstructionByTaskId(
+      String(result.task.id),
+      projectIdStore
+    );
 
     return {
       ...result.task,
@@ -110,6 +160,8 @@ export function registerIpc({
         String(result.task.id),
         projectIdStore
       ),
+      pathConnectionInstruction: connectionInstructionPayload?.path,
+      ide: connectionInstructionPayload?.ide,
     };
   });
 }
