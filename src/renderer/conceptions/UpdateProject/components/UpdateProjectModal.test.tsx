@@ -1,7 +1,12 @@
 import { ReactNode, useEffect } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 import {
   Provider,
@@ -106,11 +111,8 @@ describe("UpdateProjectModal", () => {
       screen.getByTestId("update-project-name")
     ).getByRole("textbox");
 
-    await userEvent.clear(nameField);
-    await userEvent.type(nameField, "  Updated Name  ");
-    await userEvent.click(
-      within(form).getByRole("button", { name: "Save Changes" })
-    );
+    fireEvent.change(nameField, { target: { value: "  Updated Name  " } });
+    fireEvent.click(within(form).getByRole("button", { name: "Save Changes" }));
 
     await waitFor(() => {
       expect(updateProjectMock).toHaveBeenCalledWith({
@@ -154,11 +156,8 @@ describe("UpdateProjectModal", () => {
       screen.getByTestId("update-project-name")
     ).getByRole("textbox");
 
-    await userEvent.clear(nameField);
-    await userEvent.type(nameField, "New Name");
-    await userEvent.click(
-      within(form).getByRole("button", { name: "Save Changes" })
-    );
+    fireEvent.change(nameField, { target: { value: "New Name" } });
+    fireEvent.click(within(form).getByRole("button", { name: "Save Changes" }));
 
     await waitFor(() => {
       expect(updateProjectMock).toHaveBeenCalledWith({
@@ -189,7 +188,7 @@ describe("UpdateProjectModal", () => {
       expect(screen.getByTestId("update-project-form")).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
       expect(screen.queryByTestId("update-project-form")).toBeNull();
