@@ -19,11 +19,11 @@ import {
   normalizeHeading,
   pickColor,
   detectListStyle,
-  parseListContent,
   tokenizeSegments,
 } from "../utils";
 import { useMemo } from "react";
 import { type TListItemContent, type TListStyle } from "../utils/types";
+import { parseListContent } from "@utils/markdownContent";
 
 export const MarkdownContentList = () => {
   const contents = useContentsSelector();

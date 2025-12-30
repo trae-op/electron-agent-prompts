@@ -41,41 +41,16 @@ import { createId } from "@utils/generation";
 import {
   buildListContent,
   detectListStyle,
-  parseListContent,
 } from "@conceptions/Task/Markdown/utils";
 import type {
   TListItemContent,
   TListStyle,
 } from "@conceptions/Task/Markdown/utils/types";
-
-const createEmptyListItem = (): TListItemDraft => ({
-  id: createId(),
-  value: "",
-  subitems: [],
-});
-
-const buildInitialItems = (
-  contentValue?: TMarkdownContent
-): TListItemDraft[] => {
-  if (!contentValue?.content) {
-    return [createEmptyListItem()];
-  }
-
-  const parsed = parseListContent(contentValue.content);
-
-  if (parsed.length === 0) {
-    return [createEmptyListItem()];
-  }
-
-  return parsed.map((item) => ({
-    id: createId(),
-    value: item.value,
-    subitems: item.subitems.map((subitem) => ({
-      id: createId(),
-      value: subitem,
-    })),
-  }));
-};
+import {
+  buildInitialItems,
+  createEmptyListItem,
+  getNextPosition,
+} from "../utils";
 
 const listStyleOptions = [
   { value: "bullet", label: "Bullet" },
@@ -744,15 +719,3 @@ export const ListModal = memo(
 );
 
 ListModal.displayName = "ListModal";
-
-function getNextPosition(contents: TMarkdownContent[]): number {
-  if (contents.length === 0) {
-    return 1;
-  }
-
-  const latestPosition = Math.max(
-    ...contents.map((contentItem) => contentItem.position)
-  );
-
-  return latestPosition + 1;
-}
