@@ -33,7 +33,7 @@ export function registerIpc({
       hash: `window:task/${id}`,
     });
 
-    // window.webContents.toggleDevTools();
+    window.webContents.toggleDevTools();
   });
 
   ipcMainOn(

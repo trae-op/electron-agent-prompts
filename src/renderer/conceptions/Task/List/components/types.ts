@@ -17,16 +17,57 @@ export type TListItemDraft = {
 export type TFieldsProps = {
   items: TListItemDraft[];
   onAddItem: () => void;
-  onChangeItem: (index: number, value: string) => void;
+  onChangeItem: (itemId: string, value: string) => void;
   onRemoveItem: (index: number) => void;
+  onMoveItemUp: (index: number) => void;
+  onMoveItemDown: (index: number) => void;
   onAddSubItem: (parentIndex: number) => void;
-  onChangeSubItem: (
-    parentIndex: number,
-    subIndex: number,
-    value: string
-  ) => void;
+  onChangeSubItem: (subitemId: string, value: string) => void;
   onRemoveSubItem: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemUp: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemDown: (parentIndex: number, subIndex: number) => void;
   listStyle: TListStyle;
   onChangeListStyle: (value: TListStyle) => void;
   controlPanel?: ReactNode;
+};
+
+export type TSubItemTextFieldProps = {
+  defaultValue: string;
+  label: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+};
+
+export type TSubItemRowProps = {
+  subitem: { id: string; value: string };
+  parentIndex: number;
+  subIndex: number;
+  subitemsLength: number;
+  onChangeSubItem: (subitemId: string, value: string) => void;
+  onRemoveSubItem: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemUp: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemDown: (parentIndex: number, subIndex: number) => void;
+};
+
+export type TListItemProps = {
+  item: TListItemDraft;
+  index: number;
+  itemsLength: number;
+  onChangeItem: (itemId: string, value: string) => void;
+  onRemoveItem: (index: number) => void;
+  onMoveItemUp: (index: number) => void;
+  onMoveItemDown: (index: number) => void;
+  onAddSubItem: (parentIndex: number) => void;
+  onChangeSubItem: (subitemId: string, value: string) => void;
+  onRemoveSubItem: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemUp: (parentIndex: number, subIndex: number) => void;
+  onMoveSubItemDown: (parentIndex: number, subIndex: number) => void;
+};
+
+export type TItemTextFieldProps = {
+  defaultValue: string;
+  label: string;
+  placeholder: string;
+  autoFocus?: boolean;
+  onChange: (value: string) => void;
 };
