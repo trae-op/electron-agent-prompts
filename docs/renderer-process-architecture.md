@@ -79,12 +79,7 @@ src/renderer/
 - **Composites**: Components that handle logic, side effects, or wrap other components.
   - Example: `PrivateRoute` checks authentication state and redirects if necessary.
 
-## 6. Styling
-
-- The project uses CSS modules or global CSS (`index.css`).
-- Keep styles co-located with components if using CSS modules.
-
-## 7. Adding a New Feature
+## 6. Adding a New Feature
 
 1.  **Define Domain**: If it's a new domain, create a folder in `conceptions/`.
 2.  **IPC**: If it needs backend communication, add methods to `preload.cts` (main) and wrap them in a hook in `conceptions/<Domain>/hooks/`.
@@ -92,12 +87,12 @@ src/renderer/
 4.  **UI**: Create components in `conceptions/<Domain>/components/` or `src/renderer/components/` if generic.
 5.  **Route**: If it's a new page, add a component in `src/renderer/windows/` and a route in `App.tsx`.
 
-## 8. Forms
+## 7. Forms
 
 - Use the React Server Actions form pattern with `useActionState` to manage submissions and ensure the action logic remains outside the component body so it can be reused or tested.
 - Drive submit buttons from a dedicated component that calls `useFormStatus` for the `pending` flag; import that component into the form so loading logic is isolated from the main form layout.
 - For large forms, split the UI into focused child components that subscribe to the form state through a domain context. Only the field-level components should re-render when state changes; the main form skeleton should stay static to avoid unnecessary work.
 
-## 9. Hooks and Memoization
+## 8. Hooks and Memoization
 
 - When using `useCallback` or `useMemo`, omit stable function dependencies (for example `closeModal`) from the dependency array because they remain constant across renders.

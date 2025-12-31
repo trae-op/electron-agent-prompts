@@ -15,9 +15,10 @@ src/main/
 │   ├── tray/          # System tray logic
 │   ├── store.ts       # Electron store wrapper
 │   └── utils.ts       # General utilities (IPC wrappers, env checks)
-├── <feature>/         # Feature-specific modules (e.g., auth, user, updater)
+├── <module>/          # Modules (e.g., auth, user, updater)
 │   ├── ipc.ts         # IPC event handlers registration
 │   ├── service.ts     # Business logic and external API calls
+│   ├── utils.ts       # Helper functions of module
 │   ├── types.ts       # Feature-specific types
 │   └── window.ts      # Window configuration (if applicable)
 ├── app.ts             # Application entry point
