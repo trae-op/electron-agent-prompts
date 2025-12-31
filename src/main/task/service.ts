@@ -480,6 +480,20 @@ async function applyVsCodeConnectionInstruction({
         parsed["github.copilot.chat.codeGeneration.instructions"]
       );
 
+      const dedupedInstructions: TInstructionEntry[] = [];
+      const existingFiles = new Set<string>();
+
+      for (const entry of instructions) {
+        const normalized = normalizePathSeparator(entry.file);
+
+        if (existingFiles.has(normalized)) {
+          continue;
+        }
+
+        existingFiles.add(normalized);
+        dedupedInstructions.push(entry);
+      }
+
       const projectRoot = resolve(settingsPath, "..", "..");
       const projectFiles = savedFilePaths
         .filter((savedPath) => isPathInsideRoot(savedPath, projectRoot))
@@ -488,20 +502,20 @@ async function applyVsCodeConnectionInstruction({
             `./${normalizePathSeparator(relative(projectRoot, savedPath))}`
         );
 
-      const existingFiles = new Set(
-        instructions.map((entry) => normalizePathSeparator(entry.file))
-      );
-
       for (const projectFile of projectFiles) {
         const normalizedProjectFile = normalizePathSeparator(projectFile);
+        const targetFile = normalizedProjectFile.endsWith(".md")
+          ? normalizedProjectFile
+          : `${normalizedProjectFile}.md`;
 
-        if (!existingFiles.has(normalizedProjectFile)) {
-          instructions.push({ file: `${projectFile}.md` });
-          existingFiles.add(normalizedProjectFile);
+        if (!existingFiles.has(targetFile)) {
+          dedupedInstructions.push({ file: targetFile });
+          existingFiles.add(targetFile);
         }
       }
 
-      parsed["github.copilot.chat.codeGeneration.instructions"] = instructions;
+      parsed["github.copilot.chat.codeGeneration.instructions"] =
+        dedupedInstructions;
 
       await writeFile(settingsPath, JSON.stringify(parsed, null, 2), "utf8");
     }

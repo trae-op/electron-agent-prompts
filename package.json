@@ -1,7 +1,7 @@
 {
   "name": "electron-agent-prompts",
   "private": true,
-  "version": "0.11.30",
+  "version": "0.11.33",
   "type": "module",
   "main": "dist-main/app.js",
   "author": "traeop",
