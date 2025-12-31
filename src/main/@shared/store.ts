@@ -24,7 +24,6 @@ export type TConnectionInstructionFiles = {
   [projectId: string]: {
     [taskId: string]:
       | {
-          path: string;
           ide?: string;
         }
       | undefined;

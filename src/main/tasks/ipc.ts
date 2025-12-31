@@ -42,7 +42,6 @@ export function registerIpc({
         foldersContentFiles && foldersContentFiles[task.id + ""]
           ? foldersContentFiles[task.id + ""]
           : [],
-      pathConnectionInstruction: connectionInstructions?.[task.id + ""]?.path,
       ide: connectionInstructions?.[task.id + ""]?.ide,
     }));
   };

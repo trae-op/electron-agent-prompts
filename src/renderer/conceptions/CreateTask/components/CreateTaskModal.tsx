@@ -3,13 +3,13 @@ import { useParams } from "react-router-dom";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
+import MenuItem from "@mui/material/MenuItem";
 import { Popup } from "@composites/Popup";
 import { useCreateTaskModalActions } from "../hooks";
 import { TCreateTaskModalProps, TFieldsProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
-import { ConnectInstruction } from "@components/ConnectInstruction";
 
 const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
   const { pending } = useFormStatus();
@@ -27,8 +27,19 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         fullWidth
         disabled={pending}
       />
+      <TextField
+        select
+        name="ide"
+        id="create-task-ide"
+        label="Target IDE for Instructions"
+        defaultValue="vs-code"
+        fullWidth
+        disabled={pending}
+        data-testid="create-task-ide"
+      >
+        <MenuItem value="vs-code">VS Code</MenuItem>
+      </TextField>
       <UploadFile />
-      <ConnectInstruction />
       <FoldersInput folders={folders} onChange={onFoldersChange} />
     </Stack>
   );
@@ -50,10 +61,17 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
         const rawName = formData.get("name");
         const name = typeof rawName === "string" ? rawName.trim() : "";
 
+        const rawIde = formData.get("ide");
+        const ide =
+          typeof rawIde === "string" && rawIde.trim().length > 0
+            ? rawIde.trim()
+            : undefined;
+
         const response = await window.electron.invoke.createTask({
           name,
           projectId,
           folderPaths: selectedFolders,
+          ide,
         });
 
         if (response !== undefined) {

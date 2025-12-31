@@ -29,6 +29,7 @@ type TEventSendInvoke = {
     name: string;
     projectId: string;
     folderPaths?: string[];
+    ide?: string;
   };
   updateTask: {
     id: number;
@@ -37,6 +38,7 @@ type TEventSendInvoke = {
     fileId?: string;
     url?: string | null;
     folderPaths?: string[];
+    ide?: string;
   };
   deleteTask: {
     id: number;
@@ -44,11 +46,6 @@ type TEventSendInvoke = {
   uploadFile: {
     file: Blob;
     path?: string;
-  };
-  uploadConnectionInstructionFile: {
-    file: Blob;
-    path?: string;
-    ide?: string;
   };
   markdownContent: {
     taskId: string;
@@ -79,9 +76,6 @@ type TInvoke = {
   uploadFile: (
     payload: TEventSendInvoke["uploadFile"]
   ) => Promise<TEventPayloadInvoke["uploadFile"]>;
-  uploadConnectionInstructionFile: (
-    payload: TEventSendInvoke["uploadConnectionInstructionFile"]
-  ) => Promise<TEventPayloadInvoke["uploadConnectionInstructionFile"]>;
   markdownContent: (
     payload: TEventSendInvoke["markdownContent"]
   ) => Promise<TEventPayloadInvoke["markdownContent"]>;

@@ -1,4 +1,3 @@
-import { getStore, setStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { createTask } from "./service.js";
 
@@ -40,14 +39,16 @@ export function registerIpc({
   saveConnectionInstruction: (payload: {
     projectId: string;
     taskId: string;
-    path?: string;
     ide?: string;
   }) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
     projectId?: string | undefined
-  ) => { path: string; ide?: string } | undefined;
-  connectionInstruction: () => Promise<void>;
+  ) => { ide?: string } | undefined;
+  connectionInstruction: (payload: {
+    fileBlob?: Blob;
+    ide?: string;
+  }) => Promise<void>;
 }): void {
   ipcMainHandle("createTask", async (payload) => {
     if (payload === undefined || payload.projectId === undefined) {
@@ -93,26 +94,22 @@ export function registerIpc({
       }
     }
 
-    const connectionInstructionStore = getStore<
-      { path?: string; ide?: string },
-      string
-    >("uploadConnectionInstructionFile");
+    const normalizedIde = payload.ide?.trim();
 
-    if (connectionInstructionStore?.path) {
+    if (normalizedIde !== undefined && normalizedIde.length > 0) {
       saveConnectionInstruction({
         projectId: payload.projectId,
         taskId: String(result.task.id),
-        path: connectionInstructionStore.path,
-        ide: connectionInstructionStore.ide,
+        ide: normalizedIde,
       });
 
-      await connectionInstruction();
+      if (result.fileBlob !== undefined) {
+        await connectionInstruction({
+          fileBlob: result.fileBlob,
+          ide: normalizedIde,
+        });
+      }
     }
-
-    setStore("uploadConnectionInstructionFile", {
-      path: "",
-      ide: connectionInstructionStore?.ide ?? "vs-code",
-    });
 
     const projectMarkdownContent = getMarkdownContentByProjectId(
       payload.projectId
@@ -135,7 +132,6 @@ export function registerIpc({
         String(result.task.id),
         payload.projectId
       ),
-      pathConnectionInstruction: connectionInstructionPayload?.path,
       ide: connectionInstructionPayload?.ide,
     };
   });

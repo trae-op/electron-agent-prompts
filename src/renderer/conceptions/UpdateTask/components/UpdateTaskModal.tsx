@@ -2,6 +2,7 @@ import { memo, useActionState, useCallback, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
+import MenuItem from "@mui/material/MenuItem";
 
 import { Popup } from "@composites/Popup";
 import {
@@ -10,7 +11,6 @@ import {
 } from "../context";
 import { TFieldsProps, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
-import { ConnectInstruction } from "@components/ConnectInstruction";
 import { FoldersInput } from "@components/FoldersInput";
 
 const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
@@ -36,11 +36,20 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         fullWidth
         disabled={pending}
       />
+      <TextField
+        key={`ide-${task.id}`}
+        select
+        name="ide"
+        id="update-task-ide"
+        label="Target IDE for Instructions"
+        defaultValue={task.ide ?? "vs-code"}
+        fullWidth
+        disabled={pending}
+        data-testid="update-task-ide"
+      >
+        <MenuItem value="vs-code">VS Code</MenuItem>
+      </TextField>
       <UploadFile />
-      <ConnectInstruction
-        initialPath={task.pathConnectionInstruction}
-        initialIde={task.ide}
-      />
       <FoldersInput folders={folders} onChange={onFoldersChange} />
     </Stack>
   );
@@ -65,6 +74,12 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
         const rawName = formData.get("name");
         const name = typeof rawName === "string" ? rawName.trim() : "";
 
+        const rawIde = formData.get("ide");
+        const ide =
+          typeof rawIde === "string" && rawIde.trim().length > 0
+            ? rawIde.trim()
+            : undefined;
+
         const response = await window.electron.invoke.updateTask({
           id: task.id,
           name,
@@ -72,6 +87,7 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
           fileId: task.fileId,
           url: task.url,
           folderPaths: selectedFolders,
+          ide,
         });
 
         if (response !== undefined) {

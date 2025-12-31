@@ -1,4 +1,4 @@
-import { getStore, setStore } from "../@shared/store.js";
+import { getStore } from "../@shared/store.js";
 import { ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
 
@@ -43,15 +43,17 @@ export function registerIpc({
   saveConnectionInstruction: (payload: {
     projectId: string;
     taskId: string;
-    path?: string;
     ide?: string;
   }) => void;
   deleteConnectionInstruction: (taskId: string, projectId?: string) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
     projectId?: string | undefined
-  ) => { path: string; ide?: string } | undefined;
-  connectionInstruction: () => Promise<void>;
+  ) => { ide?: string } | undefined;
+  connectionInstruction: (payload: {
+    fileBlob?: Blob;
+    ide?: string;
+  }) => Promise<void>;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
     if (payload === undefined || payload.projectId === undefined) {
@@ -113,32 +115,27 @@ export function registerIpc({
       }
     }
 
-    const connectionInstructionStore = getStore<
-      { path?: string; ide?: string },
-      string
-    >("uploadConnectionInstructionFile");
-
     const connectionInstructionProjectId = projectIdValue ?? projectIdStore;
+    const normalizedIde = payload.ide?.trim();
 
     if (
-      connectionInstructionStore?.path !== undefined &&
-      connectionInstructionStore.path.trim().length > 0 &&
+      normalizedIde !== undefined &&
+      normalizedIde.length > 0 &&
       connectionInstructionProjectId !== undefined
     ) {
       saveConnectionInstruction({
         projectId: String(connectionInstructionProjectId),
         taskId: String(result.task.id),
-        path: connectionInstructionStore.path,
-        ide: connectionInstructionStore.ide,
+        ide: normalizedIde,
       });
 
-      await connectionInstruction();
+      if (resolvedFileBlob !== undefined) {
+        await connectionInstruction({
+          fileBlob: resolvedFileBlob,
+          ide: normalizedIde,
+        });
+      }
     }
-
-    setStore("uploadConnectionInstructionFile", {
-      path: "",
-      ide: connectionInstructionStore?.ide ?? "vs-code",
-    });
 
     const projectMarkdownContent =
       getMarkdownContentByProjectId(projectIdStore);
@@ -160,7 +157,6 @@ export function registerIpc({
         String(result.task.id),
         projectIdStore
       ),
-      pathConnectionInstruction: connectionInstructionPayload?.path,
       ide: connectionInstructionPayload?.ide,
     };
   });

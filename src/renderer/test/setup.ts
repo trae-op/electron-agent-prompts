@@ -42,6 +42,5 @@ window.electron = {
     uploadFile: vi.fn(),
     markdownContent: vi.fn(),
     resolveFilePath: vi.fn(),
-    uploadConnectionInstructionFile: vi.fn(),
   },
 };
