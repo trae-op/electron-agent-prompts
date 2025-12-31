@@ -49,7 +49,15 @@ const Task = () => {
                       height="calc(100vh - 120px)"
                       sx={{
                         "&::-webkit-scrollbar": {
-                          width: 0,
+                          width: 4,
+
+                          backgroundColor: "lightgrey",
+                        },
+
+                        "&::-webkit-scrollbar-thumb": {
+                          backgroundColor: "black",
+                          height: 30,
+                          cursor: "pointer",
                         },
                       }}
                       direction="column"
