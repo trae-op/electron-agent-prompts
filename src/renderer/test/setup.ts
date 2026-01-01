@@ -15,6 +15,7 @@ window.electron = {
     subscribeUpdateTask: vi.fn(() => noopUnsubscribe),
     subscribeWindowTask: vi.fn(() => noopUnsubscribe),
     subscribeTasks: vi.fn(() => noopUnsubscribe),
+    subscribeSearchResult: vi.fn(() => noopUnsubscribe),
   },
   send: {
     restart: vi.fn(),
@@ -30,6 +31,8 @@ window.electron = {
     windowTask: vi.fn(),
     openLatestVersion: vi.fn(),
     windowOpenUpdate: vi.fn(),
+    findInPage: vi.fn(),
+    stopFindInPage: vi.fn(),
   },
   invoke: {
     getVersion: vi.fn(),

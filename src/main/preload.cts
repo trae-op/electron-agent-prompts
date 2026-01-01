@@ -50,6 +50,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
       ipcOn("tasks", (payload) => {
         callback(payload);
       }),
+    subscribeSearchResult: (
+      callback: (payload: TEventPayloadReceive["search-result"]) => void
+    ) =>
+      ipcOn("search-result", (payload) => {
+        callback(payload);
+      }),
   },
   send: {
     restart: () => {
@@ -66,6 +72,12 @@ electron.contextBridge.exposeInMainWorld("electron", {
     },
     task: (payload: TEventPayloadSend["task"]) => {
       ipcSend("task", payload);
+    },
+    findInPage: (payload: TEventPayloadSend["findInPage"]) => {
+      ipcSend("findInPage", payload);
+    },
+    stopFindInPage: () => {
+      ipcSend("stopFindInPage");
     },
     windowTask: (payload: TEventPayloadSend["windowTask"]) => {
       ipcSend("windowTask", payload);

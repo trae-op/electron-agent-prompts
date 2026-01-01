@@ -9,6 +9,14 @@ type TEventPayloadSend = {
   task: {
     taskId: string;
   };
+  findInPage: {
+    text: string;
+    options?: {
+      forward?: boolean;
+      findNext?: boolean;
+    };
+  };
+  stopFindInPage: undefined;
   logout: undefined;
   checkForUpdates: undefined;
   checkAuth: undefined;
@@ -31,6 +39,8 @@ type TSend = {
   projects: () => void;
   tasks: (payload: TEventPayloadSend["tasks"]) => void;
   task: (payload: TEventPayloadSend["task"]) => void;
+  findInPage: (payload: TEventPayloadSend["findInPage"]) => void;
+  stopFindInPage: () => void;
   checkAuth: () => void;
   logout: () => void;
   checkForUpdates: () => void;

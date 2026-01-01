@@ -13,6 +13,7 @@ import { useListModalActions } from "@conceptions/Task/List";
 import { useTextModalActions } from "@conceptions/Task/Text";
 import { useArchitectureModalActions } from "@conceptions/Task/Architecture";
 import { TopPanel } from "@layouts/TopPanel";
+import { SearchContent } from "@conceptions/Task/SearchContent";
 
 const items = [
   { id: "1", action: "title", label: "title", icon: <TitleIcon /> },
@@ -94,7 +95,7 @@ const ContainerTopPanel = () => {
         direction="row"
         justifyContent="flex-start"
         alignItems="center"
-        sx={{ width: "100%" }}
+        sx={{ flexGrow: 1 }}
         onClick={handleOpenModal}
       >
         {items.map((item) => (
@@ -107,6 +108,7 @@ const ContainerTopPanel = () => {
           </IconButton>
         ))}
       </Stack>
+      <SearchContent />
     </TopPanel>
   );
 };

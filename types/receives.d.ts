@@ -20,6 +20,10 @@ type TEventPayloadReceive = {
     task: TTask;
     contents: TMarkdownContent[];
   };
+  "search-result": {
+    activeMatchOrdinal: number;
+    matches: number;
+  };
 };
 
 type TReceive = {
@@ -46,5 +50,8 @@ type TReceive = {
   ) => TUnsubscribeFunction;
   subscribeTasks: (
     callback: (payload: TEventPayloadReceive["tasks"]) => void
+  ) => TUnsubscribeFunction;
+  subscribeSearchResult: (
+    callback: (payload: TEventPayloadReceive["search-result"]) => void
   ) => TUnsubscribeFunction;
 };

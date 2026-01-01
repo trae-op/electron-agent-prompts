@@ -8,6 +8,7 @@ import { Provider as ListProvider } from "@conceptions/Task/List";
 import { Provider as TextProvider } from "@conceptions/Task/Text";
 import { Provider as ArchitectureProvider } from "@conceptions/Task/Architecture";
 import { Provider as PositionProvider } from "@conceptions/Task/Position";
+import { Provider as SearchContentProvider } from "@conceptions/Task/SearchContent";
 import { Subscriber } from "./Subscriber";
 import {
   TitleModal,
@@ -25,56 +26,58 @@ const LazyTopPanel = lazy(() => import("./TopPanel"));
 const Task = () => {
   return (
     <MarkdownProvider>
-      <Subscriber />
-      <CodeProvider>
-        <TitleProvider>
-          <ListProvider>
-            <TextProvider>
-              <ArchitectureProvider>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <LazyTopPanel />
-                </Suspense>
+      <SearchContentProvider>
+        <Subscriber />
+        <CodeProvider>
+          <TitleProvider>
+            <ListProvider>
+              <TextProvider>
+                <ArchitectureProvider>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <LazyTopPanel />
+                  </Suspense>
 
-                <TitleModal />
-                <ListModal />
-                <TextModal />
-                <CodeModal />
-                <ArchitectureModal />
-                <PositionProvider>
-                  <PositionModal />
-                  <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
-                    <Stack
-                      overflow="auto"
-                      width="calc(100vw - 25px)"
-                      height="calc(100vh - 120px)"
-                      sx={{
-                        "&::-webkit-scrollbar": {
-                          width: 4,
+                  <TitleModal />
+                  <ListModal />
+                  <TextModal />
+                  <CodeModal />
+                  <ArchitectureModal />
+                  <PositionProvider>
+                    <PositionModal />
+                    <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
+                      <Stack
+                        overflow="auto"
+                        width="calc(100vw - 25px)"
+                        height="calc(100vh - 120px)"
+                        sx={{
+                          "&::-webkit-scrollbar": {
+                            width: 4,
 
-                          backgroundColor: "lightgrey",
-                        },
+                            backgroundColor: "lightgrey",
+                          },
 
-                        "&::-webkit-scrollbar-thumb": {
-                          backgroundColor: "black",
-                          height: 30,
-                          cursor: "pointer",
-                        },
-                      }}
-                      direction="column"
-                      spacing={1}
-                    >
-                      <TaskOverview />
+                          "&::-webkit-scrollbar-thumb": {
+                            backgroundColor: "black",
+                            height: 30,
+                            cursor: "pointer",
+                          },
+                        }}
+                        direction="column"
+                        spacing={1}
+                      >
+                        <TaskOverview />
+                      </Stack>
+                      <Stack width="100%" direction="row">
+                        <MarkdownContentListButtons />
+                      </Stack>
                     </Stack>
-                    <Stack width="100%" direction="row">
-                      <MarkdownContentListButtons />
-                    </Stack>
-                  </Stack>
-                </PositionProvider>
-              </ArchitectureProvider>
-            </TextProvider>
-          </ListProvider>
-        </TitleProvider>
-      </CodeProvider>
+                  </PositionProvider>
+                </ArchitectureProvider>
+              </TextProvider>
+            </ListProvider>
+          </TitleProvider>
+        </CodeProvider>
+      </SearchContentProvider>
     </MarkdownProvider>
   );
 };

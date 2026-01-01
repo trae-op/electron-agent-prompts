@@ -33,7 +33,16 @@ export function registerIpc({
       hash: `window:task/${id}`,
     });
 
-    // window.webContents.toggleDevTools();
+    if (!window) {
+      return;
+    }
+
+    window.webContents.on("found-in-page", (_, result) => {
+      window.webContents.send("search-result", {
+        activeMatchOrdinal: result.activeMatchOrdinal,
+        matches: result.matches,
+      });
+    });
   });
 
   ipcMainOn(
@@ -46,8 +55,10 @@ export function registerIpc({
         return;
       }
 
-      const taskFromCache = cacheTask(payload.taskId);
-      let markdownContents = getMarkdownContentByTaskId(payload.taskId);
+      const taskId = payload.taskId;
+
+      const taskFromCache = cacheTask(taskId);
+      let markdownContents = getMarkdownContentByTaskId(taskId);
 
       if (taskFromCache !== undefined) {
         event.reply("task", {
@@ -56,7 +67,7 @@ export function registerIpc({
         });
       }
 
-      const task = await getTask(payload.taskId);
+      const task = await getTask(taskId);
 
       if (
         (markdownContents === undefined || markdownContents.length === 0) &&
@@ -73,6 +84,24 @@ export function registerIpc({
       }
     }
   );
+
+  ipcMainOn("findInPage", (event, payload) => {
+    if (payload === undefined) {
+      return;
+    }
+
+    const text = payload.text.trim();
+
+    if (text === "") {
+      return;
+    }
+
+    event.sender.findInPage(text, payload.options || { findNext: true });
+  });
+
+  ipcMainOn("stopFindInPage", (event) => {
+    event.sender.stopFindInPage("clearSelection");
+  });
 
   ipcMainHandle("markdownContent", async (payload) => {
     if (payload === undefined || payload.contents.length === 0) {
