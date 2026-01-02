@@ -18,7 +18,9 @@ import { getWindow } from "../@shared/control-window/receive.js";
 
 export function registerIpc({
   updateTask,
+  initMenu,
 }: {
+  initMenu?: (currentWindow: Electron.BrowserWindow) => void;
   updateTask: (payload: TEventSendInvoke["updateTask"]) => Promise<
     | {
         task: TTask;
@@ -37,9 +39,7 @@ export function registerIpc({
       return;
     }
 
-    // if (isDev()) {
-    //   window.webContents.toggleDevTools();
-    // }
+    initMenu?.(window);
 
     window.webContents.on("found-in-page", (_, result) => {
       window.webContents.send("search-result", {

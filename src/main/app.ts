@@ -55,6 +55,23 @@ setFeedURL();
 
 crash();
 
+function initMenu(currentWindow: BrowserWindow) {
+  buildMenu(currentWindow, (window) => {
+    return getMenu().map((item) => {
+      if (item.name === "app") {
+        item.submenu = [
+          {
+            label: menu.labels.devTools,
+            click: () => window.webContents.openDevTools(),
+          },
+        ];
+      }
+
+      return item;
+    });
+  });
+}
+
 app.on("ready", async () => {
   const mainWindow = createWindow<TWindows["main"]>({
     hash: "window:main",
@@ -84,24 +101,7 @@ app.on("ready", async () => {
     })
   );
 
-  buildMenu(mainWindow, (window) => {
-    return getMenu().map((item) => {
-      if (item.name === "app") {
-        item.submenu = [
-          {
-            label: menu.labels.devTools,
-            click: () => window.webContents.openDevTools({ mode: "detach" }),
-          },
-          {
-            label: menu.labels.quit,
-            click: () => app.quit(),
-          },
-        ];
-      }
-
-      return item;
-    });
-  });
+  initMenu(mainWindow);
 
   registerIpcAuth();
   registerIpcUser();
@@ -149,6 +149,7 @@ app.on("ready", async () => {
   registerIpcUpdater();
   registerIpcTask({
     updateTask: updateTaskService,
+    initMenu,
   });
 
   handleCloseEvents(mainWindow);
