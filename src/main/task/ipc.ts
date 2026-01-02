@@ -3,6 +3,7 @@ import {
   ipcMainHandle,
   ipcMainOn,
   ipcWebContentsSend,
+  isDev,
 } from "../@shared/utils.js";
 import {
   createMarkdownFile,
@@ -37,7 +38,10 @@ export function registerIpc({
       return;
     }
 
-    window.webContents.toggleDevTools();
+    if (isDev()) {
+      window.webContents.toggleDevTools();
+    }
+
     window.webContents.on("found-in-page", (_, result) => {
       window.webContents.send("search-result", {
         activeMatchOrdinal: result.activeMatchOrdinal,
