@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow } from "electron";
 import dotenv from "dotenv";
 import path from "node:path";
 import { buildMenu, getMenu } from "./@shared/menu/menu.js";
@@ -51,8 +51,6 @@ dotenv.config(!isDev() ? { path: envPath } : undefined);
 
 app.disableHardwareAcceleration();
 
-Menu.setApplicationMenu(null);
-
 setFeedURL();
 
 crash();
@@ -86,13 +84,13 @@ app.on("ready", async () => {
     })
   );
 
-  buildMenu(
-    getMenu().map((item) => {
+  buildMenu(mainWindow, (window) => {
+    return getMenu().map((item) => {
       if (item.name === "app") {
         item.submenu = [
           {
             label: menu.labels.devTools,
-            click: () => mainWindow.webContents.openDevTools(),
+            click: () => window.webContents.openDevTools({ mode: "detach" }),
           },
           {
             label: menu.labels.quit,
@@ -102,8 +100,8 @@ app.on("ready", async () => {
       }
 
       return item;
-    })
-  );
+    });
+  });
 
   registerIpcAuth();
   registerIpcUser();

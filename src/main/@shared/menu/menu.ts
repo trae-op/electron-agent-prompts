@@ -1,4 +1,4 @@
-import { Menu } from "electron";
+import { BrowserWindow, Menu } from "electron";
 import { isPlatform } from "../utils.js";
 import { menu } from "../../config.js";
 import { TItem } from "./types.js";
@@ -37,8 +37,16 @@ export function getMenu(): TItem[] {
   return defaultMenu;
 }
 
-export function buildMenu(items?: TItem[]): void {
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate(items !== undefined ? items : defaultMenu)
-  );
+export function buildMenu(
+  targetWindow: BrowserWindow,
+  items?: TItem[] | ((window: BrowserWindow) => TItem[])
+): void {
+  const template =
+    typeof items === "function"
+      ? items(targetWindow)
+      : items !== undefined
+      ? items
+      : defaultMenu;
+
+  targetWindow.setMenu(Menu.buildFromTemplate(template));
 }
