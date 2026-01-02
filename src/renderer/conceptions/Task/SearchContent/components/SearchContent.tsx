@@ -46,8 +46,8 @@ const ArrowButtons = memo(({ searchQuery }: { searchQuery: string }) => {
 
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
-      <Typography variant="body2" color="text.secondary">
-        {activeMatchOrdinal}/{matches}
+      <Typography variant="caption" color="text.secondary">
+        found {activeMatchOrdinal} of {matches}
       </Typography>
       <IconButton
         aria-label="previous match"
@@ -67,12 +67,6 @@ const ArrowButtons = memo(({ searchQuery }: { searchQuery: string }) => {
       >
         <ArrowDownwardIcon fontSize="small" />
       </IconButton>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ minWidth: 56, textAlign: "center" }}
-        data-testid="search-content-count"
-      ></Typography>
     </Stack>
   );
 });
@@ -118,8 +112,9 @@ export const SearchContent = () => {
     >
       <TextField
         size="small"
-        fullWidth
         value={searchQuery}
+        fullWidth
+        sx={{ flex: 1 }}
         placeholder="Find in page + ↵"
         data-testid="search-content-input-field"
         onChange={handleChange}
