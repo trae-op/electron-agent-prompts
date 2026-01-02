@@ -5,7 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import type { PaletteMode } from "@mui/material";
 import { usePaletteModeSelector } from "@composites/LightDarkMode";
-import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 
 const buildTheme = (mode: PaletteMode) =>
   createTheme({
@@ -28,7 +27,6 @@ const buildTheme = (mode: PaletteMode) =>
   });
 
 export const MainLayout = () => {
-  useClosePreloadWindow();
   const mode = usePaletteModeSelector();
   const theme = useMemo(() => buildTheme(mode), [mode]);
 

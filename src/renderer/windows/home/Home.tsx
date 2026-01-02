@@ -11,6 +11,7 @@ import {
   UpdateSubscriber,
 } from "@conceptions/Updater";
 
+import { useClosePreloadWindow } from "@hooks/closePreloadWindow";
 import { Provider as ProviderUpdateTask } from "@conceptions/UpdateTask";
 import { Provider as ProviderDeleteTask } from "@conceptions/DeleteTask";
 import { Provider as ProviderCreateTask } from "@conceptions/CreateTask";
@@ -30,6 +31,8 @@ const LazyTasksContent = lazy(() => import("./TasksContent"));
 const LazyProjectsOverview = lazy(() => import("./ProjectsOverview"));
 
 const Home = () => {
+  useClosePreloadWindow();
+
   return (
     <ProviderUpdater>
       <UpdateSubscriber />
