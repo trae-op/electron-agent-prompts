@@ -36,6 +36,7 @@ vi.mock("../../config.js", () => ({
     distRenderer: "dist-renderer",
     distMain: "dist-main",
   },
+  nameApp: "Test App",
 }));
 
 describe("createWindow", () => {
@@ -127,16 +128,19 @@ describe("createWindow", () => {
 
       createWindow({ options });
 
-      expect(BrowserWindow).toHaveBeenCalledWith({
-        width: 800,
-        height: 600,
-        webPreferences: {
-          preload: expect.any(String),
-          contextIsolation: true,
-          nodeIntegration: false,
-          devTools: false,
-        },
-      });
+      expect(BrowserWindow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          width: 800,
+          height: 600,
+          title: "Test App",
+          webPreferences: expect.objectContaining({
+            preload: expect.any(String),
+            contextIsolation: true,
+            nodeIntegration: false,
+            devTools: false,
+          }),
+        })
+      );
     });
 
     it("should use correct preload path in development", () => {
