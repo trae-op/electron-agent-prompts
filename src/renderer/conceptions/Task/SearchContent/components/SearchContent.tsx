@@ -120,7 +120,7 @@ export const SearchContent = () => {
         size="small"
         fullWidth
         value={searchQuery}
-        placeholder="Find in page"
+        placeholder="Find in page + ↵"
         data-testid="search-content-input-field"
         onChange={handleChange}
         slotProps={{

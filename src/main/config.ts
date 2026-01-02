@@ -5,6 +5,8 @@ import { isDev } from "./@shared/utils.js";
 const envPath = path.join(process.resourcesPath, ".env");
 dotenv.config(!isDev() ? { path: envPath } : undefined);
 
+export const nameApp = "Agent Prompts";
+
 export const windows: TWindows = {
   main: "window:main",
   updateApp: "window:update-app",

@@ -1,7 +1,7 @@
 import { BrowserWindow, session, app } from "electron";
 import path from "node:path";
 import type { TParamsCreateWindow } from "./types.js";
-import { folders } from "../../config.js";
+import { folders, nameApp } from "../../config.js";
 import { cacheWindows } from "./cache.js";
 import { getWindow } from "./receive.js";
 
@@ -43,6 +43,7 @@ export function createWindow<N extends string>({
 
   const newWindow = new BrowserWindow({
     ...(options || {}),
+    title: nameApp,
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
