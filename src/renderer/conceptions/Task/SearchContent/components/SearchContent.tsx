@@ -1,9 +1,9 @@
 import {
   useCallback,
   memo,
-  useState,
   type ChangeEvent,
   type FormEvent,
+  useRef,
 } from "react";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -18,10 +18,13 @@ import ClearIcon from "@mui/icons-material/Clear";
 import {
   useSearchResultSelector,
   useSetSearchResultDispatch,
+  useSetSearchQueryDispatch,
+  useSearchQuerySelector,
 } from "../context";
 
-const ArrowButtons = memo(({ searchQuery }: { searchQuery: string }) => {
+const ArrowButtons = () => {
   const { matches, activeMatchOrdinal } = useSearchResultSelector();
+  const searchQuery = useSearchQuerySelector();
   const isEmpty = searchQuery.trim() === "" || matches === 0;
 
   const handleNext = useCallback(() => {
@@ -69,36 +72,65 @@ const ArrowButtons = memo(({ searchQuery }: { searchQuery: string }) => {
       </IconButton>
     </Stack>
   );
-});
+};
+
+const EndAdornment = memo(
+  ({ inputRef }: { inputRef: React.RefObject<HTMLInputElement | null> }) => {
+    const searchQuery = useSearchQuerySelector();
+    const setSearchQuery = useSetSearchQueryDispatch();
+    const resetSearch = useSetSearchResultDispatch();
+
+    const handleClear = useCallback(() => {
+      setSearchQuery("");
+      resetSearch({ activeMatchOrdinal: 0, matches: 0 });
+      if (inputRef.current) {
+        inputRef.current.value = "";
+        inputRef.current.focus();
+      }
+      window.electron.send.stopFindInPage();
+    }, []);
+
+    if (searchQuery.trim() === "") {
+      return null;
+    }
+
+    return (
+      <InputAdornment position="end">
+        <IconButton
+          aria-label="clear search"
+          size="small"
+          onClick={handleClear}
+        >
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      </InputAdornment>
+    );
+  }
+);
 
 export const SearchContent = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const resetSearch = useSetSearchResultDispatch();
+  const setSearchQuery = useSetSearchQueryDispatch();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   }, []);
 
-  const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
+  const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-      if (searchQuery.trim() === "") {
-        window.electron.send.stopFindInPage();
-        return;
-      }
+    const form = event.currentTarget;
+    const input = form.elements.namedItem("search-input") as HTMLInputElement;
+    const text = input.value;
 
-      window.electron.send.findInPage({
-        text: searchQuery,
-      });
-    },
-    [searchQuery]
-  );
+    if (text.trim() === "") {
+      window.electron.send.stopFindInPage();
+      return;
+    }
 
-  const handleClear = useCallback(() => {
-    setSearchQuery("");
-    resetSearch({ activeMatchOrdinal: 0, matches: 0 });
-    window.electron.send.stopFindInPage();
+    window.electron.send.findInPage({
+      text,
+    });
   }, []);
 
   return (
@@ -112,9 +144,10 @@ export const SearchContent = () => {
     >
       <TextField
         size="small"
-        value={searchQuery}
         fullWidth
+        inputRef={inputRef}
         sx={{ flex: 1 }}
+        name="search-input"
         placeholder="Find in page + ↵"
         data-testid="search-content-input-field"
         onChange={handleChange}
@@ -125,23 +158,12 @@ export const SearchContent = () => {
                 <SearchIcon fontSize="small" />
               </InputAdornment>
             ),
-            endAdornment:
-              searchQuery.trim() !== "" ? (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="clear search"
-                    size="small"
-                    onClick={handleClear}
-                  >
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ) : undefined,
+            endAdornment: <EndAdornment inputRef={inputRef} />,
           },
         }}
       />
 
-      <ArrowButtons searchQuery={searchQuery} />
+      <ArrowButtons />
     </Stack>
   );
 };

@@ -37,6 +37,7 @@ export function registerIpc({
       return;
     }
 
+    window.webContents.toggleDevTools();
     window.webContents.on("found-in-page", (_, result) => {
       window.webContents.send("search-result", {
         activeMatchOrdinal: result.activeMatchOrdinal,
