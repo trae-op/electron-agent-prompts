@@ -2,10 +2,7 @@ import { LoadingSpinner } from "@components/LoadingSpinner";
 import { useCallback, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSetContentsDispatch } from "@conceptions/Task/Markdown";
-import {
-  // useResetSearchDispatch,
-  useSetSearchResultDispatch,
-} from "@conceptions/Task/SearchContent";
+import { useSetSearchResultDispatch } from "@conceptions/Task/SearchContent";
 
 export const Subscriber = () => {
   const isSend = useRef(true);
@@ -14,7 +11,6 @@ export const Subscriber = () => {
   }>();
   const setContentsDispatch = useSetContentsDispatch();
   const setSearchResult = useSetSearchResultDispatch();
-  // const resetSearch = useResetSearchDispatch();
 
   if (taskId === undefined) {
     return <LoadingSpinner />;

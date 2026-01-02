@@ -1,16 +1,22 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import type { THookInvoke } from "./types";
 
 export const useInvoke = (): THookInvoke => {
   const [version, setVersion] = useState("");
+  const isSubscribe = useRef(true);
 
-  useEffect(() => {
+  const subscribe = useCallback(() => {
     window.electron.invoke.getVersion().then((value) => {
       setVersion((prevValue) => (prevValue === value ? prevValue : value));
     });
   }, []);
 
-  const data = useMemo(() => ({ version }), [version]);
+  useEffect(() => {
+    if (isSubscribe.current) {
+      isSubscribe.current = false;
+      subscribe();
+    }
+  }, [subscribe]);
 
-  return data;
+  return useMemo(() => ({ version }), [version]);
 };
