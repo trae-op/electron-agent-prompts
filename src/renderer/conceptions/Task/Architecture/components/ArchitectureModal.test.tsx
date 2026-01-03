@@ -108,22 +108,33 @@ describe("ArchitectureModal", () => {
 
     const form = await screen.findByTestId("architecture-modal-form");
 
-    fireEvent.change(screen.getByLabelText("Root path"), {
+    fireEvent.change(within(form).getByPlaceholderText("src/"), {
       target: { value: " src " },
     });
-    fireEvent.change(screen.getByLabelText("Item 1"), {
+
+    let itemInputs = within(form).getAllByPlaceholderText(
+      "Enter folder or file"
+    );
+
+    fireEvent.change(itemInputs[0], {
       target: { value: " components " },
     });
 
     fireEvent.click(screen.getByRole("button", { name: "add nested item" }));
-    fireEvent.change(screen.getByLabelText("Nested 1"), {
+
+    itemInputs = within(form).getAllByPlaceholderText("Enter folder or file");
+
+    fireEvent.change(itemInputs[1], {
       target: { value: " Button.tsx " },
     });
 
     fireEvent.click(
       screen.getByRole("button", { name: "add architecture item" })
     );
-    fireEvent.change(screen.getByLabelText("Item 2"), {
+
+    itemInputs = within(form).getAllByPlaceholderText("Enter folder or file");
+
+    fireEvent.change(itemInputs[2], {
       target: { value: "index.ts" },
     });
 
@@ -187,20 +198,24 @@ describe("ArchitectureModal", () => {
 
     const form = await screen.findByTestId("architecture-modal-form");
 
-    fireEvent.change(screen.getByLabelText("Root path"), {
+    fireEvent.change(within(form).getByPlaceholderText("src/"), {
       target: { value: "  app  " },
     });
 
-    fireEvent.change(screen.getByLabelText("Item 1"), {
+    let itemInputs = within(form).getAllByPlaceholderText(
+      "Enter folder or file"
+    );
+
+    fireEvent.change(itemInputs[0], {
       target: { value: "ui" },
     });
 
-    fireEvent.change(screen.getByLabelText("Item 2"), {
-      target: { value: "index.tsx" },
+    fireEvent.change(itemInputs[1], {
+      target: { value: "Button.jsx" },
     });
 
-    fireEvent.change(screen.getByLabelText("Nested 1"), {
-      target: { value: "Button.jsx" },
+    fireEvent.change(itemInputs[2], {
+      target: { value: "index.tsx" },
     });
 
     fireEvent.click(

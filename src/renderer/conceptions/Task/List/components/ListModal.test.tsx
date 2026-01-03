@@ -105,16 +105,23 @@ describe("ListModal", () => {
 
     const form = await screen.findByTestId("list-modal-form");
 
-    fireEvent.change(screen.getByLabelText("Item 1"), {
+    let itemInputs = within(form).getAllByPlaceholderText("Enter list item");
+
+    fireEvent.change(itemInputs[0], {
       target: { value: "  Project Outline  " },
     });
     fireEvent.click(screen.getByRole("button", { name: "add sub item" }));
-    fireEvent.change(screen.getByLabelText("Subitem 1"), {
-      target: { value: "  Key Points  " },
-    });
+    fireEvent.change(
+      within(form).getAllByPlaceholderText("Enter sub item")[0],
+      {
+        target: { value: "  Key Points  " },
+      }
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "add list item" }));
-    fireEvent.change(screen.getByLabelText("Item 2"), {
+    itemInputs = within(form).getAllByPlaceholderText("Enter list item");
+
+    fireEvent.change(itemInputs[1], {
       target: { value: "Second Item" },
     });
 
@@ -169,13 +176,18 @@ describe("ListModal", () => {
 
     const form = await screen.findByTestId("list-modal-form");
 
-    fireEvent.change(screen.getByLabelText("Item 1"), {
+    let itemInputs = within(form).getAllByPlaceholderText("Enter list item");
+
+    fireEvent.change(itemInputs[0], {
       target: { value: "Updated item" },
     });
 
-    fireEvent.change(screen.getByLabelText("Subitem 1"), {
-      target: { value: "Updated detail" },
-    });
+    fireEvent.change(
+      within(form).getAllByPlaceholderText("Enter sub item")[0],
+      {
+        target: { value: "Updated detail" },
+      }
+    );
 
     fireEvent.click(screen.getByLabelText("Numbered"));
 
