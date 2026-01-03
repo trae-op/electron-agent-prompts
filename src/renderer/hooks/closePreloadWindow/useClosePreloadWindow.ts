@@ -1,7 +1,16 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-export const useClosePreloadWindow = () => {
+export const useClosePreloadWindow = (currentPathname: string) => {
+  const { pathname } = useLocation();
+
   useEffect(() => {
-    window.electron.send.windowClosePreload();
-  }, []);
+    const normalizedParam = currentPathname.startsWith("/")
+      ? currentPathname
+      : `/${currentPathname}`;
+
+    if (normalizedParam === pathname) {
+      window.electron.send.windowClosePreload();
+    }
+  }, [currentPathname, pathname]);
 };

@@ -31,7 +31,7 @@ const LazyTasksContent = lazy(() => import("./TasksContent"));
 const LazyProjectsOverview = lazy(() => import("./ProjectsOverview"));
 
 const Home = () => {
-  useClosePreloadWindow();
+  useClosePreloadWindow("window:main");
 
   return (
     <ProviderUpdater>
