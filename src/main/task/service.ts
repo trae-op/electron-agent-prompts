@@ -589,6 +589,15 @@ export async function buildMarkdownContentsFromBlob(
   }
 }
 
+function ensureMarkdownExtension(fileName: string): string {
+  const trimmed = fileName.trim();
+  const normalized = trimmed.length > 0 ? trimmed : "file";
+
+  return normalized.toLowerCase().endsWith(".md")
+    ? normalized
+    : `${normalized}.md`;
+}
+
 export async function saveFileToStoredFolders(payload: {
   file: Blob;
   fileName: string;
@@ -618,10 +627,12 @@ export async function saveFileToStoredFolders(payload: {
     return;
   }
 
+  const fileName = ensureMarkdownExtension(payload.fileName);
+
   const fileBuffer = Buffer.from(await payload.file.arrayBuffer());
 
   const destinations = normalizedFolders.map((folderPath) =>
-    join(folderPath, payload.fileName)
+    join(folderPath, fileName)
   );
 
   const results = await Promise.allSettled(
