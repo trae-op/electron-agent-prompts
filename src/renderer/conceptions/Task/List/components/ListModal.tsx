@@ -58,13 +58,7 @@ const listStyleOptions = [
 ];
 
 const ItemTextField = memo(
-  ({
-    defaultValue,
-    label,
-    placeholder,
-    autoFocus,
-    onChange,
-  }: TItemTextFieldProps) => {
+  ({ defaultValue, placeholder, autoFocus, onChange }: TItemTextFieldProps) => {
     const handleChange = useCallback(
       (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         onChange(event.target.value);
@@ -75,7 +69,6 @@ const ItemTextField = memo(
     return (
       <TextField
         name="items"
-        label={label}
         placeholder={placeholder}
         defaultValue={defaultValue}
         onChange={handleChange}
@@ -387,7 +380,16 @@ const Fields = memo(
             ))}
           </RadioGroup>
         </FormControl>
-        <Stack spacing={1.25}>
+        <Stack
+          spacing={1.25}
+          overflow="auto"
+          height="calc(100vh - 290px)"
+          sx={{
+            "&::-webkit-scrollbar": {
+              width: 0,
+            },
+          }}
+        >
           {items.map((item, index) => {
             return (
               <ListItem
@@ -689,6 +691,7 @@ export const ListModal = memo(
         title={modalTitle}
         description="Add one or more bullet points for this task section."
         isOpen={isOpen}
+        isScrollBar={false}
         onClose={handleClose}
         formAction={formAction}
         confirmLabel={confirmLabel}

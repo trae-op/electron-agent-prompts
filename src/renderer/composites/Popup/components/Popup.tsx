@@ -68,6 +68,7 @@ const PopupComponent = ({
   formTestId = "confirm-model-form",
   messageTestId = "confirm-model-message",
   content,
+  isScrollBar = true,
 }: TConfirmModelProps) => {
   const handlerClose = useCallback(() => {
     onClose?.();
@@ -95,8 +96,12 @@ const PopupComponent = ({
             boxShadow: (theme) => theme.shadows[6],
             position: "relative",
             maxHeight: "90vh",
-            overflowY: "auto",
-            overflowX: "hidden",
+            ...(isScrollBar
+              ? {
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                }
+              : {}),
             display: "flex",
             flexDirection: "column",
           }}

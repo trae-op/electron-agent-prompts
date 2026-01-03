@@ -87,7 +87,6 @@ const NodeFields = memo(
         <Stack direction="row" alignItems="center" spacing={1}>
           <TextField
             name="architecture-item"
-            label={depth === 0 ? `Item ${index + 1}` : `Nested ${index + 1}`}
             placeholder="Enter folder or file"
             defaultValue={nameValue}
             onChange={handleChange}
@@ -206,7 +205,16 @@ const Fields = memo(
           fullWidth
         />
 
-        <Stack spacing={1.25}>
+        <Stack
+          spacing={1.25}
+          overflow="auto"
+          height="calc(100vh - 290px)"
+          sx={{
+            "&::-webkit-scrollbar": {
+              width: 0,
+            },
+          }}
+        >
           {nodes.map((node, index) => (
             <NodeFields
               key={node.id}
@@ -395,6 +403,7 @@ export const ArchitectureModal = memo(
         isOpen={isOpen}
         onClose={handleClose}
         formAction={formAction}
+        isScrollBar={false}
         confirmLabel={confirmLabel}
         confirmPendingLabel={confirmPendingLabel}
         formTestId="architecture-modal-form"

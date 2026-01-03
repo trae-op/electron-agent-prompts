@@ -19,6 +19,7 @@ export type TConfirmModelProps = {
   confirmColor?: ButtonProps["color"];
   formTestId?: string;
   messageTestId?: string;
+  isScrollBar?: boolean;
 };
 
 export type TCancelButtonProps = {
