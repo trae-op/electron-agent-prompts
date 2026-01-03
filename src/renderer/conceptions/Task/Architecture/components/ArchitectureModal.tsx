@@ -208,7 +208,7 @@ const Fields = memo(
         <Stack
           spacing={1.25}
           overflow="auto"
-          height="calc(100vh - 290px)"
+          height="calc(100vh - 320px)"
           sx={{
             "&::-webkit-scrollbar": {
               width: 0,

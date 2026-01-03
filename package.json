@@ -1,7 +1,7 @@
 {
   "name": "electron-agent-prompts",
   "private": true,
-  "version": "0.14.39",
+  "version": "0.14.40",
   "type": "module",
   "main": "dist-main/app.js",
   "author": "traeop",
@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "free:port": "netstat -aon | findstr :8844 && Get-NetTCPConnection -LocalPort 8844 -State Listen",
     "test:unit:renderer": "vitest src/renderer --watch=false",
     "test:unit:main": "vitest src/main --watch=false",
     "open:mac:prod": "./dist/mac/electron-agent-prompts.app/Contents/MacOS/electron-agent-prompts",
