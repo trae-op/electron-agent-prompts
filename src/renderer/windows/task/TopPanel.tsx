@@ -6,12 +6,14 @@ import CodeIcon from "@mui/icons-material/Code";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import TransformIcon from "@mui/icons-material/Transform";
 
 import { useTitleModalActions } from "@conceptions/Task/Title";
 import { useCodeModalActions } from "@conceptions/Task/Code";
 import { useListModalActions } from "@conceptions/Task/List";
 import { useTextModalActions } from "@conceptions/Task/Text";
 import { useArchitectureModalActions } from "@conceptions/Task/Architecture";
+import { useConverterModalActions } from "@conceptions/Task/Converter";
 import { TopPanel } from "@layouts/TopPanel";
 import { SearchContent } from "@conceptions/Task/SearchContent";
 
@@ -26,6 +28,7 @@ const items = [
     label: "architecture",
     icon: <AccountTreeIcon />,
   },
+  { id: "6", action: "converter", label: "converter", icon: <TransformIcon /> },
 ];
 
 const ContainerTopPanel = () => {
@@ -34,6 +37,7 @@ const ContainerTopPanel = () => {
   const { openModal: openListModal } = useListModalActions();
   const { openModal: openTextModal } = useTextModalActions();
   const { openModal: openArchitectureModal } = useArchitectureModalActions();
+  const { openModal: openConverterModal } = useConverterModalActions();
 
   const handleOpenModal = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -60,11 +64,21 @@ const ContainerTopPanel = () => {
         case "list":
           openListModal();
           break;
+        case "converter":
+          openConverterModal();
+          break;
         default:
           break;
       }
     },
-    [openCodeModal, openListModal, openTextModal, openTitleModal]
+    [
+      openArchitectureModal,
+      openCodeModal,
+      openConverterModal,
+      openListModal,
+      openTextModal,
+      openTitleModal,
+    ]
   );
 
   return (

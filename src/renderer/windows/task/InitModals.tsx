@@ -6,6 +6,7 @@ import { ListModal as ListModalComponent } from "@conceptions/Task/List";
 import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
 import { ArchitectureModal as ArchitectureModalComponent } from "@conceptions/Task/Architecture";
 import { PositionModal as PositionModalComponent } from "@conceptions/Task/Position";
+import { ConverterModal as ConverterModalComponent } from "@conceptions/Task/Converter";
 import { TextControlPanel } from "@conceptions/Task/TextControlPanel";
 import {
   useAddContentDispatch,
@@ -171,4 +172,8 @@ export const ArchitectureModal = () => {
       onUpdate={handleUpdate}
     />
   );
+};
+
+export const ConverterModal = () => {
+  return <ConverterModalComponent />;
 };

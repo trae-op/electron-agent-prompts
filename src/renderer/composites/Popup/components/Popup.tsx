@@ -88,7 +88,7 @@ const PopupComponent = ({
         <Box
           component="section"
           sx={{
-            width: { xs: "100%", sm: 420 },
+            width: { xs: "100%", sm: 820 },
             maxWidth: 480,
             bgcolor: "background.paper",
             borderRadius: 3,
