@@ -13,6 +13,8 @@ import {
 import { TFieldsProps, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 const Fields = ({ folders, onFoldersChange, projects }: TFieldsProps) => {
   const { pending } = useFormStatus();
@@ -38,28 +40,31 @@ const Fields = ({ folders, onFoldersChange, projects }: TFieldsProps) => {
         disabled={pending}
       />
 
-      <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
-        defaultValue={task.projectId ?? ""}
-        label="Projects"
-        name="projectId"
-      >
-        {projects
-          .map((project) => {
-            const parsedId = Number(project.id);
-            if (!Number.isFinite(parsedId)) {
-              return undefined;
-            }
+      <FormControl fullWidth>
+        <InputLabel id="project-id-select-label">Projects</InputLabel>
+        <Select
+          labelId="project-id-select-label"
+          id="project-id-select"
+          defaultValue={task.projectId ?? ""}
+          label="Projects"
+          name="projectId"
+        >
+          {projects
+            .map((project) => {
+              const parsedId = Number(project.id);
+              if (!Number.isFinite(parsedId)) {
+                return undefined;
+              }
 
-            return (
-              <MenuItem key={project.id} value={parsedId}>
-                {project.name}
-              </MenuItem>
-            );
-          })
-          .filter(Boolean)}
-      </Select>
+              return (
+                <MenuItem key={project.id} value={parsedId}>
+                  {project.name}
+                </MenuItem>
+              );
+            })
+            .filter(Boolean)}
+        </Select>
+      </FormControl>
 
       <TextField
         key={`ide-${task.id}`}
