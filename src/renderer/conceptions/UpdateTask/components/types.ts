@@ -1,5 +1,6 @@
 export type TUpdateTaskModalProps = {
   onSuccess: (data: TTask) => void;
+  projects: TProject[];
 };
 
 export type TUpdateTaskFormProps = {
@@ -12,4 +13,5 @@ export type TUpdateTaskFormProps = {
 export type TFieldsProps = {
   folders: string[];
   onFoldersChange: (folders: string[]) => void;
+  projects: TProject[];
 };

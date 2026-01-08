@@ -1,6 +1,7 @@
 import { memo, useActionState, useCallback, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -13,7 +14,7 @@ import { TFieldsProps, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
 
-const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
+const Fields = ({ folders, onFoldersChange, projects }: TFieldsProps) => {
   const { pending } = useFormStatus();
   const task = useUpdateTaskModalTaskSelector();
 
@@ -36,6 +37,30 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         fullWidth
         disabled={pending}
       />
+
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        defaultValue={task.projectId ?? ""}
+        label="Projects"
+        name="projectId"
+      >
+        {projects
+          .map((project) => {
+            const parsedId = Number(project.id);
+            if (!Number.isFinite(parsedId)) {
+              return undefined;
+            }
+
+            return (
+              <MenuItem key={project.id} value={parsedId}>
+                {project.name}
+              </MenuItem>
+            );
+          })
+          .filter(Boolean)}
+      </Select>
+
       <TextField
         key={`ide-${task.id}`}
         select
@@ -55,77 +80,84 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
   );
 };
 
-export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
-  const task = useUpdateTaskModalTaskSelector();
-  const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
-  const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
+export const UpdateTaskModal = memo(
+  ({ onSuccess, projects }: TUpdateTaskModalProps) => {
+    const task = useUpdateTaskModalTaskSelector();
+    const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
+    const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
-  useEffect(() => {
-    setSelectedFolders(task?.foldersContentFiles ?? []);
-  }, [task?.id, task?.foldersContentFiles]);
+    useEffect(() => {
+      setSelectedFolders(task?.foldersContentFiles ?? []);
+    }, [task?.id, task?.foldersContentFiles]);
 
-  const [_, formAction] = useActionState(
-    useCallback(
-      async (_state: undefined, formData: FormData): Promise<undefined> => {
-        if (task === undefined) {
+    const [_, formAction] = useActionState(
+      useCallback(
+        async (_state: undefined, formData: FormData): Promise<undefined> => {
+          if (task === undefined) {
+            return undefined;
+          }
+
+          const rawName = formData.get("name");
+          const rawProjectId = formData.get("projectId");
+          const name = typeof rawName === "string" ? rawName.trim() : "";
+
+          const rawIde = formData.get("ide");
+          const ide =
+            typeof rawIde === "string" && rawIde.trim().length > 0
+              ? rawIde.trim()
+              : undefined;
+
+          const response = await window.electron.invoke.updateTask({
+            id: task.id,
+            name,
+            projectId:
+              typeof rawProjectId === "string"
+                ? Number(rawProjectId)
+                : task.projectId,
+            fileId: task.fileId,
+            url: task.url,
+            folderPaths: selectedFolders,
+            ide,
+          });
+
+          if (response !== undefined) {
+            onSuccess(response);
+            setUpdateTask(undefined);
+          }
+
           return undefined;
+        },
+        [onSuccess, selectedFolders, setUpdateTask, task]
+      ),
+      undefined
+    );
+
+    const handleClose = useCallback(() => {
+      setUpdateTask(undefined);
+      setSelectedFolders([]);
+    }, [setSelectedFolders, setUpdateTask]);
+
+    return (
+      <Popup
+        title="Update task"
+        description="Update the task name."
+        isOpen={task !== undefined}
+        onClose={handleClose}
+        formAction={formAction}
+        confirmLabel="Save Changes"
+        confirmPendingLabel="Saving..."
+        formTestId="update-task-form"
+        messageTestId="update-task-message"
+        content={
+          <Fields
+            folders={selectedFolders}
+            onFoldersChange={setSelectedFolders}
+            projects={projects}
+          />
         }
-
-        const rawName = formData.get("name");
-        const name = typeof rawName === "string" ? rawName.trim() : "";
-
-        const rawIde = formData.get("ide");
-        const ide =
-          typeof rawIde === "string" && rawIde.trim().length > 0
-            ? rawIde.trim()
-            : undefined;
-
-        const response = await window.electron.invoke.updateTask({
-          id: task.id,
-          name,
-          projectId: task.projectId,
-          fileId: task.fileId,
-          url: task.url,
-          folderPaths: selectedFolders,
-          ide,
-        });
-
-        if (response !== undefined) {
-          onSuccess(response);
-          setUpdateTask(undefined);
-        }
-
-        return undefined;
-      },
-      [onSuccess, selectedFolders, setUpdateTask, task]
-    ),
-    undefined
-  );
-
-  const handleClose = useCallback(() => {
-    setUpdateTask(undefined);
-    setSelectedFolders([]);
-  }, [setSelectedFolders, setUpdateTask]);
-
-  return (
-    <Popup
-      title="Update task"
-      description="Update the task name."
-      isOpen={task !== undefined}
-      onClose={handleClose}
-      formAction={formAction}
-      confirmLabel="Save Changes"
-      confirmPendingLabel="Saving..."
-      formTestId="update-task-form"
-      messageTestId="update-task-message"
-      content={
-        <Fields
-          folders={selectedFolders}
-          onFoldersChange={setSelectedFolders}
-        />
-      }
-    />
-  );
-});
+      />
+    );
+  }
+);
 
 UpdateTaskModal.displayName = "UpdateTaskModal";
