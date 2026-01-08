@@ -2,6 +2,7 @@ import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import Popover from "@mui/material/Popover";
+import CopyAll from "@mui/icons-material/CopyAll";
 
 import { useControl } from "../hooks/useControl";
 import { useUserSelector } from "../context/useSelectors";
@@ -11,7 +12,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { TUserPopoverProps } from "./types";
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -77,15 +78,37 @@ const DisplayName = () => {
 
 const DisplayEmail = () => {
   const user = useUserSelector();
+  const [isCopy, setIsCopy] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(user?.email || "");
+    setIsCopy(true);
+  }, [user?.email]);
 
   if (user?.email === undefined) {
     return null;
   }
 
   return (
-    <Typography variant="body2" color="text.secondary">
-      {user.email}
-    </Typography>
+    <Stack
+      width="85%"
+      direction="row"
+      spacing={0}
+      alignItems="center"
+      justifyContent="center"
+    >
+      <Typography variant="caption" color="text.secondary" noWrap>
+        {user.email}
+      </Typography>
+      <IconButton
+        sx={{ p: 0.5 }}
+        color={isCopy ? "success" : "default"}
+        aria-label="copy email"
+        onClick={handleCopy}
+      >
+        <CopyAll fontSize="small" />
+      </IconButton>
+    </Stack>
   );
 };
 
