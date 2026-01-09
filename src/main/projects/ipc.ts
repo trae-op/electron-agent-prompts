@@ -1,7 +1,6 @@
 import { ipcMainOn } from "../@shared/utils.js";
 import { cacheProjects } from "../@shared/cache-responses.js";
 import { getProjects } from "./service.js";
-import { getStore, setStore } from "../@shared/store.js";
 
 export function registerIpc(): void {
   ipcMainOn("projects", async (event: Electron.IpcMainEvent) => {
@@ -13,17 +12,12 @@ export function registerIpc(): void {
       });
     }
 
-    const isStartProjects = getStore<boolean, string>("isStartProjects");
+    const projects = await getProjects();
 
-    if (isStartProjects) {
-      setStore("isStartProjects", false);
-      const projects = await getProjects();
-
-      if (projects !== undefined) {
-        event.reply("projects", {
-          projects,
-        });
-      }
+    if (projects !== undefined) {
+      event.reply("projects", {
+        projects,
+      });
     }
   });
 }

@@ -69,10 +69,24 @@ export function registerIpc({
         });
       }
 
-      const isStartTasks = getStore<boolean, string>("isStartTasks");
+      const startedTasksByProjectId = getStore<
+        {
+          [key: string]: boolean;
+        },
+        string
+      >("startedTasksByProjectId");
 
-      if (isStartTasks) {
-        setStore("isStartTasks", false);
+      if (
+        startedTasksByProjectId === undefined ||
+        startedTasksByProjectId[projectId] === undefined ||
+        (startedTasksByProjectId !== undefined &&
+          startedTasksByProjectId[projectId] === false)
+      ) {
+        setStore("startedTasksByProjectId", {
+          ...(startedTasksByProjectId || {}),
+          [projectId]: true,
+        });
+
         const tasks = await getTasks(projectId);
 
         if (tasks !== undefined) {

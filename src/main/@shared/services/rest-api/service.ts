@@ -13,6 +13,7 @@ import { buildTasksEndpoint } from "../../utils.js";
 import { restApi } from "../../../config.js";
 import type { ApiResponse, DataError, RequestOptions } from "./types.js";
 import { logout } from "../logout.js";
+import { cacheTasks } from "../../cache-responses.js";
 
 function getAuthorization(): AxiosRequestConfig["headers"] | undefined {
   const token = getElectronStorage("authToken");
@@ -278,7 +279,7 @@ function addResponseEntityElectronStorage(
   }
 }
 
-function deleteResponseEntityElectronStorage(entityId: string): void {
+export function deleteResponseEntityElectronStorage(entityId: string): void {
   const cacheResponse = getElectronStorage("response");
 
   if (cacheResponse === undefined) {
@@ -328,12 +329,16 @@ function setResponseElectronStorage(
   response: AxiosResponse<any, any>
 ) {
   if (response.status >= 200 && response.status < 300) {
-    const merged = merge({
-      [endpoint]: response.data,
-    });
-    if (merged !== undefined) {
-      setElectronStorage("response", merged);
-    }
+    setDataResponseElectronStorage(endpoint, response.data);
+  }
+}
+
+export function setDataResponseElectronStorage<T>(endpoint: string, data: T) {
+  const merged = merge({
+    [endpoint]: data,
+  });
+  if (merged !== undefined) {
+    setElectronStorage("response", merged);
   }
 }
 
@@ -373,6 +378,14 @@ export async function put<T>(
       data,
       options
     );
+    if (
+      response.status >= 200 &&
+      response.status < 300 &&
+      response.data !== undefined &&
+      response.data !== null
+    ) {
+      addResponseEntityElectronStorage(endpoint, response.data);
+    }
     return handleResponse<T>(response);
   } catch (error: any) {
     return handleError(error as AxiosError<DataError>);

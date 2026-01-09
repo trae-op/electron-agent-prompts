@@ -1,6 +1,40 @@
+import { cacheTasks } from "../@shared/cache-responses.js";
+import { setDataResponseElectronStorage } from "../@shared/services/rest-api/service.js";
 import { getStore } from "../@shared/store.js";
-import { ipcMainHandle } from "../@shared/utils.js";
+import { buildTasksEndpoint, ipcMainHandle } from "../@shared/utils.js";
 import { updateTask } from "./service.js";
+
+function removeTaskFromResponseCache(
+  projectIdValue: number,
+  taskId: number
+): void {
+  const projectIdStore = getStore<string, string>("projectId");
+
+  const newProjectIdString =
+    projectIdValue !== undefined ? `${projectIdValue}` : undefined;
+
+  if (
+    newProjectIdString !== undefined &&
+    newProjectIdString !== projectIdStore
+  ) {
+    const parsedProjectIdStore = Number(projectIdStore);
+
+    if (!Number.isNaN(parsedProjectIdStore)) {
+      const cachedCurrentProjectTasks = cacheTasks(parsedProjectIdStore);
+
+      if (cachedCurrentProjectTasks !== undefined) {
+        const tasksWithoutUpdated = cachedCurrentProjectTasks.filter(
+          (task) => String(task.id) !== String(taskId)
+        );
+
+        setDataResponseElectronStorage(
+          buildTasksEndpoint(parsedProjectIdStore),
+          tasksWithoutUpdated
+        );
+      }
+    }
+  }
+}
 
 export function registerIpc({
   saveFoldersContent,
@@ -87,6 +121,10 @@ export function registerIpc({
     const projectIdStore = getStore<string, string>("projectId");
     if (projectIdStore === undefined) {
       return undefined;
+    }
+
+    if (String(projectIdStore).trim() !== String(projectIdValue).trim()) {
+      removeTaskFromResponseCache(projectIdValue, result.task.id);
     }
 
     const resolvedFileName = result.task?.name;

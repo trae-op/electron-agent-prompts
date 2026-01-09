@@ -8,6 +8,11 @@ import {
 import { restApi, windows } from "../config.js";
 ``;
 
+export const buildDeleteTaskEndpoint = (taskId: number): string =>
+  `${restApi.urls.base}${restApi.urls.baseApi}${
+    restApi.urls.tasks.base
+  }${restApi.urls.tasks.byId(taskId + "")}`;
+
 export const buildTasksEndpoint = (projectId: number): string =>
   `${restApi.urls.base}${restApi.urls.baseApi}${
     restApi.urls.tasks.base
