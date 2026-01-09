@@ -69,12 +69,17 @@ export function registerIpc({
         });
       }
 
-      const tasks = await getTasks(projectId);
+      const isStartTasks = getStore<boolean, string>("isStartTasks");
 
-      if (tasks !== undefined) {
-        event.reply("tasks", {
-          tasks: tasksCollect(tasks),
-        });
+      if (isStartTasks) {
+        setStore("isStartTasks", false);
+        const tasks = await getTasks(projectId);
+
+        if (tasks !== undefined) {
+          event.reply("tasks", {
+            tasks: tasksCollect(tasks),
+          });
+        }
       }
     }
   );

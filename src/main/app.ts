@@ -73,6 +73,9 @@ function initMenu(currentWindow: BrowserWindow) {
 }
 
 app.on("ready", async () => {
+  setStore("isStartTasks", true);
+  setStore("isStartProjects", true);
+
   const mainWindow = createWindow<TWindows["main"]>({
     hash: "window:main",
     isCache: true,
