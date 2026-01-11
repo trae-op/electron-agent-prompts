@@ -6,6 +6,8 @@ export const Context = createContext<TContext | null>(null);
 
 export function Provider({ children }: TProviderProps) {
   const task = useRef<TTaskWithFoldersContent | undefined>(undefined);
+  const projects = useRef<TProject[]>([]);
+
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
   const getTask = useCallback((): TTaskWithFoldersContent | undefined => {
@@ -20,6 +22,15 @@ export function Provider({ children }: TProviderProps) {
     []
   );
 
+  const getProjects = useCallback((): TProject[] => {
+    return projects.current;
+  }, []);
+
+  const setProjects = useCallback((value: TProject[]): void => {
+    projects.current = value;
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
   const subscribe = useCallback((callback: TSubscriberCallback) => {
     subscribers.current.add(callback);
 
@@ -32,6 +43,8 @@ export function Provider({ children }: TProviderProps) {
     <Context.Provider
       value={{
         getTask,
+        getProjects,
+        setProjects,
         setTask,
         subscribe,
       }}

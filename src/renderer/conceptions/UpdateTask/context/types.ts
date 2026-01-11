@@ -8,4 +8,6 @@ export type TContext = {
   getTask: () => TTaskWithFoldersContent | undefined;
   setTask: (value: TTaskWithFoldersContent | undefined) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
+  getProjects: () => TProject[];
+  setProjects: (value: TProject[]) => void;
 };

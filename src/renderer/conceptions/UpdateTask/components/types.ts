@@ -1,8 +1,9 @@
 export type TUpdateTaskModalProps = {
   onSuccess: (data: TTask) => void;
-  projects: TProject[];
 };
 
-export type TProjectFieldProps = {
-  projects: TProject[];
+export type TUpdateTaskActionArgs = {
+  task: TTask;
+  onSuccess: (data: TTask) => void;
+  setUpdateTask: (task: TTask | undefined) => void;
 };

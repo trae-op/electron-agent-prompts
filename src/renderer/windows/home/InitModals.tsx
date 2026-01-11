@@ -20,6 +20,7 @@ import { CreateTaskModal } from "@conceptions/CreateTask";
 import {
   UpdateTaskModal,
   useUpdateTaskModalTaskSelector,
+  useSetUpdateTaskModalProjectsDispatch,
 } from "@conceptions/UpdateTask";
 import { DeleteTaskModal } from "@conceptions/DeleteTask";
 
@@ -101,6 +102,7 @@ export const UpdateTaskModalContainer = () => {
   const task = useUpdateTaskModalTaskSelector();
   const removeTask = useRemoveTaskDispatch();
   const updateProject = useUpdateProjectDispatch();
+  const setUpdateTaskModalProjects = useSetUpdateTaskModalProjectsDispatch();
 
   const onSuccess = useCallback(
     (data: TTaskWithFoldersContent) => {
@@ -136,7 +138,16 @@ export const UpdateTaskModalContainer = () => {
     [task]
   );
 
-  return <UpdateTaskModal onSuccess={onSuccess} projects={projects} />;
+  const setProjectsToTasks = useCallback((items: TProject[]) => {
+    console.log("Setting projects to update task modal:", items);
+    setUpdateTaskModalProjects(items);
+  }, []);
+
+  useEffect(() => {
+    setProjectsToTasks(projects);
+  }, [projects]);
+
+  return <UpdateTaskModal onSuccess={onSuccess} />;
 };
 
 export const DeleteTaskModalContainer = () => {

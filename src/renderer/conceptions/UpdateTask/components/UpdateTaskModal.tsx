@@ -9,8 +9,9 @@ import { Popup } from "@composites/Popup";
 import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
+  useUpdateTaskModalProjectsSelector,
 } from "../context";
-import { TProjectFieldProps, TUpdateTaskModalProps } from "./types";
+import { TUpdateTaskActionArgs, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
 import FormControl from "@mui/material/FormControl";
@@ -43,9 +44,10 @@ const TaskNameField = memo(() => {
 
 TaskNameField.displayName = "TaskNameField";
 
-const TaskProjectField = memo(({ projects }: TProjectFieldProps) => {
+const TaskProjectField = () => {
   const { pending } = useFormStatus();
   const task = useUpdateTaskModalTaskSelector();
+  const projects = useUpdateTaskModalProjectsSelector();
 
   if (task === undefined) {
     return null;
@@ -79,7 +81,7 @@ const TaskProjectField = memo(({ projects }: TProjectFieldProps) => {
       </Select>
     </FormControl>
   );
-});
+};
 
 TaskProjectField.displayName = "TaskProjectField";
 
@@ -127,7 +129,7 @@ const TaskFoldersField = memo(() => {
 
 TaskFoldersField.displayName = "TaskFoldersField";
 
-const UpdateTaskFields = memo(({ projects }: TProjectFieldProps) => {
+const UpdateTaskFields = () => {
   const task = useUpdateTaskModalTaskSelector();
 
   if (task === undefined) {
@@ -137,21 +139,15 @@ const UpdateTaskFields = memo(({ projects }: TProjectFieldProps) => {
   return (
     <Stack spacing={2} key={task.id}>
       <TaskNameField />
-      <TaskProjectField projects={projects} />
+      <TaskProjectField />
       <TaskIdeField />
       <TaskUploadFileField />
       <TaskFoldersField />
     </Stack>
   );
-});
+};
 
 UpdateTaskFields.displayName = "UpdateTaskFields";
-
-type TUpdateTaskActionArgs = {
-  task: TTask;
-  onSuccess: (data: TTask) => void;
-  setUpdateTask: (task: TTask | undefined) => void;
-};
 
 const submitUpdateTask = async (
   { task, onSuccess, setUpdateTask }: TUpdateTaskActionArgs,
@@ -186,45 +182,43 @@ const submitUpdateTask = async (
   }
 };
 
-export const UpdateTaskModal = memo(
-  ({ onSuccess, projects }: TUpdateTaskModalProps) => {
-    const task = useUpdateTaskModalTaskSelector();
-    const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
+export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
+  const task = useUpdateTaskModalTaskSelector();
+  const setUpdateTask = useSetUpdateTaskModalTaskDispatch();
 
-    const [, formAction] = useActionState(
-      useCallback(
-        async (_state: undefined, formData: FormData): Promise<undefined> => {
-          if (task === undefined) {
-            return undefined;
-          }
-
-          await submitUpdateTask({ task, onSuccess, setUpdateTask }, formData);
+  const [, formAction] = useActionState(
+    useCallback(
+      async (_state: undefined, formData: FormData): Promise<undefined> => {
+        if (task === undefined) {
           return undefined;
-        },
-        [onSuccess, setUpdateTask, task]
-      ),
-      undefined
-    );
+        }
 
-    const handleClose = useCallback(() => {
-      setUpdateTask(undefined);
-    }, [setUpdateTask]);
+        await submitUpdateTask({ task, onSuccess, setUpdateTask }, formData);
+        return undefined;
+      },
+      [onSuccess, setUpdateTask, task]
+    ),
+    undefined
+  );
 
-    return (
-      <Popup
-        title="Update task"
-        description="Update the task name."
-        isOpen={task !== undefined}
-        onClose={handleClose}
-        formAction={formAction}
-        confirmLabel="Save Changes"
-        confirmPendingLabel="Saving..."
-        formTestId="update-task-form"
-        messageTestId="update-task-message"
-        content={<UpdateTaskFields projects={projects} />}
-      />
-    );
-  }
-);
+  const handleClose = useCallback(() => {
+    setUpdateTask(undefined);
+  }, [setUpdateTask]);
+
+  return (
+    <Popup
+      title="Update task"
+      description="Update the task name."
+      isOpen={task !== undefined}
+      onClose={handleClose}
+      formAction={formAction}
+      confirmLabel="Save Changes"
+      confirmPendingLabel="Saving..."
+      formTestId="update-task-form"
+      messageTestId="update-task-message"
+      content={<UpdateTaskFields />}
+    />
+  );
+});
 
 UpdateTaskModal.displayName = "UpdateTaskModal";
