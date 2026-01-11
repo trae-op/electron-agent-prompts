@@ -7,6 +7,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import TransformIcon from "@mui/icons-material/Transform";
+import PsychologyIcon from "@mui/icons-material/Psychology";
 
 import { useTitleModalActions } from "@conceptions/Task/Title";
 import { useCodeModalActions } from "@conceptions/Task/Code";
@@ -14,6 +15,7 @@ import { useListModalActions } from "@conceptions/Task/List";
 import { useTextModalActions } from "@conceptions/Task/Text";
 import { useArchitectureModalActions } from "@conceptions/Task/Architecture";
 import { useConverterModalActions } from "@conceptions/Task/Converter";
+import { useAgentSkillsModalActions } from "@conceptions/Task/AgentSkills";
 import { TopPanel } from "@layouts/TopPanel";
 import { SearchContent } from "@conceptions/Task/SearchContent";
 
@@ -29,6 +31,12 @@ const items = [
     icon: <AccountTreeIcon />,
   },
   { id: "6", action: "converter", label: "converter", icon: <TransformIcon /> },
+  {
+    id: "7",
+    action: "agent-skills",
+    label: "agent skills",
+    icon: <PsychologyIcon />,
+  },
 ];
 
 const ContainerTopPanel = () => {
@@ -38,6 +46,7 @@ const ContainerTopPanel = () => {
   const { openModal: openTextModal } = useTextModalActions();
   const { openModal: openArchitectureModal } = useArchitectureModalActions();
   const { openModal: openConverterModal } = useConverterModalActions();
+  const { openModal: openAgentSkillsModal } = useAgentSkillsModalActions();
 
   const handleOpenModal = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -54,6 +63,9 @@ const ContainerTopPanel = () => {
           break;
         case "text":
           openTextModal();
+          break;
+        case "agent-skills":
+          openAgentSkillsModal();
           break;
         case "architecture":
           openArchitectureModal();
@@ -73,6 +85,7 @@ const ContainerTopPanel = () => {
     },
     [
       openArchitectureModal,
+      openAgentSkillsModal,
       openCodeModal,
       openConverterModal,
       openListModal,

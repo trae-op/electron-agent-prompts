@@ -912,6 +912,10 @@ function trimEmptyBoundaryLines(content: string): string {
 function detectMarkdownContentType(content: string): TTypesMarkdownContent {
   const normalized = content.trim();
 
+  if (isAgentSkillsFrontmatter(normalized)) {
+    return "agent-skills";
+  }
+
   if (/^#{1,6}\s+/.test(normalized)) {
     return "title";
   }
@@ -955,4 +959,37 @@ function detectMarkdownContentType(content: string): TTypesMarkdownContent {
   }
 
   return "text";
+}
+
+function isAgentSkillsFrontmatter(content: string): boolean {
+  const lines = content.split(/\r?\n/);
+
+  if (lines.length < 4) {
+    return false;
+  }
+
+  if (lines[0].trim() !== "---") {
+    return false;
+  }
+
+  if (lines[lines.length - 1].trim() !== "---") {
+    return false;
+  }
+
+  let hasName = false;
+  let hasDescription = false;
+
+  for (const line of lines.slice(1, -1)) {
+    const trimmed = line.trim().toLowerCase();
+
+    if (trimmed.startsWith("name:")) {
+      hasName = true;
+    }
+
+    if (trimmed.startsWith("description:")) {
+      hasDescription = true;
+    }
+  }
+
+  return hasName && hasDescription;
 }

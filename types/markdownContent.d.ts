@@ -3,7 +3,8 @@ type TTypesMarkdownContent =
   | "code"
   | "list"
   | "title"
-  | "architecture";
+  | "architecture"
+  | "agent-skills";
 
 type TMarkdownContent = {
   type: TTypesMarkdownContent;

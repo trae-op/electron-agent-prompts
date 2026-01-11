@@ -22,6 +22,10 @@ import {
   useSetTextModalOpenDispatch,
 } from "@conceptions/Task/Text";
 import {
+  useSetAgentSkillsContentDispatch,
+  useSetAgentSkillsModalOpenDispatch,
+} from "@conceptions/Task/AgentSkills";
+import {
   useSetArchitectureContentDispatch,
   useSetArchitectureModalOpenDispatch,
 } from "@conceptions/Task/Architecture";
@@ -40,6 +44,8 @@ const TaskOverview = () => {
   const setListModalOpen = useSetListModalOpenDispatch();
   const setTextContent = useSetTextContentDispatch();
   const setTextModalOpen = useSetTextModalOpenDispatch();
+  const setAgentSkillsContent = useSetAgentSkillsContentDispatch();
+  const setAgentSkillsModalOpen = useSetAgentSkillsModalOpenDispatch();
   const setArchitectureContent = useSetArchitectureContentDispatch();
   const setArchitectureModalOpen = useSetArchitectureModalOpenDispatch();
   const setPositionContent = useSetPositionContentDispatch();
@@ -67,6 +73,10 @@ const TaskOverview = () => {
           setTextContent(content);
           setTextModalOpen(true);
           break;
+        case "agent-skills":
+          setAgentSkillsContent(content);
+          setAgentSkillsModalOpen(true);
+          break;
         case "architecture":
           setArchitectureContent(content);
           setArchitectureModalOpen(true);
@@ -82,6 +92,8 @@ const TaskOverview = () => {
       setListModalOpen,
       setTextContent,
       setTextModalOpen,
+      setAgentSkillsContent,
+      setAgentSkillsModalOpen,
       setArchitectureContent,
       setArchitectureModalOpen,
     ]

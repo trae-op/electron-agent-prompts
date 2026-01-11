@@ -11,6 +11,8 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ControlCameraIcon from "@mui/icons-material/ControlCamera";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 import { useContentsSelector } from "../context";
 import { TContentBlockWrapperProps, THeadingVariant } from "./types";
@@ -24,6 +26,7 @@ import {
 import { useMemo } from "react";
 import { type TListItemContent, type TListStyle } from "../utils/types";
 import { parseListContent } from "@utils/markdownContent";
+import { parseAgentSkillsContent } from "@conceptions/Task/AgentSkills";
 
 export const MarkdownContentList = () => {
   const contents = useContentsSelector();
@@ -56,6 +59,8 @@ function renderContent(contentItem: TMarkdownContent) {
       return <ArchitectureItem content={contentItem.content} />;
     case "list":
       return <ListItemBlock content={contentItem.content} />;
+    case "agent-skills":
+      return <AgentSkillsItem content={contentItem.content} />;
     case "text":
     default:
       return <ParagraphItem content={contentItem.content} />;
@@ -290,6 +295,29 @@ const ArchitectureItem = ({ content }: { content: string }) => {
         {content}
       </Box>
     </Paper>
+  );
+};
+
+const AgentSkillsItem = ({ content }: { content: string }) => {
+  const { name, description } = useMemo(() => {
+    return parseAgentSkillsContent(content);
+  }, [content]);
+
+  return (
+    <Card sx={{ width: "100%" }} variant="outlined">
+      <CardContent>
+        <Typography gutterBottom variant="h4" component="h4">
+          {name || "Untitled skill"}
+        </Typography>
+        <Typography
+          variant="body2"
+          component="p"
+          sx={{ whiteSpace: "pre-wrap" }}
+        >
+          {description || ""}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 };
 

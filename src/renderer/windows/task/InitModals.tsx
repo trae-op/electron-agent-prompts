@@ -4,6 +4,7 @@ import { TitleModal as TitleModalComponent } from "@conceptions/Task/Title";
 import { CodeModal as CodeModalComponent } from "@conceptions/Task/Code";
 import { ListModal as ListModalComponent } from "@conceptions/Task/List";
 import { TextModal as TextModalComponent } from "@conceptions/Task/Text";
+import { AgentSkillsModal as AgentSkillsModalComponent } from "@conceptions/Task/AgentSkills";
 import { ArchitectureModal as ArchitectureModalComponent } from "@conceptions/Task/Architecture";
 import { PositionModal as PositionModalComponent } from "@conceptions/Task/Position";
 import { ConverterModal as ConverterModalComponent } from "@conceptions/Task/Converter";
@@ -142,6 +143,34 @@ export const TextModal = () => {
       onSuccess={handleSuccess}
       onUpdate={handleUpdate}
       controlPanel={<TextControlPanel />}
+    />
+  );
+};
+
+export const AgentSkillsModal = () => {
+  const contents = useContentsSelector();
+  const addContentDispatch = useAddContentDispatch();
+  const updateContentDispatch = useUpdateContentDispatch();
+
+  const handleSuccess = useCallback(
+    (data: TMarkdownContent) => {
+      addContentDispatch(data);
+    },
+    [addContentDispatch]
+  );
+
+  const handleUpdate = useCallback(
+    (data: TMarkdownContent) => {
+      updateContentDispatch(data);
+    },
+    [updateContentDispatch]
+  );
+
+  return (
+    <AgentSkillsModalComponent
+      contents={contents}
+      onSuccess={handleSuccess}
+      onUpdate={handleUpdate}
     />
   );
 };

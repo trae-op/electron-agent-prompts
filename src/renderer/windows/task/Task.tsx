@@ -6,6 +6,7 @@ import { Provider as CodeProvider } from "@conceptions/Task/Code";
 import { Provider as TitleProvider } from "@conceptions/Task/Title";
 import { Provider as ListProvider } from "@conceptions/Task/List";
 import { Provider as TextProvider } from "@conceptions/Task/Text";
+import { Provider as AgentSkillsProvider } from "@conceptions/Task/AgentSkills";
 import { Provider as ArchitectureProvider } from "@conceptions/Task/Architecture";
 import { Provider as PositionProvider } from "@conceptions/Task/Position";
 import { Provider as SearchContentProvider } from "@conceptions/Task/SearchContent";
@@ -17,6 +18,7 @@ import {
   ListModal,
   TextModal,
   ArchitectureModal,
+  AgentSkillsModal,
   ConverterModal,
   PositionModal,
 } from "./InitModals";
@@ -35,48 +37,51 @@ const Task = () => {
             <TitleProvider>
               <ListProvider>
                 <TextProvider>
-                  <ArchitectureProvider>
-                    <Suspense fallback={<LoadingSpinner />}>
-                      <LazyTopPanel />
-                    </Suspense>
+                  <AgentSkillsProvider>
+                    <ArchitectureProvider>
+                      <Suspense fallback={<LoadingSpinner />}>
+                        <LazyTopPanel />
+                      </Suspense>
 
-                    <TitleModal />
-                    <ListModal />
-                    <TextModal />
-                    <CodeModal />
-                    <ArchitectureModal />
-                    <ConverterModal />
-                    <PositionProvider>
-                      <PositionModal />
-                      <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
-                        <Stack
-                          overflow="auto"
-                          width="calc(100vw - 25px)"
-                          height="calc(100vh - 120px)"
-                          sx={{
-                            "&::-webkit-scrollbar": {
-                              width: 4,
+                      <TitleModal />
+                      <ListModal />
+                      <TextModal />
+                      <AgentSkillsModal />
+                      <CodeModal />
+                      <ArchitectureModal />
+                      <ConverterModal />
+                      <PositionProvider>
+                        <PositionModal />
+                        <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
+                          <Stack
+                            overflow="auto"
+                            width="calc(100vw - 25px)"
+                            height="calc(100vh - 120px)"
+                            sx={{
+                              "&::-webkit-scrollbar": {
+                                width: 4,
 
-                              backgroundColor: "lightgrey",
-                            },
+                                backgroundColor: "lightgrey",
+                              },
 
-                            "&::-webkit-scrollbar-thumb": {
-                              backgroundColor: "black",
-                              height: 30,
-                              cursor: "pointer",
-                            },
-                          }}
-                          direction="column"
-                          spacing={1}
-                        >
-                          <TaskOverview />
+                              "&::-webkit-scrollbar-thumb": {
+                                backgroundColor: "black",
+                                height: 30,
+                                cursor: "pointer",
+                              },
+                            }}
+                            direction="column"
+                            spacing={1}
+                          >
+                            <TaskOverview />
+                          </Stack>
+                          <Stack width="100%" direction="row">
+                            <MarkdownContentListButtons />
+                          </Stack>
                         </Stack>
-                        <Stack width="100%" direction="row">
-                          <MarkdownContentListButtons />
-                        </Stack>
-                      </Stack>
-                    </PositionProvider>
-                  </ArchitectureProvider>
+                      </PositionProvider>
+                    </ArchitectureProvider>
+                  </AgentSkillsProvider>
                 </TextProvider>
               </ListProvider>
             </TitleProvider>
