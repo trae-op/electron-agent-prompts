@@ -10,7 +10,7 @@ import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
 } from "../context";
-import { TUpdateTaskModalProps } from "./types";
+import { TProjectFieldProps, TUpdateTaskModalProps } from "./types";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
 import FormControl from "@mui/material/FormControl";
@@ -42,10 +42,6 @@ const TaskNameField = memo(() => {
 });
 
 TaskNameField.displayName = "TaskNameField";
-
-type TProjectFieldProps = {
-  projects: TProject[];
-};
 
 const TaskProjectField = memo(({ projects }: TProjectFieldProps) => {
   const { pending } = useFormStatus();
