@@ -8,5 +8,6 @@ type TTask = {
   url: string | null;
   foldersContentFiles?: string[];
   ide?: string;
+  isSkills?: boolean;
   content?: string[];
 };

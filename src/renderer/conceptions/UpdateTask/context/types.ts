@@ -10,4 +10,8 @@ export type TContext = {
   subscribe: (callback: TSubscriberCallback) => () => void;
   getProjects: () => TProject[];
   setProjects: (value: TProject[]) => void;
+  getIde: () => string | undefined;
+  setIde: (value: string | undefined) => void;
+  getIsSkills: () => boolean;
+  setIsSkills: (value: boolean) => void;
 };

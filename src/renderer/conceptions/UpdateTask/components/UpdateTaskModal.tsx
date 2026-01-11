@@ -1,10 +1,4 @@
-import {
-  memo,
-  useActionState,
-  useCallback,
-  ChangeEvent,
-  useState,
-} from "react";
+import { memo, useActionState, useCallback, ChangeEvent } from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
@@ -18,6 +12,10 @@ import {
   useUpdateTaskModalTaskSelector,
   useSetUpdateTaskModalTaskDispatch,
   useUpdateTaskModalProjectsSelector,
+  useUpdateTaskModalIdeSelector,
+  useSetUpdateTaskModalIdeDispatch,
+  useUpdateTaskModalIsSkillsSelector,
+  useSetUpdateTaskModalIsSkillsDispatch,
 } from "../context";
 import {
   TTaskAgentSkillsFieldProps,
@@ -127,7 +125,7 @@ const TaskIdeSelectField = memo(({ onChange, ide }: TTaskIdeFieldProps) => {
         id="update-task-ide"
         label="Target IDE for Instructions"
         name="ide"
-        value={ide}
+        value={ide ?? ""}
         disabled={pending}
         data-testid="update-task-ide"
         onChange={handleChange}
@@ -143,6 +141,15 @@ TaskIdeSelectField.displayName = "TaskIdeSelectField";
 const TaskAgentSkillsField = memo(
   ({ isVisible }: TTaskAgentSkillsFieldProps) => {
     const { pending } = useFormStatus();
+    const isSkills = useUpdateTaskModalIsSkillsSelector();
+    const setIsSkills = useSetUpdateTaskModalIsSkillsDispatch();
+
+    const handleChange = useCallback(
+      (_event: unknown, checked: boolean) => {
+        setIsSkills(checked);
+      },
+      [setIsSkills]
+    );
 
     if (!isVisible) {
       return null;
@@ -156,6 +163,8 @@ const TaskAgentSkillsField = memo(
             value="true"
             disabled={pending}
             data-testid="update-task-agent-skills"
+            checked={isSkills}
+            onChange={handleChange}
           />
         }
         label="Agent Skills"
@@ -186,7 +195,21 @@ TaskFoldersField.displayName = "TaskFoldersField";
 
 const UpdateTaskFields = () => {
   const task = useUpdateTaskModalTaskSelector();
-  const [ide, setIde] = useState<string>("");
+  const ide = useUpdateTaskModalIdeSelector();
+  const setIde = useSetUpdateTaskModalIdeDispatch();
+  const setIsSkills = useSetUpdateTaskModalIsSkillsDispatch();
+
+  const handleIdeChange = useCallback(
+    (nextIde: string) => {
+      const normalizedIde = nextIde.trim();
+      setIde(normalizedIde.length > 0 ? normalizedIde : undefined);
+
+      if (normalizedIde !== "vs-code") {
+        setIsSkills(false);
+      }
+    },
+    [setIde, setIsSkills]
+  );
 
   if (task === undefined) {
     return null;
@@ -196,7 +219,7 @@ const UpdateTaskFields = () => {
     <Stack spacing={2} key={task.id}>
       <TaskNameField />
       <TaskProjectField />
-      <TaskIdeSelectField ide={ide} onChange={setIde} />
+      <TaskIdeSelectField ide={ide} onChange={handleIdeChange} />
       <TaskAgentSkillsField isVisible={ide === "vs-code"} />
       <TaskUploadFileField />
       <TaskFoldersField />

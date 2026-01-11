@@ -43,6 +43,7 @@ export function registerIpc({
           ? foldersContentFiles[task.id + ""]
           : [],
       ide: connectionInstructions?.[task.id + ""]?.ide,
+      isSkills: connectionInstructions?.[task.id + ""]?.isSkills,
     }));
   };
 

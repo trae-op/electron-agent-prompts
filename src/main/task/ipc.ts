@@ -7,13 +7,14 @@ import {
 import {
   createMarkdownFile,
   getMarkdownContentByTaskId,
+  getConnectionInstructionByTaskId,
   getTask,
   loadMarkdownContentFromTaskUrl,
   saveFileToStoredFolders,
   saveMarkdownContent,
 } from "./service.js";
 import { openWindow } from "./window.js";
-import { setStore } from "../@shared/store.js";
+import { getStore, setStore } from "../@shared/store.js";
 import { getWindow } from "../@shared/control-window/receive.js";
 
 export function registerIpc({
@@ -160,8 +161,18 @@ export function registerIpc({
     }
 
     if (taskWindow !== undefined && mainWindow !== undefined) {
+      const projectIdStore = getStore<string, string>("projectId");
+      const connectionInstructionPayload = getConnectionInstructionByTaskId(
+        String(result.task.id),
+        projectIdStore
+      );
+
       ipcWebContentsSend("updateTask", mainWindow.webContents, {
-        task: result.task,
+        task: {
+          ...result.task,
+          ide: connectionInstructionPayload?.ide,
+          isSkills: connectionInstructionPayload?.isSkills,
+        },
       });
       taskWindow.hide();
     }

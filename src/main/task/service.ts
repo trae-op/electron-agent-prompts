@@ -1,6 +1,13 @@
 import axios from "axios";
 import { randomUUID } from "node:crypto";
-import { access, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import {
+  access,
+  mkdir,
+  mkdtemp,
+  readFile,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { get } from "../@shared/services/rest-api/service.js";
@@ -389,14 +396,18 @@ export async function connectionInstruction(payload: {
   ide?: string;
   isSkills?: boolean;
   taskName?: string;
+  folderPaths?: string[];
 }): Promise<void> {
-  const { fileBlob, ide, isSkills, taskName } = payload;
+  const { fileBlob, ide, isSkills, taskName, folderPaths } = payload;
 
   if (fileBlob === undefined) {
     return;
   }
 
-  const savedFilePaths = getStore<string[], string>("lastSavedFilePaths") ?? [];
+  const savedFilePaths =
+    folderPaths !== undefined && folderPaths.length > 0
+      ? folderPaths
+      : getStore<string[], string>("lastSavedFilePaths") ?? [];
 
   if (savedFilePaths.length === 0) {
     return;
@@ -504,7 +515,7 @@ async function applyAgentSkillsInstruction({
 async function findVsCodeSettingsPath(
   startPath: string
 ): Promise<string | undefined> {
-  let currentDir = dirname(startPath);
+  let currentDir = await resolveStartDir(startPath);
 
   while (true) {
     const candidate = join(currentDir, ".vscode", "settings.json");
@@ -527,7 +538,7 @@ async function findVsCodeSettingsPath(
 }
 
 async function findGitRoot(startPath: string): Promise<string | undefined> {
-  let currentDir = dirname(startPath);
+  let currentDir = await resolveStartDir(startPath);
 
   while (true) {
     const candidate = join(currentDir, ".git");
@@ -547,6 +558,21 @@ async function findGitRoot(startPath: string): Promise<string | undefined> {
 
     currentDir = parentDir;
   }
+}
+
+async function resolveStartDir(startPath: string): Promise<string> {
+  const resolved = resolve(startPath);
+
+  try {
+    const stats = await stat(resolved);
+    if (stats.isDirectory()) {
+      return resolved;
+    }
+  } catch {
+    // ignore
+  }
+
+  return dirname(resolved);
 }
 
 async function applyVsCodeConnectionInstruction({

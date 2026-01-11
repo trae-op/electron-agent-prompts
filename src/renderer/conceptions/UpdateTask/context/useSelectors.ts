@@ -21,3 +21,23 @@ export const useSetUpdateTaskModalProjectsDispatch = () => {
 export const useSetUpdateTaskModalTaskDispatch = () => {
   return useUpdateTaskContext().setTask;
 };
+
+export const useUpdateTaskModalIdeSelector = (): string | undefined => {
+  const { getIde, subscribe } = useUpdateTaskContext();
+
+  return useSyncExternalStore(subscribe, getIde, getIde);
+};
+
+export const useUpdateTaskModalIsSkillsSelector = (): boolean => {
+  const { getIsSkills, subscribe } = useUpdateTaskContext();
+
+  return useSyncExternalStore(subscribe, getIsSkills, getIsSkills);
+};
+
+export const useSetUpdateTaskModalIdeDispatch = () => {
+  return useUpdateTaskContext().setIde;
+};
+
+export const useSetUpdateTaskModalIsSkillsDispatch = () => {
+  return useUpdateTaskContext().setIsSkills;
+};

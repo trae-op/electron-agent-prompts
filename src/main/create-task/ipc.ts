@@ -51,6 +51,7 @@ export function registerIpc({
     ide?: string;
     isSkills?: boolean;
     taskName?: string;
+    folderPaths?: string[];
   }) => Promise<void>;
 }): void {
   ipcMainHandle("createTask", async (payload) => {
@@ -137,6 +138,7 @@ export function registerIpc({
         payload.projectId
       ),
       ide: connectionInstructionPayload?.ide,
+      isSkills: connectionInstructionPayload?.isSkills,
     };
   });
 }

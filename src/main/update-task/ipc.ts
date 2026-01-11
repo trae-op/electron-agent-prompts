@@ -90,6 +90,7 @@ export function registerIpc({
     ide?: string;
     isSkills?: boolean;
     taskName?: string;
+    folderPaths?: string[];
   }) => Promise<void>;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
@@ -126,6 +127,8 @@ export function registerIpc({
       return undefined;
     }
 
+    const normalizedIde = payload.ide?.trim();
+
     if (String(projectIdStore).trim() !== String(projectIdValue).trim()) {
       removeTaskFromResponseCache(projectIdValue, result.task.id);
     }
@@ -135,7 +138,11 @@ export function registerIpc({
       result.fileBlob ??
       (result.task.url ? await downloadByUrl(result.task.url) : undefined);
 
-    if (resolvedFileBlob !== undefined && resolvedFileName !== undefined) {
+    if (
+      resolvedFileBlob !== undefined &&
+      resolvedFileName !== undefined &&
+      payload.isSkills !== true
+    ) {
       await saveFileToStoredFolders({
         file: resolvedFileBlob,
         fileName: resolvedFileName,
@@ -157,7 +164,6 @@ export function registerIpc({
     }
 
     const connectionInstructionProjectId = projectIdValue ?? projectIdStore;
-    const normalizedIde = payload.ide?.trim();
 
     if (
       normalizedIde !== undefined &&
@@ -172,11 +178,22 @@ export function registerIpc({
       });
 
       if (resolvedFileBlob !== undefined) {
+        const skillFolderPaths =
+          payload.isSkills === true
+            ? payload.folderPaths ??
+              getFoldersContentByTaskId(
+                String(result.task.id),
+                projectIdStore
+              ) ??
+              []
+            : undefined;
+
         await connectionInstruction({
           fileBlob: resolvedFileBlob,
           ide: normalizedIde,
           isSkills: payload.isSkills,
           taskName: payload.name,
+          folderPaths: skillFolderPaths,
         });
       }
     }
@@ -202,6 +219,7 @@ export function registerIpc({
         projectIdStore
       ),
       ide: connectionInstructionPayload?.ide,
+      isSkills: connectionInstructionPayload?.isSkills,
     };
   });
 }
