@@ -4,20 +4,18 @@ import {
   ipcMainOn,
   ipcWebContentsSend,
 } from "../@shared/utils.js";
-import {
-  createMarkdownFile,
-  getMarkdownContentByTaskId,
-  getConnectionInstructionByTaskId,
-  getFoldersContentByTaskId,
-  getTask,
-  loadMarkdownContentFromTaskUrl,
-  connectionInstruction,
-  saveFileToStoredFolders,
-  saveMarkdownContent,
-} from "./service.js";
+import { getTask, loadMarkdownContentFromTaskUrl } from "./service.js";
 import { openWindow } from "./window.js";
 import { getStore, setStore } from "../@shared/store.js";
 import { getWindow } from "../@shared/control-window/receive.js";
+import {
+  getMarkdownContentByTaskId,
+  saveMarkdownContent,
+} from "./utils/storage.js";
+import { createMarkdownFile, saveFileToStoredFolders } from "./utils/files.js";
+import { getConnectionInstructionByTaskId } from "./utils/connection-storage.js";
+import { connectionInstruction } from "./utils/connection.js";
+import { getFoldersContentByTaskId } from "./utils/folders.js";
 
 export function registerIpc({
   updateTask,

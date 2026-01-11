@@ -32,17 +32,21 @@ import {
   deleteProjectFoldersContent,
   getFoldersContentByProjectId,
   getFoldersContentByTaskId,
-  saveFileToStoredFolders,
-  buildMarkdownContentsFromBlob,
-  getMarkdownContentByProjectId,
+} from "./task/utils/folders.js";
+import { saveFileToStoredFolders } from "./task/utils/files.js";
+import { buildMarkdownContentsFromBlob } from "./task/utils/markdown.js";
+import {
   saveMarkdownContent,
-  downloadByUrl,
+  getMarkdownContentByProjectId,
+} from "./task/utils/storage.js";
+import {
   saveConnectionInstruction,
   deleteConnectionInstruction,
   getConnectionInstructionByProjectId,
   getConnectionInstructionByTaskId,
-  connectionInstruction,
-} from "./task/service.js";
+} from "./task/utils/connection-storage.js";
+import { connectionInstruction } from "./task/utils/connection.js";
+import { downloadByUrl } from "./task/service.js";
 import { registerIpc as registerIpcTasks } from "./tasks/ipc.js";
 import { crash } from "./crash/service.js";
 import { menu } from "./config.js";
