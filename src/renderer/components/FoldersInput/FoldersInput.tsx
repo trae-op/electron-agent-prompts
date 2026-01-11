@@ -1,9 +1,8 @@
-import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import FolderIcon from "@mui/icons-material/Folder";
-import styled from "@emotion/styled";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -13,120 +12,61 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 
 export type TFoldersInputProps = {
-  folders: string[];
-  onChange: (folders: string[]) => void;
+  defaultFolders?: string[];
 };
 
-const extractFolderPath = (
-  file: File,
-  resolvedPath?: string
-): string | undefined => {
-  const fileWithPath = file as File & {
-    path?: string;
-    webkitRelativePath?: string;
-  };
-
-  const absolutePath = resolvedPath ?? fileWithPath.path;
-
-  if (typeof absolutePath === "string") {
-    const separatorIndex = Math.max(
-      absolutePath.lastIndexOf("\\"),
-      absolutePath.lastIndexOf("/")
-    );
-
-    return separatorIndex > 0
-      ? absolutePath.slice(0, separatorIndex)
-      : absolutePath;
-  }
-
-  if (typeof fileWithPath.webkitRelativePath === "string") {
-    const separatorIndex = fileWithPath.webkitRelativePath.lastIndexOf("/");
-
-    return separatorIndex > 0
-      ? fileWithPath.webkitRelativePath.slice(0, separatorIndex)
-      : fileWithPath.webkitRelativePath;
-  }
-
-  return undefined;
-};
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
-export const FoldersInput = ({ folders, onChange }: TFoldersInputProps) => {
+export const FoldersInput = ({ defaultFolders }: TFoldersInputProps) => {
   const { pending } = useFormStatus();
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [folders, setFolders] = useState<string[]>([]);
+  const defaultFoldersKey = (defaultFolders ?? []).join("\n");
+  const foldersValue = useMemo(() => JSON.stringify(folders), [folders]);
 
   useEffect(() => {
-    if (inputRef.current !== null) {
-      inputRef.current.setAttribute("webkitdirectory", "");
-      inputRef.current.setAttribute("directory", "");
-    }
-  }, []);
-
-  const handleFoldersChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { files } = event.target;
-
-      if (files === null) {
-        return;
+    setFolders((current) => {
+      if (current.join("\n") === defaultFoldersKey) {
+        return current;
       }
 
-      const folderSet = new Set(folders);
+      return defaultFolders ?? [];
+    });
+  }, [defaultFolders, defaultFoldersKey]);
 
-      Array.from(files).forEach((file) => {
-        const folderPath = extractFolderPath(
-          file,
-          window.electron.invoke.resolveFilePath(file)
-        );
+  const handleSelectFolders = useCallback(async () => {
+    if (pending) {
+      return;
+    }
 
-        if (folderPath !== undefined) {
-          folderSet.add(folderPath);
-        }
-      });
+    const selectedFolders = await window.electron.invoke.selectFolders();
 
-      onChange(Array.from(folderSet));
-      event.target.value = "";
-    },
-    [folders, onChange]
-  );
+    if (selectedFolders.length === 0) {
+      return;
+    }
+
+    setFolders((current) => {
+      const set = new Set(current);
+      selectedFolders.forEach((folder) => set.add(folder));
+      return Array.from(set);
+    });
+  }, [pending]);
 
   const handleRemoveFolder = useCallback(
     (folder: string) => () => {
-      onChange(folders.filter((item) => item !== folder));
+      setFolders((current) => current.filter((item) => item !== folder));
     },
-    [folders, onChange]
+    []
   );
 
   return (
     <Stack spacing={1} data-testid="create-task-folders">
+      <input type="hidden" name="folders" value={foldersValue} readOnly />
       <Button
-        component="label"
-        role={undefined}
         variant="outlined"
-        tabIndex={-1}
         startIcon={<FolderIcon />}
         disabled={pending}
         data-testid="create-task-folders-input"
+        onClick={handleSelectFolders}
       >
         {folders.length > 0 ? "Add more folders" : "Add folders"}
-        <VisuallyHiddenInput
-          type="file"
-          name="folders"
-          onChange={handleFoldersChange}
-          multiple
-          disabled={pending}
-          ref={inputRef}
-        />
       </Button>
       <List dense>
         {folders.length === 0 ? (

@@ -113,6 +113,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
     updateTask: (payload) => ipcInvoke("updateTask", payload),
     deleteTask: (payload) => ipcInvoke("deleteTask", payload),
     markdownContent: (payload) => ipcInvoke("markdownContent", payload),
+    selectFolders: () => ipcInvoke("selectFolders"),
     uploadFile: (payload) => {
       const filePath = electron.webUtils.getPathForFile(payload.file);
       payload.path = filePath;

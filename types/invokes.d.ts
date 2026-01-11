@@ -9,6 +9,7 @@ type TEventPayloadInvoke = {
   uploadFile: undefined;
   uploadConnectionInstructionFile: undefined;
   markdownContent: TTask | undefined;
+  selectFolders: string[];
 };
 
 type TEventSendInvoke = {
@@ -51,6 +52,7 @@ type TEventSendInvoke = {
     taskId: string;
     contents: TMarkdownContent[];
   };
+  selectFolders: undefined;
 };
 
 type TInvoke = {
@@ -79,5 +81,6 @@ type TInvoke = {
   markdownContent: (
     payload: TEventSendInvoke["markdownContent"]
   ) => Promise<TEventPayloadInvoke["markdownContent"]>;
+  selectFolders: () => Promise<TEventPayloadInvoke["selectFolders"]>;
   resolveFilePath: (file: File) => string | undefined;
 };

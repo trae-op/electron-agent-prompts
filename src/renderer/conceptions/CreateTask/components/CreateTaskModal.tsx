@@ -1,4 +1,4 @@
-import { memo, useActionState, useCallback, useState } from "react";
+import { memo, useActionState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
@@ -6,12 +6,13 @@ import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
 import { Popup } from "@composites/Popup";
 import { useCreateTaskModalActions } from "../hooks";
-import { TCreateTaskModalProps, TFieldsProps } from "./types";
+import { TCreateTaskModalProps } from "./types";
 import { useCreateTaskModalOpenSelector } from "../context";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
+import { parseFoldersFromFormData } from "@utils/folders";
 
-const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
+const Fields = () => {
   const { pending } = useFormStatus();
 
   return (
@@ -40,7 +41,7 @@ const Fields = ({ folders, onFoldersChange }: TFieldsProps) => {
         <MenuItem value="vs-code">VS Code</MenuItem>
       </TextField>
       <UploadFile />
-      <FoldersInput folders={folders} onChange={onFoldersChange} />
+      <FoldersInput />
     </Stack>
   );
 };
@@ -49,9 +50,8 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
   const { projectId } = useParams<{ projectId?: string }>();
   const isOpen = useCreateTaskModalOpenSelector();
   const { closeModal } = useCreateTaskModalActions();
-  const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
-  const [_, formAction] = useActionState(
+  const [, formAction] = useActionState(
     useCallback(
       async (_state: undefined, formData: FormData): Promise<undefined> => {
         if (projectId === undefined) {
@@ -67,30 +67,30 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
             ? rawIde.trim()
             : undefined;
 
+        const folderPaths = parseFoldersFromFormData(formData);
+
         const response = await window.electron.invoke.createTask({
           name,
           projectId,
-          folderPaths: selectedFolders,
+          folderPaths,
           ide,
         });
 
         if (response !== undefined) {
           closeModal();
           onSuccess(response);
-          setSelectedFolders([]);
         }
 
         return undefined;
       },
-      [closeModal, onSuccess, projectId, selectedFolders]
+      [closeModal, onSuccess, projectId]
     ),
     undefined
   );
 
   const handleClose = useCallback(() => {
     closeModal();
-    setSelectedFolders([]);
-  }, [closeModal, setSelectedFolders]);
+  }, [closeModal]);
 
   return (
     <Popup
@@ -103,12 +103,7 @@ export const CreateTaskModal = memo(({ onSuccess }: TCreateTaskModalProps) => {
       confirmPendingLabel="Creating..."
       formTestId="create-task-form"
       messageTestId="create-task-message"
-      content={
-        <Fields
-          folders={selectedFolders}
-          onFoldersChange={setSelectedFolders}
-        />
-      }
+      content={<Fields />}
     />
   );
 });
