@@ -78,15 +78,18 @@ export function registerIpc({
     projectId: string;
     taskId: string;
     ide?: string;
+    isSkills?: boolean;
   }) => void;
   deleteConnectionInstruction: (taskId: string, projectId?: string) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
     projectId?: string | undefined
-  ) => { ide?: string } | undefined;
+  ) => { ide?: string; isSkills?: boolean } | undefined;
   connectionInstruction: (payload: {
     fileBlob?: Blob;
     ide?: string;
+    isSkills?: boolean;
+    taskName?: string;
   }) => Promise<void>;
 }): void {
   ipcMainHandle("updateTask", async (payload) => {
@@ -165,12 +168,15 @@ export function registerIpc({
         projectId: String(connectionInstructionProjectId),
         taskId: String(result.task.id),
         ide: normalizedIde,
+        isSkills: payload.isSkills,
       });
 
       if (resolvedFileBlob !== undefined) {
         await connectionInstruction({
           fileBlob: resolvedFileBlob,
           ide: normalizedIde,
+          isSkills: payload.isSkills,
+          taskName: payload.name,
         });
       }
     }

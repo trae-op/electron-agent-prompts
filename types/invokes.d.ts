@@ -40,6 +40,7 @@ type TEventSendInvoke = {
     url?: string | null;
     folderPaths?: string[];
     ide?: string;
+    isSkills?: boolean;
   };
   deleteTask: {
     id: number;

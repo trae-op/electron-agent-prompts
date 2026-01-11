@@ -10,5 +10,3 @@ type TTask = {
   ide?: string;
   content?: string[];
 };
-
-type TTaskWithFoldersContent = TTask;

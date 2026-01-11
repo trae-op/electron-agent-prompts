@@ -63,7 +63,7 @@ export const CreateTaskModalContainer = () => {
   const updateProject = useUpdateProjectDispatch();
   const [taskId, setTaskId] = useState<number | undefined>(undefined);
 
-  const onSuccess = useCallback((data: TTaskWithFoldersContent) => {
+  const onSuccess = useCallback((data: TTask) => {
     addNewTask(data);
     setTaskId(data.id);
   }, []);
@@ -105,7 +105,7 @@ export const UpdateTaskModalContainer = () => {
   const setUpdateTaskModalProjects = useSetUpdateTaskModalProjectsDispatch();
 
   const onSuccess = useCallback(
-    (data: TTaskWithFoldersContent) => {
+    (data: TTask) => {
       if (task !== undefined && task.projectId !== data.projectId) {
         const foundCurrentProject = projects.find(
           (project) => String(project.id) === String(task.projectId)
@@ -139,7 +139,6 @@ export const UpdateTaskModalContainer = () => {
   );
 
   const setProjectsToTasks = useCallback((items: TProject[]) => {
-    console.log("Setting projects to update task modal:", items);
     setUpdateTaskModalProjects(items);
   }, []);
 

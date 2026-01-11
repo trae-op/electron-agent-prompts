@@ -11,7 +11,7 @@ type TEventPayloadReceive = {
     projects: TProject[];
   };
   tasks: {
-    tasks: TTaskWithFoldersContent[];
+    tasks: TTask[];
   };
   updateTask: {
     task: TTask;

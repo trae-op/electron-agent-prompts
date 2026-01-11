@@ -423,4 +423,44 @@ export const MultiStepForm = memo((props: TMultiStepFormProps) => {
 });
 ```
 
+## Critical Mistakes to Avoid
+
+### ❌ Inline Arrow Functions
+
+```
+<input onChange={(e) => setValue(e.target.value)} />
+<button onClick={() => handleAction()}>Click</button>
+```
+
+### ✅ Correct: useCallback References
+
+```
+const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  setValue(e.target.value);
+}, []);
+
+const handleClick = useCallback(() => {
+  handleAction();
+}, [handleAction]);
+
+<input onChange={handleChange} />
+<button onClick={handleClick}>Click</button>
+```
+
+### ❌ Anonymous Functions
+
+```
+<select onChange={function(e) { handleSelect(e.target.value); }}>
+```
+
+### ✅ Correct: Named useCallback Function
+
+```
+const handleSelect = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+  handleSelectValue(e.target.value);
+}, [handleSelectValue]);
+
+<select onChange={handleSelect}>
+```
+
 This architecture ensures optimal performance, maintainability, and follows React best practices for form handling with modern hooks.

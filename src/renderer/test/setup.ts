@@ -44,6 +44,7 @@ window.electron = {
     deleteTask: vi.fn(),
     uploadFile: vi.fn(),
     markdownContent: vi.fn(),
+    selectFolders: vi.fn(),
     resolveFilePath: vi.fn(),
   },
 };

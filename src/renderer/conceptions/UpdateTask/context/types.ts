@@ -5,8 +5,8 @@ export type TProviderProps = PropsWithChildren;
 export type TSubscriberCallback = () => void;
 
 export type TContext = {
-  getTask: () => TTaskWithFoldersContent | undefined;
-  setTask: (value: TTaskWithFoldersContent | undefined) => void;
+  getTask: () => TTask | undefined;
+  setTask: (value: TTask | undefined) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
   getProjects: () => TProject[];
   setProjects: (value: TProject[]) => void;

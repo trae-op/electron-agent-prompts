@@ -40,14 +40,17 @@ export function registerIpc({
     projectId: string;
     taskId: string;
     ide?: string;
+    isSkills?: boolean;
   }) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
     projectId?: string | undefined
-  ) => { ide?: string } | undefined;
+  ) => { ide?: string; isSkills?: boolean } | undefined;
   connectionInstruction: (payload: {
     fileBlob?: Blob;
     ide?: string;
+    isSkills?: boolean;
+    taskName?: string;
   }) => Promise<void>;
 }): void {
   ipcMainHandle("createTask", async (payload) => {
@@ -107,6 +110,7 @@ export function registerIpc({
         await connectionInstruction({
           fileBlob: result.fileBlob,
           ide: normalizedIde,
+          taskName: payload.name,
         });
       }
     }

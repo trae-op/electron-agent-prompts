@@ -1,9 +1,17 @@
-import { memo, useActionState, useCallback } from "react";
+import {
+  memo,
+  useActionState,
+  useCallback,
+  ChangeEvent,
+  useState,
+} from "react";
 import { useFormStatus } from "react-dom";
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import { Popup } from "@composites/Popup";
 import {
@@ -11,7 +19,12 @@ import {
   useSetUpdateTaskModalTaskDispatch,
   useUpdateTaskModalProjectsSelector,
 } from "../context";
-import { TUpdateTaskActionArgs, TUpdateTaskModalProps } from "./types";
+import {
+  TTaskAgentSkillsFieldProps,
+  TTaskIdeFieldProps,
+  TUpdateTaskActionArgs,
+  TUpdateTaskModalProps,
+} from "./types";
 import { UploadFile } from "@components/UploadFile";
 import { FoldersInput } from "@components/FoldersInput";
 import FormControl from "@mui/material/FormControl";
@@ -85,31 +98,73 @@ const TaskProjectField = () => {
 
 TaskProjectField.displayName = "TaskProjectField";
 
-const TaskIdeField = memo(() => {
+const TaskIdeSelectField = memo(({ onChange, ide }: TTaskIdeFieldProps) => {
   const { pending } = useFormStatus();
-  const task = useUpdateTaskModalTaskSelector();
-
-  if (task === undefined) {
-    return null;
-  }
+  const handleChange = useCallback(
+    (
+      event:
+        | ChangeEvent<HTMLInputElement>
+        | (Event & {
+            target: {
+              value: unknown;
+              name: string;
+            };
+          })
+    ) => {
+      const nextIde = String(event.target.value);
+      onChange(nextIde);
+    },
+    [onChange]
+  );
 
   return (
-    <TextField
-      select
-      name="ide"
-      id="update-task-ide"
-      label="Target IDE for Instructions"
-      defaultValue={task.ide ?? "vs-code"}
-      fullWidth
-      disabled={pending}
-      data-testid="update-task-ide"
-    >
-      <MenuItem value="vs-code">VS Code</MenuItem>
-    </TextField>
+    <FormControl fullWidth disabled={pending}>
+      <InputLabel id="update-task-ide-label">
+        Target IDE for Instructions
+      </InputLabel>
+      <Select
+        labelId="update-task-ide-label"
+        id="update-task-ide"
+        label="Target IDE for Instructions"
+        name="ide"
+        value={ide}
+        disabled={pending}
+        data-testid="update-task-ide"
+        onChange={handleChange}
+      >
+        <MenuItem value="vs-code">VS Code</MenuItem>
+      </Select>
+    </FormControl>
   );
 });
 
-TaskIdeField.displayName = "TaskIdeField";
+TaskIdeSelectField.displayName = "TaskIdeSelectField";
+
+const TaskAgentSkillsField = memo(
+  ({ isVisible }: TTaskAgentSkillsFieldProps) => {
+    const { pending } = useFormStatus();
+
+    if (!isVisible) {
+      return null;
+    }
+
+    return (
+      <FormControlLabel
+        control={
+          <Checkbox
+            name="agent-skills"
+            value="true"
+            disabled={pending}
+            data-testid="update-task-agent-skills"
+          />
+        }
+        label="Agent Skills"
+      />
+    );
+  }
+);
+
+TaskAgentSkillsField.displayName = "TaskAgentSkillsField";
 
 const TaskUploadFileField = memo(() => {
   return <UploadFile />;
@@ -131,6 +186,7 @@ TaskFoldersField.displayName = "TaskFoldersField";
 
 const UpdateTaskFields = () => {
   const task = useUpdateTaskModalTaskSelector();
+  const [ide, setIde] = useState<string>("");
 
   if (task === undefined) {
     return null;
@@ -140,7 +196,8 @@ const UpdateTaskFields = () => {
     <Stack spacing={2} key={task.id}>
       <TaskNameField />
       <TaskProjectField />
-      <TaskIdeField />
+      <TaskIdeSelectField ide={ide} onChange={setIde} />
+      <TaskAgentSkillsField isVisible={ide === "vs-code"} />
       <TaskUploadFileField />
       <TaskFoldersField />
     </Stack>
@@ -164,6 +221,7 @@ const submitUpdateTask = async (
       : undefined;
 
   const folderPaths = parseFoldersFromFormData(formData);
+  const isSkills = formData.get("agent-skills") !== null;
 
   const response = await window.electron.invoke.updateTask({
     id: task.id,
@@ -174,6 +232,7 @@ const submitUpdateTask = async (
     url: task.url,
     folderPaths,
     ide,
+    isSkills: isSkills ? true : undefined,
   });
 
   if (response !== undefined) {

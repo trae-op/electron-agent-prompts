@@ -7,3 +7,12 @@ export type TUpdateTaskActionArgs = {
   onSuccess: (data: TTask) => void;
   setUpdateTask: (task: TTask | undefined) => void;
 };
+
+export type TTaskIdeFieldProps = {
+  onChange: (ide: string) => void;
+  ide?: string;
+};
+
+export type TTaskAgentSkillsFieldProps = {
+  isVisible: boolean;
+};

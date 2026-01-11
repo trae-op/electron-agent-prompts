@@ -157,6 +157,7 @@ const CONNECTION_INSTRUCTION_STORAGE_KEY = "connectionInstructionFiles";
 
 type TConnectionInstructionEntry = {
   ide?: string;
+  isSkills?: boolean;
 };
 
 function normalizeFolders(folders: string[]): string[] {
@@ -281,6 +282,7 @@ export function saveConnectionInstruction(payload: {
   projectId: string;
   taskId: string;
   ide?: string;
+  isSkills?: boolean;
 }) {
   const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
   const projectInstructions = storage[payload.projectId] ?? {};
@@ -314,6 +316,7 @@ export function saveConnectionInstruction(payload: {
       ...projectInstructions,
       [payload.taskId]: {
         ide: normalizedIde,
+        isSkills: payload.isSkills,
       },
     },
   });
@@ -384,8 +387,10 @@ export function getConnectionInstructionByProjectId(projectId?: string) {
 export async function connectionInstruction(payload: {
   fileBlob?: Blob;
   ide?: string;
+  isSkills?: boolean;
+  taskName?: string;
 }): Promise<void> {
-  const { fileBlob, ide } = payload;
+  const { fileBlob, ide, isSkills, taskName } = payload;
 
   if (fileBlob === undefined) {
     return;
@@ -397,16 +402,102 @@ export async function connectionInstruction(payload: {
     return;
   }
 
-  switch (ide ?? "vs-code") {
+  switch (ide) {
     case "vs-code": {
-      await applyVsCodeConnectionInstruction({
-        fileBlob,
-        savedFilePaths,
-      });
+      if (isSkills === true) {
+        await applyAgentSkillsInstruction({
+          fileBlob,
+          savedFilePaths,
+          taskName,
+        });
+      } else {
+        await applyVsCodeConnectionInstruction({
+          fileBlob,
+          savedFilePaths,
+        });
+      }
       break;
     }
     default:
       break;
+  }
+}
+
+function sanitizeSkillsFolderName(taskName: string): string {
+  const trimmed = taskName.trim();
+  const fallback = trimmed.length > 0 ? trimmed : "task";
+
+  return fallback
+    .replace(/[\\/]/g, "-")
+    .replace(/[<>:"|?*]/g, "_")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function applyAgentSkillsInstruction({
+  fileBlob,
+  savedFilePaths,
+  taskName,
+}: {
+  fileBlob: Blob;
+  savedFilePaths: string[];
+  taskName?: string;
+}) {
+  try {
+    if (fileBlob.size === 0) {
+      return;
+    }
+
+    const resolvedTaskName = sanitizeSkillsFolderName(taskName ?? "task");
+    const markdown = await fileBlob.text();
+
+    if (markdown.trim().length === 0) {
+      return;
+    }
+
+    const gitRoots = await Promise.all(
+      savedFilePaths.map((path) => findGitRoot(path))
+    );
+    const uniqueGitRoots = Array.from(
+      new Set(gitRoots.filter((path): path is string => path !== undefined))
+    );
+
+    const projectRoots =
+      uniqueGitRoots.length > 0
+        ? uniqueGitRoots
+        : Array.from(
+            new Set(
+              (
+                await Promise.all(
+                  savedFilePaths.map((path) => findVsCodeSettingsPath(path))
+                )
+              )
+                .filter((path): path is string => path !== undefined)
+                .map((settingsPath) => resolve(settingsPath, "..", ".."))
+            )
+          );
+
+    if (projectRoots.length === 0) {
+      return;
+    }
+
+    for (const projectRoot of projectRoots) {
+      const skillsDir = join(
+        projectRoot,
+        ".github",
+        "skills",
+        resolvedTaskName
+      );
+      await mkdir(skillsDir, { recursive: true });
+
+      const skillFilePath = join(skillsDir, "SKILL.md");
+      await writeFile(skillFilePath, markdown, "utf8");
+    }
+  } catch (error) {
+    showErrorMessages({
+      title: "Error applying agent skills instruction",
+      body: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
@@ -421,6 +512,29 @@ async function findVsCodeSettingsPath(
     try {
       await access(candidate);
       return candidate;
+    } catch {
+      // continue searching upwards
+    }
+
+    const parentDir = dirname(currentDir);
+
+    if (parentDir === currentDir) {
+      return undefined;
+    }
+
+    currentDir = parentDir;
+  }
+}
+
+async function findGitRoot(startPath: string): Promise<string | undefined> {
+  let currentDir = dirname(startPath);
+
+  while (true) {
+    const candidate = join(currentDir, ".git");
+
+    try {
+      await access(candidate);
+      return currentDir;
     } catch {
       // continue searching upwards
     }

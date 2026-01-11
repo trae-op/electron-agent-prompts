@@ -25,6 +25,7 @@ export type TConnectionInstructionFiles = {
     [taskId: string]:
       | {
           ide?: string;
+          isSkills?: boolean;
         }
       | undefined;
   };
