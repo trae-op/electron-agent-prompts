@@ -8,8 +8,10 @@ import {
   createMarkdownFile,
   getMarkdownContentByTaskId,
   getConnectionInstructionByTaskId,
+  getFoldersContentByTaskId,
   getTask,
   loadMarkdownContentFromTaskUrl,
+  connectionInstruction,
   saveFileToStoredFolders,
   saveMarkdownContent,
 } from "./service.js";
@@ -153,11 +155,36 @@ export function registerIpc({
     }
 
     if (result.fileBlob !== undefined) {
-      await saveFileToStoredFolders({
-        file: result.fileBlob,
-        fileName: task.name,
-        taskId: String(result.task.id),
-      });
+      const projectIdStore = getStore<string, string>("projectId");
+      const connectionInstructionPayload = getConnectionInstructionByTaskId(
+        String(result.task.id),
+        projectIdStore
+      );
+      const normalizedIde = connectionInstructionPayload?.ide?.trim();
+      const isSkills = connectionInstructionPayload?.isSkills === true;
+
+      if (!isSkills) {
+        await saveFileToStoredFolders({
+          file: result.fileBlob,
+          fileName: task.name,
+          taskId: String(result.task.id),
+        });
+      }
+
+      if (normalizedIde !== undefined && normalizedIde.length > 0) {
+        await connectionInstruction({
+          fileBlob: result.fileBlob,
+          ide: normalizedIde,
+          isSkills,
+          taskName: task.name,
+          folderPaths: isSkills
+            ? getFoldersContentByTaskId(
+                String(result.task.id),
+                projectIdStore
+              ) ?? []
+            : undefined,
+        });
+      }
     }
 
     if (taskWindow !== undefined && mainWindow !== undefined) {
