@@ -17,6 +17,9 @@
     },
     {
       "file": "./docs/styling.md"
+    },
+    {
+      "file": "./docs/react-form-instructions.md"
     }
   ],
   "github.copilot.chat.commitMessageGeneration.instructions": [
