@@ -82,7 +82,7 @@ export const ConverterModal = memo((_props: TConverterModalProps) => {
             autoFocus
             fullWidth
             multiline
-            minRows={10}
+            rows={7.7}
             value={markdownValue}
             onChange={handleChange}
             autoComplete="off"

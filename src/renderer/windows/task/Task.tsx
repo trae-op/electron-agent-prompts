@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useRef } from "react";
 import Stack from "@mui/material/Stack";
 import { LoadingSpinner } from "@components/LoadingSpinner";
 import { Provider as MarkdownProvider } from "@conceptions/Task/Markdown";
@@ -28,6 +28,8 @@ import { MarkdownContentListButtons } from "./MarkdownContentListButtons";
 const LazyTopPanel = lazy(() => import("./TopPanel"));
 
 const Task = () => {
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <MarkdownProvider>
       <SearchContentProvider>
@@ -59,6 +61,7 @@ const Task = () => {
                           }}
                         >
                           <Stack
+                            ref={scrollContainerRef}
                             overflow="auto"
                             width="100%"
                             height="calc(100vh - 110px)"
@@ -95,7 +98,9 @@ const Task = () => {
                               px: 1.5,
                             }}
                           >
-                            <MarkdownContentListButtons />
+                            <MarkdownContentListButtons
+                              containerRef={scrollContainerRef}
+                            />
                           </Stack>
                         </Stack>
                       </PositionProvider>
