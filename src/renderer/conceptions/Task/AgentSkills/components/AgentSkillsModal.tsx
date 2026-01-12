@@ -67,7 +67,7 @@ const Fields = memo(
           placeholder="Describe what this skill covers"
           fullWidth
           multiline
-          minRows={4}
+          rows={4}
           defaultValue={parsed.description}
           autoComplete="off"
         />

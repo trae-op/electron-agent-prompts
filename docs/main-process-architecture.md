@@ -6,7 +6,7 @@ This document describes the architecture and maintenance guidelines for the Elec
 
 The main process code is organized by feature, with a shared directory for common utilities.
 
-```
+```architecture
 src/main/
 ├── @shared/           # Shared utilities, types, and helpers
 │   ├── control-window/# Window creation/destruction logic

@@ -49,7 +49,7 @@ const Fields = memo(
           autoFocus
           fullWidth
           multiline
-          minRows={8}
+          rows={8}
           defaultValue={contentValue?.content ?? ""}
           autoComplete="off"
         />

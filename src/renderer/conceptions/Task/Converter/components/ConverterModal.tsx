@@ -1,13 +1,9 @@
-import { ChangeEvent, memo, useActionState, useCallback } from "react";
+import { memo, useActionState, useCallback } from "react";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 import { Popup } from "@composites/Popup";
-import {
-  useConverterMarkdownValueSelector,
-  useConverterModalOpenSelector,
-  useSetConverterMarkdownDispatch,
-} from "../context";
+import { useConverterModalOpenSelector } from "../context";
 import { useConverterModalActions } from "../hooks";
 import { convertMarkdownToContents } from "../utils";
 import { useSetContentsDispatch } from "@conceptions/Task/Markdown";
@@ -15,23 +11,11 @@ import type { TConverterModalProps } from "./types";
 
 export const ConverterModal = memo((_props: TConverterModalProps) => {
   const isOpen = useConverterModalOpenSelector();
-  const markdownValue = useConverterMarkdownValueSelector();
-
   const { closeModal } = useConverterModalActions();
-  const setMarkdownValue = useSetConverterMarkdownDispatch();
   const setContents = useSetContentsDispatch();
-
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setMarkdownValue(event.target.value);
-    },
-    [setMarkdownValue]
-  );
-
   const handleClose = useCallback(() => {
-    setMarkdownValue("");
     closeModal();
-  }, [closeModal, setMarkdownValue]);
+  }, []);
 
   const [_, formAction] = useActionState(
     useCallback(
@@ -39,8 +23,6 @@ export const ConverterModal = memo((_props: TConverterModalProps) => {
         const rawMarkdown = formData.get("markdown");
         const nextValue =
           typeof rawMarkdown === "string" ? rawMarkdown.trim() : "";
-
-        setMarkdownValue(nextValue);
 
         if (nextValue === "") {
           return undefined;
@@ -56,7 +38,7 @@ export const ConverterModal = memo((_props: TConverterModalProps) => {
 
         return undefined;
       },
-      [handleClose, setContents, setMarkdownValue]
+      []
     ),
     undefined
   );
@@ -83,8 +65,6 @@ export const ConverterModal = memo((_props: TConverterModalProps) => {
             fullWidth
             multiline
             rows={7.7}
-            value={markdownValue}
-            onChange={handleChange}
             autoComplete="off"
           />
         </Stack>
