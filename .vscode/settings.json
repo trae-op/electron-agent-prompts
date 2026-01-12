@@ -10,12 +10,6 @@
       "file": "./docs/renderer-process-architecture.md"
     },
     {
-      "file": "./docs/main-process-unit-tests.md"
-    },
-    {
-      "file": "./docs/renderer-process-unit-tests.md"
-    },
-    {
       "file": "./docs/styling.md"
     }
   ],

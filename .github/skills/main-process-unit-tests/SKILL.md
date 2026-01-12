@@ -1,6 +1,18 @@
+---
+name: main-process-unit-tests
+description: This document describes how to write unit tests for the Electron main process (`src/main`). Use this when asked to create or update and fix unit tests.
+---
+
 # Main Process Unit Tests
 
-This document describes how to write unit tests for the Electron main process (`src/main`).
+## When to use this skill
+
+Use this skill when I say some like this:
+
+- Create unit tests for main process
+- Fix unit tests for main process
+- Create unit tests for [name of service or ipc and so on]
+- I see failed unit tests. Fix that!
 
 ## Technologies
 
@@ -28,7 +40,7 @@ Tests should be co-located with the files they test.
 
 Ensure you have the necessary dependencies (already in `package.json`):
 
-```bash
+```
 npm install -D vitest
 ```
 
@@ -38,7 +50,7 @@ npm install -D vitest
 
 Use `vi.mock("electron", ...)` at the top of your test file.
 
-```typescript
+```
 import { vi } from "vitest";
 
 vi.mock("electron", () => ({
@@ -60,7 +72,7 @@ vi.mock("electron", () => ({
 
 Suppose you have a service `src/main/user/service.ts` that fetches a user.
 
-```typescript
+```
 // src/main/user/service.test.ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserById } from "./service.js";
@@ -116,7 +128,7 @@ To test IPC handlers, you often need to mock the registration function or the `i
 
 If your IPC setup looks like this:
 
-```typescript
+```
 // src/main/user/ipc.ts
 import { ipcMainOn } from "../@shared/utils.js";
 import { getUserById } from "./service.js";
@@ -130,7 +142,7 @@ export function registerIpc() {
 
 You can test it like this:
 
-```typescript
+```
 // src/main/user/ipc.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { registerIpc } from "./ipc.js";
@@ -174,12 +186,12 @@ describe("User IPC", () => {
 
 Run all unit tests:
 
-```bash
+```
 npm run test:unit:main
 ```
 
 Run specific test file:
 
-```bash
+```
 npx vitest src/main/user/service.test.ts
 ```

@@ -1,6 +1,18 @@
-# Renderer Process Unit Tests
+---
+name: renderer-process-unit-tests
+description: This document describes how to write unit tests for the React renderer process (src/renderer). Use this when asked to create or update and fix unit tests.
+---
 
-This document describes how to write unit tests for the React renderer process (`src/renderer`).
+## When to use this skill
+
+Use this skill when I say some like this:
+
+- Create unit tests for renderer process
+- Fix unit tests for renderer process
+- Create unit tests for [name of component or hook and so on]
+- I see failed unit tests. Fix that!
+
+# Renderer Process Unit Tests
 
 ## Technologies
 
@@ -12,7 +24,7 @@ This document describes how to write unit tests for the React renderer process (
 
 Create or update `vitest.config.ts` (or add to `vite.config.ts`) to set the environment to `jsdom`.
 
-```typescript
+```
 // vitest.config.ts
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
@@ -40,7 +52,7 @@ export default defineConfig({
 
 If you use `setupFiles`, create `src/renderer/test/setup.ts`:
 
-```typescript
+```
 import "@testing-library/jest-dom";
 ```
 
@@ -55,10 +67,11 @@ import "@testing-library/jest-dom";
 7.  **The `data-testid` Rule**: Always use the **`data-testid`** word to find elements. This is for elements where you want to check the value or text. if the component does not have this prop `data-testid` then find this component and add this prop, then just use for example `screen.getByTestId('test-id')` in the unit test
 
 - Example:
-  ```typescript
+
+```
   // In the component: <div data-testid="user-greeting">Hello, ${userName}</div>
   // In the test: expect(screen.getByTestId('user-greeting')).toHaveTextContent('Hello, John');
-  ```
+```
 
 8. **Run and Fix New Tests**: After creating a new unit test, run that test immediately (for example with `npm run test:unit:renderer`) and inspect the results; if the test fails, fix the test or the implementation until it passes.
 
@@ -68,7 +81,7 @@ import "@testing-library/jest-dom";
 
 You can mock it globally in your setup file or per test.
 
-```typescript
+```
 // In a test file
 import { vi } from "vitest";
 
@@ -87,7 +100,7 @@ global.window.electron = {
 
 Suppose you have a component `src/renderer/components/UserInfo.tsx`.
 
-```typescript
+```
 // src/renderer/components/UserInfo.test.tsx
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
@@ -114,7 +127,7 @@ describe("UserInfo", () => {
 
 Suppose you have a hook `src/renderer/hooks/useLogin.ts`.
 
-```typescript
+```
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { useLogin } from "./useLogin";
@@ -142,6 +155,6 @@ describe("useLogin", () => {
 
 Run all unit tests:
 
-```bash
+```
 npm run test:unit:renderer
 ```
