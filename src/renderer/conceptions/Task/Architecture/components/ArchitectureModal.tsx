@@ -370,8 +370,8 @@ export const ArchitectureModal = memo(
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
     const maxCreatePosition = useMemo(() => {
-      return Math.max(contents.length + 1, 1);
-    }, [contents.length]);
+      return Math.max(position, 1);
+    }, [position]);
 
     const [_, formAction] = useActionState(
       useCallback(
@@ -461,7 +461,9 @@ export const ArchitectureModal = memo(
             onMoveNodeUp={handleMoveNodeUp}
             onMoveNodeDown={handleMoveNodeDown}
             showPositionField={!contentValue}
-            defaultPosition={maxCreatePosition}
+            defaultPosition={
+              contentValue ? contentValue.position + 1 : undefined
+            }
             maxPosition={maxCreatePosition}
           />
         }

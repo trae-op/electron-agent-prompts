@@ -90,9 +90,7 @@ export const AgentSkillsModal = memo(
     }, [closeModal, setContent]);
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
-    const maxCreatePosition = useMemo(() => {
-      return Math.max(contents.length + 1, 1);
-    }, [contents.length]);
+    const maxCreatePosition = useMemo(() => Math.max(position, 1), [position]);
 
     const [_, formAction] = useActionState(
       useCallback(
@@ -171,7 +169,9 @@ export const AgentSkillsModal = memo(
           <Fields
             contentValue={contentValue}
             showPositionField={!contentValue}
-            defaultPosition={maxCreatePosition}
+            defaultPosition={
+              contentValue ? contentValue.position + 1 : undefined
+            }
             maxPosition={maxCreatePosition}
           />
         }

@@ -3,6 +3,8 @@ name: renderer-process-unit-tests
 description: This document describes how to write unit tests for the React renderer process (src/renderer). Use this when asked to create or update and fix unit tests.
 ---
 
+# Renderer Process Unit Tests
+
 ## When to use this skill
 
 Use this skill when I say some like this:
@@ -11,8 +13,6 @@ Use this skill when I say some like this:
 - Fix unit tests for renderer process
 - Create unit tests for [name of component or hook and so on]
 - I see failed unit tests. Fix that!
-
-# Renderer Process Unit Tests
 
 ## Technologies
 
