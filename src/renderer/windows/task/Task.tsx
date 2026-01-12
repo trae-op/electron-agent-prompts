@@ -58,6 +58,7 @@ const Task = () => {
                         <PositionModal />
                         <Stack
                           direction="column"
+                          width="100%"
                           sx={{
                             mt: 6.3,
                           }}
@@ -79,12 +80,6 @@ const Task = () => {
                                 height: 30,
                                 cursor: "pointer",
                               },
-                              borderBottom: (theme) =>
-                                `1px solid ${
-                                  theme.palette.mode === "dark"
-                                    ? theme.palette.grey[800]
-                                    : theme.palette.grey[200]
-                                }`,
                             }}
                             direction="column"
                             spacing={1}
@@ -93,21 +88,12 @@ const Task = () => {
                               <LazyTaskOverview />
                             </Suspense>
                           </Stack>
-                          <Stack
-                            width="100%"
-                            height={60}
-                            direction="row"
-                            alignItems="center"
-                            sx={{
-                              px: 1.5,
-                            }}
-                          >
-                            <Suspense fallback={<LoadingSpinner />}>
-                              <LazyMarkdownContentListButtons
-                                containerRef={scrollContainerRef}
-                              />
-                            </Suspense>
-                          </Stack>
+
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <LazyMarkdownContentListButtons
+                              containerRef={scrollContainerRef}
+                            />
+                          </Suspense>
                         </Stack>
                       </PositionProvider>
                     </ArchitectureProvider>

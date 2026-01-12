@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import Stack from "@mui/material/Stack";
 
 type MarkdownContentListButtonsProps = {
   containerRef: RefObject<HTMLElement | null>;
@@ -80,53 +81,73 @@ const MarkdownContentListButtons = memo(
       };
     }, []);
 
+    if (contents.length === 0) {
+      return null;
+    }
+
     return (
-      <Box
+      <Stack
+        width="100%"
+        height={60}
+        direction="row"
+        alignItems="center"
         sx={{
-          ml: "auto",
-          alignItems: "center",
-          display: "flex",
-          gap: 1,
+          px: 1.5,
+          borderTop: (theme) =>
+            `1px solid ${
+              theme.palette.mode === "dark"
+                ? theme.palette.grey[800]
+                : theme.palette.grey[200]
+            }`,
         }}
       >
-        <Tooltip title="Total Content" enterDelay={200} arrow placement="top">
-          <Typography sx={{ px: 2 }} component="span" variant="body2">
-            {contents.length}
-          </Typography>
-        </Tooltip>
-        <Tooltip title="Scroll to top" arrow placement="top">
-          <span>
-            <IconButton
-              onClick={handleScrollTop}
-              disabled={isAtTop}
-              size="small"
-            >
-              <ArrowUpwardIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title="Scroll to bottom" arrow placement="top">
-          <span>
-            <IconButton
-              onClick={handleScrollBottom}
-              disabled={isAtBottom}
-              size="small"
-            >
-              <ArrowDownwardIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Button
-          variant="contained"
-          startIcon={<SaveIcon />}
-          onClick={handleApply}
-          disabled={padding}
-          loading={padding}
-          data-testid="save-button"
+        <Box
+          sx={{
+            ml: "auto",
+            alignItems: "center",
+            display: "flex",
+            gap: 1,
+          }}
         >
-          Save
-        </Button>
-      </Box>
+          <Tooltip title="Total Content" enterDelay={200} arrow placement="top">
+            <Typography sx={{ px: 2 }} component="span" variant="body2">
+              {contents.length}
+            </Typography>
+          </Tooltip>
+          <Tooltip title="Scroll to top" arrow placement="top">
+            <span>
+              <IconButton
+                onClick={handleScrollTop}
+                disabled={isAtTop}
+                size="small"
+              >
+                <ArrowUpwardIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Scroll to bottom" arrow placement="top">
+            <span>
+              <IconButton
+                onClick={handleScrollBottom}
+                disabled={isAtBottom}
+                size="small"
+              >
+                <ArrowDownwardIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleApply}
+            disabled={padding}
+            loading={padding}
+            data-testid="save-button"
+          >
+            Save
+          </Button>
+        </Box>
+      </Stack>
     );
   }
 );
