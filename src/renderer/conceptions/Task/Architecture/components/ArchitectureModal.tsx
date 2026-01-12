@@ -46,6 +46,7 @@ import {
   removeNode,
 } from "../utils";
 import { TArchitectureNodeDraft } from "../utils/type";
+import { clamp } from "@utils/markdownContent";
 
 const NodeFields = memo(
   ({
@@ -182,6 +183,9 @@ const Fields = memo(
     onMoveNodeUp,
     onMoveNodeDown,
     controlPanel,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
   }: TFieldsProps) => {
     const handleRootChange = useCallback(
       (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -193,6 +197,21 @@ const Fields = memo(
     return (
       <Stack spacing={1}>
         {Boolean(controlPanel) && controlPanel}
+
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="architecture-modal-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
 
         <TextField
           name="architecture-root"
@@ -350,10 +369,13 @@ export const ArchitectureModal = memo(
     );
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
 
     const [_, formAction] = useActionState(
       useCallback(
-        async (_state: undefined, _formData: FormData): Promise<undefined> => {
+        async (_state: undefined, formData: FormData): Promise<undefined> => {
           const normalizedRoot = normalizeRootPath(rootPathDraftRef.current);
           const normalizedNodes = normalizeArchitectureNodes(
             mapDraftsToInput(nodes, nodeNameDraftValuesRef.current)
@@ -368,11 +390,20 @@ export const ArchitectureModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "architecture",
             content: architectureContent,
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -385,7 +416,15 @@ export const ArchitectureModal = memo(
 
           return undefined;
         },
-        [contentValue, handleClose, nodes, onSuccess, onUpdate, position]
+        [
+          contentValue,
+          handleClose,
+          nodes,
+          onSuccess,
+          onUpdate,
+          position,
+          contents.length,
+        ]
       ),
       undefined
     );
@@ -421,6 +460,9 @@ export const ArchitectureModal = memo(
             onAddChild={handleAddChild}
             onMoveNodeUp={handleMoveNodeUp}
             onMoveNodeDown={handleMoveNodeDown}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
           />
         }
       />

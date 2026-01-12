@@ -11,18 +11,39 @@ import {
 import { useTextModalActions } from "../hooks";
 import type { TTextModalProps } from "./types";
 import { createId } from "@utils/generation";
+import { clamp } from "@utils/markdownContent";
 
 const Fields = memo(
   ({
     contentValue,
     controlPanel,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
   }: {
     contentValue?: TMarkdownContent;
     controlPanel?: ReactNode;
+    showPositionField?: boolean;
+    defaultPosition?: number;
+    maxPosition?: number;
   }) => {
     return (
       <Stack spacing={1}>
         {Boolean(controlPanel) && controlPanel}
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="text-modal-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
         <TextField
           name="text"
           id="text-modal-textarea"
@@ -54,6 +75,9 @@ export const TextModal = memo(
     }, [closeModal, setContent]);
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
 
     const [_, formAction] = useActionState(
       useCallback(
@@ -67,11 +91,20 @@ export const TextModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "text",
             content: textValue,
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -84,7 +117,14 @@ export const TextModal = memo(
 
           return undefined;
         },
-        [position, handleClose, onSuccess, onUpdate, contentValue]
+        [
+          position,
+          handleClose,
+          onSuccess,
+          onUpdate,
+          contentValue,
+          contents.length,
+        ]
       ),
       undefined
     );
@@ -105,7 +145,13 @@ export const TextModal = memo(
         formTestId="text-modal-form"
         messageTestId="text-modal-message"
         content={
-          <Fields contentValue={contentValue} controlPanel={controlPanel} />
+          <Fields
+            contentValue={contentValue}
+            controlPanel={controlPanel}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
+          />
         }
       />
     );

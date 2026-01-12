@@ -29,6 +29,9 @@ export type TFieldsProps = {
   listStyle: TListStyle;
   onChangeListStyle: (value: TListStyle) => void;
   controlPanel?: ReactNode;
+  showPositionField?: boolean;
+  defaultPosition?: number;
+  maxPosition?: number;
 };
 
 export type TSubItemTextFieldProps = {

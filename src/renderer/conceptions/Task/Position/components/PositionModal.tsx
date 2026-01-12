@@ -3,6 +3,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 import { Popup } from "@composites/Popup";
+import { changePosition } from "@utils/markdownContent";
 import {
   usePositionModalOpenSelector,
   usePositionContentValueSelector,
@@ -57,31 +58,20 @@ export const PositionModal = memo(
             return undefined;
           }
 
-          const targetIndex = clamp(parsedPosition - 1, 0, contents.length - 1);
-          const sourceIndex = contents.findIndex(
-            ({ id }) => id === contentValue.id
+          const result = changePosition(
+            contents,
+            contentValue.id,
+            parsedPosition
           );
 
-          if (sourceIndex === -1) {
-            handleClose();
+          if (!result.ok) {
+            if (result.reason !== "invalid-position") {
+              handleClose();
+            }
             return undefined;
           }
 
-          if (sourceIndex === targetIndex) {
-            handleClose();
-            return undefined;
-          }
-
-          const next = [...contents];
-          const [moved] = next.splice(sourceIndex, 1);
-          next.splice(targetIndex, 0, moved);
-
-          const reindexed = next.map((item, index) => ({
-            ...item,
-            position: index,
-          }));
-
-          onReorder(reindexed);
+          onReorder(result.value);
           handleClose();
 
           return undefined;
@@ -111,9 +101,8 @@ export const PositionModal = memo(
               label="Target position"
               placeholder="Enter a position"
               defaultValue={defaultPosition}
-              inputProps={{
-                min: 1,
-                max: maxPosition,
+              slotProps={{
+                htmlInput: { min: 1, max: maxPosition },
               }}
               fullWidth
               autoFocus
@@ -126,9 +115,3 @@ export const PositionModal = memo(
 );
 
 PositionModal.displayName = "PositionModal";
-
-function clamp(value: number, min: number, max: number): number {
-  if (value < min) return min;
-  if (value > max) return max;
-  return value;
-}

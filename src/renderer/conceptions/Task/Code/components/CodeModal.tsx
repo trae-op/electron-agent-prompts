@@ -11,25 +11,52 @@ import {
 import { useCodeModalActions } from "../hooks";
 import type { TCodeModalProps } from "./types";
 import { createId } from "@utils/generation";
+import { clamp } from "@utils/markdownContent";
 
-const Fields = memo(({ contentValue }: { contentValue?: TMarkdownContent }) => {
-  return (
-    <Stack spacing={2.5}>
-      <TextField
-        name="code"
-        id="code-modal-textarea"
-        label="Code"
-        placeholder={`const main = () => {\n  return 42;\n};`}
-        autoFocus
-        fullWidth
-        multiline
-        minRows={8}
-        defaultValue={contentValue?.content ?? ""}
-        autoComplete="off"
-      />
-    </Stack>
-  );
-});
+const Fields = memo(
+  ({
+    contentValue,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
+  }: {
+    contentValue?: TMarkdownContent;
+    showPositionField?: boolean;
+    defaultPosition?: number;
+    maxPosition?: number;
+  }) => {
+    return (
+      <Stack spacing={2.5}>
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="code-modal-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
+        <TextField
+          name="code"
+          id="code-modal-textarea"
+          label="Code"
+          placeholder={`const main = () => {\n  return 42;\n};`}
+          autoFocus
+          fullWidth
+          multiline
+          minRows={8}
+          defaultValue={contentValue?.content ?? ""}
+          autoComplete="off"
+        />
+      </Stack>
+    );
+  }
+);
 
 export const CodeModal = memo(
   ({ onSuccess, onUpdate, contents }: TCodeModalProps) => {
@@ -45,6 +72,9 @@ export const CodeModal = memo(
     }, [closeModal, setContent]);
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
 
     const [_, formAction] = useActionState(
       useCallback(
@@ -58,11 +88,20 @@ export const CodeModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "code",
             content: codeValue,
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -75,7 +114,14 @@ export const CodeModal = memo(
 
           return undefined;
         },
-        [position, handleClose, onSuccess, onUpdate, contentValue]
+        [
+          position,
+          handleClose,
+          onSuccess,
+          onUpdate,
+          contentValue,
+          contents.length,
+        ]
       ),
       undefined
     );
@@ -95,7 +141,14 @@ export const CodeModal = memo(
         confirmPendingLabel={confirmPendingLabel}
         formTestId="code-modal-form"
         messageTestId="code-modal-message"
-        content={<Fields contentValue={contentValue} />}
+        content={
+          <Fields
+            contentValue={contentValue}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
+          />
+        }
       />
     );
   }

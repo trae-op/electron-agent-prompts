@@ -15,6 +15,7 @@ import {
 import { useTitleModalActions } from "../hooks";
 import type { THeadingLevel, THeadingOption, TTitleModalProps } from "./types";
 import { createId } from "@utils/generation";
+import { clamp } from "@utils/markdownContent";
 
 const defaultHeadingLevel: THeadingLevel = "h2";
 
@@ -31,9 +32,15 @@ export const Fields = memo(
   ({
     contentValue,
     controlPanel,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
   }: {
     contentValue?: TMarkdownContent;
     controlPanel?: ReactNode;
+    showPositionField?: boolean;
+    defaultPosition?: number;
+    maxPosition?: number;
   }) => {
     const selectedHeadingLevel = useMemo<THeadingLevel>(() => {
       if (!contentValue?.content) {
@@ -56,6 +63,20 @@ export const Fields = memo(
     return (
       <Stack spacing={1}>
         {Boolean(controlPanel) && controlPanel}
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="title-modal-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
         <TextField
           name="title"
           id="title-modal-title"
@@ -100,6 +121,10 @@ export const TitleModal = memo(
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
 
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
+
     const [_, formAction] = useActionState(
       useCallback(
         async (_state: undefined, formData: FormData): Promise<undefined> => {
@@ -116,11 +141,20 @@ export const TitleModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "title",
             content: buildHeadingContent(nextTitle, selectedHeading),
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -132,7 +166,14 @@ export const TitleModal = memo(
 
           return undefined;
         },
-        [position, handleClose, onSuccess, onUpdate, contentValue]
+        [
+          position,
+          handleClose,
+          onSuccess,
+          onUpdate,
+          contentValue,
+          contents.length,
+        ]
       ),
       undefined
     );
@@ -149,7 +190,13 @@ export const TitleModal = memo(
         formTestId="title-modal-form"
         messageTestId="title-modal-message"
         content={
-          <Fields contentValue={contentValue} controlPanel={controlPanel} />
+          <Fields
+            contentValue={contentValue}
+            controlPanel={controlPanel}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
+          />
         }
       />
     );

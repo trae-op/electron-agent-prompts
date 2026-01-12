@@ -20,6 +20,9 @@ export type TFieldsProps = {
   onMoveNodeUp: (id: string) => void;
   onMoveNodeDown: (id: string) => void;
   controlPanel?: ReactNode;
+  showPositionField?: boolean;
+  defaultPosition?: number;
+  maxPosition?: number;
 };
 
 export type TNodeFieldsProps = {

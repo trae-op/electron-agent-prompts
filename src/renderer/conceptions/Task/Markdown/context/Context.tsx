@@ -1,5 +1,7 @@
 import { createContext, useCallback, useRef } from "react";
 
+import { changePosition, clamp } from "@utils/markdownContent";
+
 import type { TContext, TProviderProps, TSubscriberCallback } from "./types";
 
 export const Context = createContext<TContext | null>(null);
@@ -18,11 +20,15 @@ export function Provider({ children, items }: TProviderProps) {
   }, []);
 
   const addContent = useCallback((value: TMarkdownContent): void => {
-    const next = [
-      ...contents.current.filter((item) => item.id !== value.id),
-      value,
-    ];
-    contents.current = sortContents(next);
+    const previous = sortContents(
+      contents.current.filter((item) => item.id !== value.id)
+    );
+    const next = [...previous, value];
+
+    const desiredIndex = clamp(value.position, 0, previous.length);
+    const result = changePosition(next, value.id, desiredIndex + 1);
+
+    contents.current = result.ok ? result.value : sortContents(next);
     subscribers.current.forEach((callback) => callback());
   }, []);
 

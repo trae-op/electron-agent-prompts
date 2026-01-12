@@ -51,6 +51,7 @@ import {
   createEmptyListItem,
   getNextPosition,
 } from "../utils";
+import { clamp } from "@utils/markdownContent";
 
 const listStyleOptions = [
   { value: "bullet", label: "Bullet" },
@@ -326,6 +327,9 @@ const Fields = memo(
     listStyle,
     onChangeListStyle,
     controlPanel,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
   }: TFieldsProps) => {
     const handleListStyleChange = (event: ChangeEvent<HTMLInputElement>) => {
       onChangeListStyle(event.target.value as TListStyle);
@@ -333,6 +337,20 @@ const Fields = memo(
 
     return (
       <Stack spacing={1}>
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="list-modal-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
         <FormControl
           sx={{
             display: "flex",
@@ -614,10 +632,13 @@ export const ListModal = memo(
     }, [closeModal, setContent]);
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
 
     const [_, formAction] = useActionState(
       useCallback(
-        async (_state: undefined, _formData: FormData): Promise<undefined> => {
+        async (_state: undefined, formData: FormData): Promise<undefined> => {
           const normalizedItems: TListItemContent[] = items
             .map((item) => {
               const value = (
@@ -651,12 +672,21 @@ export const ListModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
           const isEditing = Boolean(contentValue);
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const content: TMarkdownContent = {
             id: contentValue?.id ?? createId(),
             type: "list",
             content: buildListContent(normalizedItems, listStyle),
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -677,6 +707,7 @@ export const ListModal = memo(
           handleClose,
           onSuccess,
           onUpdate,
+          contents.length,
         ]
       ),
       undefined
@@ -714,6 +745,9 @@ export const ListModal = memo(
             listStyle={listStyle}
             onChangeListStyle={setListStyle}
             controlPanel={controlPanel}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
           />
         }
       />

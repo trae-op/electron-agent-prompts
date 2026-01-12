@@ -12,42 +12,69 @@ import { useAgentSkillsModalActions } from "../hooks";
 import type { TAgentSkillsModalProps } from "./types";
 import { createId } from "@utils/generation";
 import { parseAgentSkillsContent, serializeAgentSkillsContent } from "../utils";
+import { clamp } from "@utils/markdownContent";
 
-const Fields = memo(({ contentValue }: { contentValue?: TMarkdownContent }) => {
-  const parsed = useMemo(() => {
-    if (!contentValue) {
-      return { name: "", description: "" };
-    }
+const Fields = memo(
+  ({
+    contentValue,
+    showPositionField,
+    defaultPosition,
+    maxPosition,
+  }: {
+    contentValue?: TMarkdownContent;
+    showPositionField?: boolean;
+    defaultPosition?: number;
+    maxPosition?: number;
+  }) => {
+    const parsed = useMemo(() => {
+      if (!contentValue) {
+        return { name: "", description: "" };
+      }
 
-    return parseAgentSkillsContent(contentValue.content);
-  }, [contentValue]);
+      return parseAgentSkillsContent(contentValue.content);
+    }, [contentValue]);
 
-  return (
-    <Stack spacing={1}>
-      <TextField
-        name="name"
-        id="agent-skills-name"
-        label="Skill name"
-        placeholder="e.g. Planning"
-        autoFocus
-        fullWidth
-        defaultValue={parsed.name}
-        autoComplete="off"
-      />
-      <TextField
-        name="description"
-        id="agent-skills-description"
-        label="Description"
-        placeholder="Describe what this skill covers"
-        fullWidth
-        multiline
-        minRows={4}
-        defaultValue={parsed.description}
-        autoComplete="off"
-      />
-    </Stack>
-  );
-});
+    return (
+      <Stack spacing={1}>
+        {showPositionField && (
+          <TextField
+            type="number"
+            name="position"
+            id="agent-skills-position"
+            label="Position"
+            placeholder="Enter a position"
+            defaultValue={defaultPosition}
+            slotProps={{
+              htmlInput: { min: 1, max: maxPosition },
+            }}
+            fullWidth
+          />
+        )}
+        <TextField
+          name="name"
+          id="agent-skills-name"
+          label="Skill name"
+          placeholder="e.g. Planning"
+          autoFocus
+          fullWidth
+          defaultValue={parsed.name}
+          autoComplete="off"
+        />
+        <TextField
+          name="description"
+          id="agent-skills-description"
+          label="Description"
+          placeholder="Describe what this skill covers"
+          fullWidth
+          multiline
+          minRows={4}
+          defaultValue={parsed.description}
+          autoComplete="off"
+        />
+      </Stack>
+    );
+  }
+);
 
 export const AgentSkillsModal = memo(
   ({ onSuccess, onUpdate, contents }: TAgentSkillsModalProps) => {
@@ -63,6 +90,9 @@ export const AgentSkillsModal = memo(
     }, [closeModal, setContent]);
 
     const position = useMemo(() => getNextPosition(contents), [contents]);
+    const maxCreatePosition = useMemo(() => {
+      return Math.max(contents.length + 1, 1);
+    }, [contents.length]);
 
     const [_, formAction] = useActionState(
       useCallback(
@@ -79,6 +109,15 @@ export const AgentSkillsModal = memo(
             return undefined;
           }
 
+          const rawPosition = formData.get("position");
+          const parsedPosition =
+            typeof rawPosition === "string" ? parseInt(rawPosition, 10) : NaN;
+
+          const createPosition =
+            !isEditing && !Number.isNaN(parsedPosition)
+              ? clamp(parsedPosition - 1, 0, contents.length)
+              : position;
+
           const markdown = serializeAgentSkillsContent({
             name: nameValue,
             description: descriptionValue,
@@ -88,7 +127,7 @@ export const AgentSkillsModal = memo(
             id: contentValue?.id ?? createId(),
             type: "agent-skills",
             content: markdown,
-            position: contentValue?.position ?? position,
+            position: contentValue?.position ?? createPosition,
           };
 
           if (isEditing && onUpdate) {
@@ -101,7 +140,14 @@ export const AgentSkillsModal = memo(
 
           return undefined;
         },
-        [contentValue, handleClose, onSuccess, onUpdate, position]
+        [
+          contentValue,
+          handleClose,
+          onSuccess,
+          onUpdate,
+          position,
+          contents.length,
+        ]
       ),
       undefined
     );
@@ -121,7 +167,14 @@ export const AgentSkillsModal = memo(
         confirmPendingLabel={confirmPendingLabel}
         formTestId="agent-skills-modal-form"
         messageTestId="agent-skills-modal-message"
-        content={<Fields contentValue={contentValue} />}
+        content={
+          <Fields
+            contentValue={contentValue}
+            showPositionField={!contentValue}
+            defaultPosition={maxCreatePosition}
+            maxPosition={maxCreatePosition}
+          />
+        }
       />
     );
   }
