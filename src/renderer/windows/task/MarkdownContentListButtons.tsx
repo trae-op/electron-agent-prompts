@@ -15,7 +15,7 @@ type MarkdownContentListButtonsProps = {
   containerRef: RefObject<HTMLElement | null>;
 };
 
-export const MarkdownContentListButtons = memo(
+const MarkdownContentListButtons = memo(
   ({ containerRef }: MarkdownContentListButtonsProps) => {
     const [isAtTop, setIsAtTop] = useState(true);
     const [isAtBottom, setIsAtBottom] = useState(false);
@@ -132,3 +132,5 @@ export const MarkdownContentListButtons = memo(
 );
 
 MarkdownContentListButtons.displayName = "MarkdownContentListButtons";
+
+export default MarkdownContentListButtons;

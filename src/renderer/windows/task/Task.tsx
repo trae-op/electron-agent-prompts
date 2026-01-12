@@ -22,10 +22,12 @@ import {
   ConverterModal,
   PositionModal,
 } from "./InitModals";
-import TaskOverview from "./TaskOverview";
-import { MarkdownContentListButtons } from "./MarkdownContentListButtons";
 
 const LazyTopPanel = lazy(() => import("./TopPanel"));
+const LazyTaskOverview = lazy(() => import("./TaskOverview"));
+const LazyMarkdownContentListButtons = lazy(
+  () => import("./MarkdownContentListButtons")
+);
 
 const Task = () => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -87,7 +89,9 @@ const Task = () => {
                             direction="column"
                             spacing={1}
                           >
-                            <TaskOverview />
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <LazyTaskOverview />
+                            </Suspense>
                           </Stack>
                           <Stack
                             width="100%"
@@ -98,9 +102,11 @@ const Task = () => {
                               px: 1.5,
                             }}
                           >
-                            <MarkdownContentListButtons
-                              containerRef={scrollContainerRef}
-                            />
+                            <Suspense fallback={<LoadingSpinner />}>
+                              <LazyMarkdownContentListButtons
+                                containerRef={scrollContainerRef}
+                              />
+                            </Suspense>
                           </Stack>
                         </Stack>
                       </PositionProvider>
