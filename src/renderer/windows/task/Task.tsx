@@ -52,11 +52,16 @@ const Task = () => {
                       <ConverterModal />
                       <PositionProvider>
                         <PositionModal />
-                        <Stack spacing={1} direction="column" sx={{ mt: 6 }}>
+                        <Stack
+                          direction="column"
+                          sx={{
+                            mt: 6.3,
+                          }}
+                        >
                           <Stack
                             overflow="auto"
-                            width="calc(100vw - 25px)"
-                            height="calc(100vh - 120px)"
+                            width="100%"
+                            height="calc(100vh - 110px)"
                             sx={{
                               "&::-webkit-scrollbar": {
                                 width: 4,
@@ -69,13 +74,27 @@ const Task = () => {
                                 height: 30,
                                 cursor: "pointer",
                               },
+                              borderBottom: (theme) =>
+                                `1px solid ${
+                                  theme.palette.mode === "dark"
+                                    ? theme.palette.grey[800]
+                                    : theme.palette.grey[200]
+                                }`,
                             }}
                             direction="column"
                             spacing={1}
                           >
                             <TaskOverview />
                           </Stack>
-                          <Stack width="100%" direction="row">
+                          <Stack
+                            width="100%"
+                            height={60}
+                            direction="row"
+                            alignItems="center"
+                            sx={{
+                              px: 1.5,
+                            }}
+                          >
                             <MarkdownContentListButtons />
                           </Stack>
                         </Stack>

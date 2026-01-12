@@ -9,7 +9,7 @@ export function openWindow({
     hash,
     isCache: true,
     options: {
-      width: 700,
+      width: 800,
       height: 600,
       ...(options || {}),
     },

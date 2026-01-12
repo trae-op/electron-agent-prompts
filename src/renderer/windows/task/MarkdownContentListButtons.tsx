@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 import SaveIcon from "@mui/icons-material/Save";
 import { useContentsSelector } from "@conceptions/Task/Markdown";
 import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 
 export const MarkdownContentListButtons = () => {
   const [padding, setPadding] = useState(false);
@@ -28,6 +30,11 @@ export const MarkdownContentListButtons = () => {
         ml: "auto",
       }}
     >
+      <Tooltip title="Total Content" enterDelay={200} arrow placement="top">
+        <Typography sx={{ px: 2 }} component="span" variant="body2">
+          {contents.length}
+        </Typography>
+      </Tooltip>
       <Button
         variant="contained"
         startIcon={<SaveIcon />}
