@@ -43,6 +43,34 @@ In the rapidly evolving landscape of AI development, managing complex prompts of
 
 ---
 
+## 🤖 Advanced AI Integration (Agent Skills & Custom Instructions)
+
+**Agent Prompts** adapts to the latest industry standards for AI customization, specifically targeting **GitHub Copilot** workflows in VS Code. It allows you to transform your tasks and prompts directly into actionable instructions within any folder you select on your local machine.
+
+### Key Benefits
+
+- **Multi-Project Synchronization**: Update a single instruction or task and have it automatically pushed to all associated project folders simultaneously.
+- **Context-Aware Discovery**: The application automatically traverses folder hierarchies to find relevant configuration files (like `.git` or `.vscode/settings.json`).
+
+When you associate local folders with a task, the application offers two powerful ways to inject context into those specific directories:
+
+### 1. VS Code Custom Instructions (`settings.json`)
+
+Inject project-specific coding standards and guidelines directly into the `.vscode/settings.json` of the selected folder.
+
+- **Mechanism**: Automatically discovers the `.vscode` directory within the selected path (or its parents) and updates the `github.copilot.chat.codeGeneration.instructions` array.
+- **Use Case**: Defining coding conventions, framework-specific rules, or architectural patterns that should always be applied within the project scope.
+
+### 2. Agent Skills (`.github/skills/`)
+
+Create portable, task-specific capabilities using the **Agent Skills** open standard within the selected workspace.
+
+- **Mechanism**: Detects the Git root of the selected folder and creates a dedicated skill directory: `.github/skills/[task-name]/SKILL.md`.
+- **Use Case**: Teaching Copilot specialized workflows, complex procedures, or providing detailed examples that are loaded on-demand based on your prompt description.
+- **Benefits**: Portable across VS Code, Copilot CLI, and Copilot coding agents, adhering to the standard defined at [agentskills.io](https://agentskills.io/).
+
+---
+
 ## Tech Stack
 
 - **Framework**: Electron (Main & Renderer process)

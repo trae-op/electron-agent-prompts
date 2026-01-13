@@ -1,6 +1,9 @@
 {
   "github.copilot.chat.codeGeneration.instructions": [
     {
+      "file": "./README.md"
+    },
+    {
       "file": "./docs/typescript.md"
     },
     {
