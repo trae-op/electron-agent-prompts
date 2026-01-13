@@ -1,6 +1,6 @@
 ﻿# Agent Prompts
 
-**Agent Prompts** is a powerful desktop application built with Electron, React, and TypeScript, designed to streamline the management of AI agent interactions. It provides a structured environment for organizing prompts into projects and tasks, while allowing developers to inject rich context from local files, markdown documents, and external URLs.
+**Agent Prompts** is a desktop application, designed to streamline the management of AI agent instructions. It provides a structured environment for organizing prompts into projects and tasks, while allowing to inject rich context from local files, markdown documents.
 
 ---
 
