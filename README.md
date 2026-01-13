@@ -17,6 +17,8 @@ In the rapidly evolving landscape of AI development, managing complex prompts of
 
 ## Core Functionality
 
+![functional](functional-gif.gif)
+
 ### 🚀 Project & Task Management
 
 - **Hierarchical Organization**: Create and manage projects containing multiple specific tasks.
@@ -56,12 +58,16 @@ When you associate local folders with a task, the application offers two powerfu
 
 ### 1. VS Code Custom Instructions (`settings.json`)
 
+![just-instruction](just-instruction-gif.gif)
+
 Inject project-specific coding standards and guidelines directly into the `.vscode/settings.json` of the selected folder.
 
 - **Mechanism**: Automatically discovers the `.vscode` directory within the selected path (or its parents) and updates the `github.copilot.chat.codeGeneration.instructions` array.
 - **Use Case**: Defining coding conventions, framework-specific rules, or architectural patterns that should always be applied within the project scope.
 
 ### 2. Agent Skills (`.github/skills/`)
+
+![agent-skills](agent-skills-gif.gif)
 
 Create portable, task-specific capabilities using the **Agent Skills** open standard within the selected workspace.
 
