@@ -62,18 +62,20 @@ crash();
 
 function initMenu(currentWindow: BrowserWindow) {
   buildMenu(currentWindow, (window) => {
-    return getMenu().map((item) => {
-      if (item.name === "app") {
-        item.submenu = [
-          {
-            label: menu.labels.devTools,
-            click: () => window.webContents.openDevTools(),
-          },
-        ];
-      }
+    return isDev()
+      ? getMenu().map((item) => {
+          if (item.name === "app") {
+            item.submenu = [
+              {
+                label: menu.labels.devTools,
+                click: () => window.webContents.openDevTools(),
+              },
+            ];
+          }
 
-      return item;
-    });
+          return item;
+        })
+      : getMenu();
   });
 }
 
