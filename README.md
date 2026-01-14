@@ -73,7 +73,7 @@ Create portable, task-specific capabilities using the **Agent Skills** open stan
 
 - **Mechanism**: Detects the Git root of the selected folder and creates a dedicated skill directory: `.github/skills/[task-name]/SKILL.md`.
 - **Use Case**: Teaching Copilot specialized workflows, complex procedures, or providing detailed examples that are loaded on-demand based on your prompt description.
-- **Benefits**: Portable across VS Code, Copilot CLI, and Copilot coding agents, adhering to the standard defined at [agentskills.io](https://agentskills.io/).
+- **Benefits**: Portable across VS Code, Copilot CLI, and Copilot coding agents, according to the settings from [agent-skills](https://code.visualstudio.com/docs/copilot/customization/agent-skills).
 
 ---
 
