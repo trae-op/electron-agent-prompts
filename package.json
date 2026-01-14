@@ -19,9 +19,12 @@
     "test:unit:main": "vitest src/main --watch=false",
     "open:mac:prod": "./dist/mac/electron-agent-prompts.app/Contents/MacOS/electron-agent-prompts",
     "transpile:electron": "tsc --project src/main/tsconfig.json",
-    "build:mac": "npm run transpile:electron && npm run build && electron-builder --mac --x64",
-    "build:win": "npm run transpile:electron && npm run build && electron-builder --win --x64",
-    "build:linux": "npm run transpile:electron && npm run build && electron-builder --linux --x64"
+    "build:mac": "npm run transpile:electron && npm run build && electron-builder --publish never --mac --x64",
+    "build:win": "npm run transpile:electron && npm run build && electron-builder --publish never --win --x64",
+    "build:linux": "npm run transpile:electron && npm run build && electron-builder --publish never --linux --x64",
+    "build:mac:publish": "npm run transpile:electron && npm run build && electron-builder --publish always --mac --x64",
+    "build:win:publish": "npm run transpile:electron && npm run build && electron-builder --publish always --win --x64",
+    "build:linux:publish": "npm run transpile:electron && npm run build && electron-builder --publish always --linux --x64"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

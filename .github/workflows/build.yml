@@ -33,7 +33,7 @@ jobs:
         run: npm run test:unit:renderer && npm run test:unit:main
 
       - name: Run Build for macOS
-        run: npm run transpile:electron && npm run build && npx electron-builder --mac --x64 --publish=always
+        run: npm run build:mac
 
   build-windows:
     runs-on: windows-latest
@@ -53,4 +53,4 @@ jobs:
         run: npm run test:unit:renderer && npm run test:unit:main
 
       - name: Run Build for Windows
-        run: npm run transpile:electron && npm run build && npx electron-builder --win --x64 --publish=always
+        run: npm run build:win
