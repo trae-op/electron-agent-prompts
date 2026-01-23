@@ -16,6 +16,7 @@ export function openWindow(provider: keyof TLessProviders): BrowserWindow {
       height: 400,
       webPreferences: {
         partition: "persist:auth",
+        sandbox: true,
       },
     },
   });

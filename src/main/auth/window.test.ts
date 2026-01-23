@@ -2,12 +2,10 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
 import type { BrowserWindow } from "electron";
 import type { TLessProviders } from "./types.js";
 
-let fromPartitionMock: Mock;
-let createWindowMock: Mock;
+let fromPartitionMock: Mock = vi.fn();
+let createWindowMock: Mock = vi.fn();
 
 vi.mock("electron", () => {
-  fromPartitionMock = vi.fn();
-
   return {
     BrowserWindow: vi.fn(),
     session: {
@@ -30,7 +28,6 @@ const restApiMock = {
 vi.mock("../config.js", () => ({ restApi: restApiMock }));
 
 vi.mock("../@shared/control-window/create.js", () => {
-  createWindowMock = vi.fn();
   return { createWindow: createWindowMock };
 });
 
@@ -40,18 +37,15 @@ describe("openWindow", () => {
     vi.clearAllMocks();
   });
 
-  it("creates an auth window using the dedicated session", async () => {
+  it("creates an auth window with the partition set to persist:auth", async () => {
     const { openWindow } = await import("./window.js");
 
-    const authSession = { partition: "persist:auth" };
     const browserWindowStub = { id: "auth-window" } as unknown as BrowserWindow;
 
-    fromPartitionMock.mockReturnValue(authSession);
     createWindowMock.mockReturnValue(browserWindowStub);
 
     const result = openWindow("google" as keyof TLessProviders);
 
-    expect(fromPartitionMock).toHaveBeenCalledWith("persist:auth");
     expect(createWindowMock).toHaveBeenCalledTimes(1);
 
     const args = createWindowMock.mock.calls[0]?.[0];
@@ -69,7 +63,7 @@ describe("openWindow", () => {
       height: 400,
     });
 
-    expect(args.options?.webPreferences?.session).toBe(authSession);
+    expect(args.options?.webPreferences?.partition).toBe("persist:auth");
     expect(result).toBe(browserWindowStub);
   });
 });
