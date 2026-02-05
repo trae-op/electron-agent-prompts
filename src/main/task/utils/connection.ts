@@ -7,10 +7,12 @@ export async function connectionInstruction(payload: {
   fileBlob?: Blob;
   ide?: string;
   isSkills?: boolean;
+  isSettings?: boolean;
   taskName?: string;
   folderPaths?: string[];
 }): Promise<void> {
-  const { fileBlob, ide, isSkills, taskName, folderPaths } = payload;
+  const { fileBlob, ide, isSkills, isSettings, taskName, folderPaths } =
+    payload;
 
   if (fileBlob === undefined) {
     return;
@@ -19,7 +21,7 @@ export async function connectionInstruction(payload: {
   const savedFilePaths =
     folderPaths !== undefined && folderPaths.length > 0
       ? folderPaths
-      : getStore<string[], string>("lastSavedFilePaths") ?? [];
+      : (getStore<string[], string>("lastSavedFilePaths") ?? []);
 
   if (savedFilePaths.length === 0) {
     return;
@@ -33,7 +35,7 @@ export async function connectionInstruction(payload: {
           savedFilePaths,
           taskName,
         });
-      } else {
+      } else if (isSettings !== false) {
         await applyVsCodeConnectionInstruction({
           fileBlob,
           savedFilePaths,
@@ -79,10 +81,10 @@ async function applyAgentSkillsInstruction({
     }
 
     const gitRoots = await Promise.all(
-      savedFilePaths.map((path) => findGitRoot(path))
+      savedFilePaths.map((path) => findGitRoot(path)),
     );
     const uniqueGitRoots = Array.from(
-      new Set(gitRoots.filter((path): path is string => path !== undefined))
+      new Set(gitRoots.filter((path): path is string => path !== undefined)),
     );
 
     const projectRoots =
@@ -92,12 +94,12 @@ async function applyAgentSkillsInstruction({
             new Set(
               (
                 await Promise.all(
-                  savedFilePaths.map((path) => findVsCodeSettingsPath(path))
+                  savedFilePaths.map((path) => findVsCodeSettingsPath(path)),
                 )
               )
                 .filter((path): path is string => path !== undefined)
-                .map((settingsPath) => resolve(settingsPath, "..", ".."))
-            )
+                .map((settingsPath) => resolve(settingsPath, "..", "..")),
+            ),
           );
 
     if (projectRoots.length === 0) {
@@ -109,7 +111,7 @@ async function applyAgentSkillsInstruction({
         projectRoot,
         ".github",
         "skills",
-        resolvedTaskName
+        resolvedTaskName,
       );
       await mkdir(skillsDir, { recursive: true });
 
@@ -125,7 +127,7 @@ async function applyAgentSkillsInstruction({
 }
 
 async function findVsCodeSettingsPath(
-  startPath: string
+  startPath: string,
 ): Promise<string | undefined> {
   let currentDir = await resolveStartDir(startPath);
 
@@ -200,12 +202,12 @@ async function applyVsCodeConnectionInstruction({
     }
 
     const settingsPaths = await Promise.all(
-      savedFilePaths.map((path) => findVsCodeSettingsPath(path))
+      savedFilePaths.map((path) => findVsCodeSettingsPath(path)),
     );
     const uniqueSettingsPaths = Array.from(
       new Set(
-        settingsPaths.filter((path): path is string => path !== undefined)
-      )
+        settingsPaths.filter((path): path is string => path !== undefined),
+      ),
     );
 
     if (uniqueSettingsPaths.length === 0) {
@@ -229,7 +231,7 @@ async function applyVsCodeConnectionInstruction({
       }
 
       const instructions = normalizeInstructionEntries(
-        parsed["github.copilot.chat.codeGeneration.instructions"]
+        parsed["github.copilot.chat.codeGeneration.instructions"],
       );
 
       const dedupedInstructions: TInstructionEntry[] = [];
@@ -251,7 +253,7 @@ async function applyVsCodeConnectionInstruction({
         .filter((savedPath) => isPathInsideRoot(savedPath, projectRoot))
         .map(
           (savedPath) =>
-            `./${normalizePathSeparator(relative(projectRoot, savedPath))}`
+            `./${normalizePathSeparator(relative(projectRoot, savedPath))}`,
         );
 
       for (const projectFile of projectFiles) {

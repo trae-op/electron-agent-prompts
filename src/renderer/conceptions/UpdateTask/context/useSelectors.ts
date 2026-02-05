@@ -41,3 +41,13 @@ export const useSetUpdateTaskModalIdeDispatch = () => {
 export const useSetUpdateTaskModalIsSkillsDispatch = () => {
   return useUpdateTaskContext().setIsSkills;
 };
+
+export const useUpdateTaskModalIsSettingsSelector = (): boolean => {
+  const { getIsSettings, subscribe } = useUpdateTaskContext();
+
+  return useSyncExternalStore(subscribe, getIsSettings, getIsSettings);
+};
+
+export const useSetUpdateTaskModalIsSettingsDispatch = () => {
+  return useUpdateTaskContext().setIsSettings;
+};

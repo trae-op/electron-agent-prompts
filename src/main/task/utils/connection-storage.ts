@@ -9,6 +9,7 @@ const CONNECTION_INSTRUCTION_STORAGE_KEY = "connectionInstructionFiles";
 type TConnectionInstructionEntry = {
   ide?: string;
   isSkills?: boolean;
+  isSettings?: boolean;
 };
 
 export function saveConnectionInstruction(payload: {
@@ -16,6 +17,7 @@ export function saveConnectionInstruction(payload: {
   taskId: string;
   ide?: string;
   isSkills?: boolean;
+  isSettings?: boolean;
 }) {
   const storage = getElectronStorage(CONNECTION_INSTRUCTION_STORAGE_KEY) ?? {};
   const projectInstructions = storage[payload.projectId] ?? {};
@@ -50,6 +52,7 @@ export function saveConnectionInstruction(payload: {
       [payload.taskId]: {
         ide: normalizedIde,
         isSkills: payload.isSkills,
+        isSettings: payload.isSettings,
       },
     },
   });
@@ -57,7 +60,7 @@ export function saveConnectionInstruction(payload: {
 
 export function deleteConnectionInstruction(
   taskId: string,
-  projectId?: string
+  projectId?: string,
 ) {
   const projectKey = projectId ?? getStore<string, string>("projectId");
 
@@ -91,7 +94,7 @@ export function deleteConnectionInstruction(
 
 export function getConnectionInstructionByTaskId(
   taskId: string,
-  projectId?: string
+  projectId?: string,
 ): TConnectionInstructionEntry | undefined {
   const projectKey = projectId ?? getStore<string, string>("projectId");
 

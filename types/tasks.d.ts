@@ -9,5 +9,6 @@ type TTask = {
   foldersContentFiles?: string[];
   ide?: string;
   isSkills?: boolean;
+  isSettings?: boolean;
   content?: string[];
 };

@@ -9,5 +9,9 @@ export type TContext = {
   setIsOpen: (value: boolean) => void;
   getLatestTask: () => TTask | undefined;
   setLatestTask: (value: TTask | undefined) => void;
+  getIsSettings: () => boolean;
+  setIsSettings: (value: boolean) => void;
+  getIsSkills: () => boolean;
+  setIsSkills: (value: boolean) => void;
   subscribe: (callback: TSubscriberCallback) => () => void;
 };

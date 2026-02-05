@@ -29,7 +29,7 @@ export function registerIpc({
   }): Promise<void>;
   getFoldersContentByTaskId: (
     taskId: string,
-    projectId?: string | undefined
+    projectId?: string | undefined,
   ) => string[] | undefined;
   saveFoldersContent: (payload: {
     projectId: string;
@@ -41,15 +41,17 @@ export function registerIpc({
     taskId: string;
     ide?: string;
     isSkills?: boolean;
+    isSettings?: boolean;
   }) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
-    projectId?: string | undefined
-  ) => { ide?: string; isSkills?: boolean } | undefined;
+    projectId?: string | undefined,
+  ) => { ide?: string; isSkills?: boolean; isSettings?: boolean } | undefined;
   connectionInstruction: (payload: {
     fileBlob?: Blob;
     ide?: string;
     isSkills?: boolean;
+    isSettings?: boolean;
     taskName?: string;
     folderPaths?: string[];
   }) => Promise<void>;
@@ -87,7 +89,7 @@ export function registerIpc({
 
     if (result.fileBlob !== undefined) {
       const markdownContents = await buildMarkdownContentsFromBlob(
-        result.fileBlob
+        result.fileBlob,
       );
 
       if (markdownContents.length > 0) {
@@ -105,40 +107,45 @@ export function registerIpc({
         projectId: payload.projectId,
         taskId: String(result.task.id),
         ide: normalizedIde,
+        isSkills: payload.isSkills,
+        isSettings: payload.isSettings,
       });
 
       if (result.fileBlob !== undefined) {
         await connectionInstruction({
           fileBlob: result.fileBlob,
           ide: normalizedIde,
+          isSkills: payload.isSkills,
+          isSettings: payload.isSettings,
           taskName: payload.name,
         });
       }
     }
 
     const projectMarkdownContent = getMarkdownContentByProjectId(
-      payload.projectId
+      payload.projectId,
     );
 
     const connectionInstructionPayload = getConnectionInstructionByTaskId(
       String(result.task.id),
-      payload.projectId
+      payload.projectId,
     );
 
     return {
       ...result.task,
       content:
         projectMarkdownContent !== undefined
-          ? projectMarkdownContent[String(result.task?.id)]?.map(
-              (task) => task.content
-            ) ?? []
+          ? (projectMarkdownContent[String(result.task?.id)]?.map(
+              (task) => task.content,
+            ) ?? [])
           : undefined,
       foldersContentFiles: getFoldersContentByTaskId(
         String(result.task.id),
-        payload.projectId
+        payload.projectId,
       ),
       ide: connectionInstructionPayload?.ide,
       isSkills: connectionInstructionPayload?.isSkills,
+      isSettings: connectionInstructionPayload?.isSettings,
     };
   });
 }

@@ -9,6 +9,7 @@ export function Provider({ children }: TProviderProps) {
   const projects = useRef<TProject[]>([]);
   const ide = useRef<string | undefined>(undefined);
   const isSkills = useRef<boolean>(false);
+  const isSettings = useRef<boolean>(true);
 
   const subscribers = useRef<Set<TSubscriberCallback>>(new Set());
 
@@ -22,9 +23,11 @@ export function Provider({ children }: TProviderProps) {
     if (value === undefined) {
       ide.current = undefined;
       isSkills.current = false;
+      isSettings.current = true;
     } else {
       ide.current = value.ide;
       isSkills.current = value.isSkills === true;
+      isSettings.current = value.isSettings !== false;
     }
 
     subscribers.current.forEach((callback) => callback());
@@ -57,6 +60,15 @@ export function Provider({ children }: TProviderProps) {
     subscribers.current.forEach((callback) => callback());
   }, []);
 
+  const getIsSettings = useCallback((): boolean => {
+    return isSettings.current;
+  }, []);
+
+  const setIsSettings = useCallback((value: boolean): void => {
+    isSettings.current = value;
+    subscribers.current.forEach((callback) => callback());
+  }, []);
+
   const subscribe = useCallback((callback: TSubscriberCallback) => {
     subscribers.current.add(callback);
 
@@ -76,6 +88,8 @@ export function Provider({ children }: TProviderProps) {
         setIde,
         getIsSkills,
         setIsSkills,
+        getIsSettings,
+        setIsSettings,
         subscribe,
       }}
     >

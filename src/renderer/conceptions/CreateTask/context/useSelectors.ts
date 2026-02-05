@@ -21,3 +21,23 @@ export const useSetCreateTaskModalOpenDispatch = () => {
 export const useSetLatestCreatedTaskDispatch = () => {
   return useCreateTaskContext().setLatestTask;
 };
+
+export const useCreateTaskModalIsSettingsSelector = (): boolean => {
+  const { getIsSettings, subscribe } = useCreateTaskContext();
+
+  return useSyncExternalStore(subscribe, getIsSettings, getIsSettings);
+};
+
+export const useSetCreateTaskModalIsSettingsDispatch = () => {
+  return useCreateTaskContext().setIsSettings;
+};
+
+export const useCreateTaskModalIsSkillsSelector = (): boolean => {
+  const { getIsSkills, subscribe } = useCreateTaskContext();
+
+  return useSyncExternalStore(subscribe, getIsSkills, getIsSkills);
+};
+
+export const useSetCreateTaskModalIsSkillsDispatch = () => {
+  return useCreateTaskContext().setIsSkills;
+};

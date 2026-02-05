@@ -14,4 +14,6 @@ export type TContext = {
   setIde: (value: string | undefined) => void;
   getIsSkills: () => boolean;
   setIsSkills: (value: boolean) => void;
+  getIsSettings: () => boolean;
+  setIsSettings: (value: boolean) => void;
 };

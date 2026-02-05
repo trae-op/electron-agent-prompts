@@ -54,7 +54,7 @@ export function registerIpc({
     "task",
     async (
       event: Electron.IpcMainEvent,
-      payload: TEventPayloadSend["task"] | undefined
+      payload: TEventPayloadSend["task"] | undefined,
     ) => {
       if (payload === undefined) {
         return;
@@ -87,7 +87,7 @@ export function registerIpc({
           contents: markdownContents ?? [],
         });
       }
-    }
+    },
   );
 
   ipcMainOn("findInPage", (event, payload) => {
@@ -122,7 +122,7 @@ export function registerIpc({
 
     const markdownFilePath = await createMarkdownFile(
       payload.taskId,
-      markdownContents
+      markdownContents,
     );
 
     setStore("uploadedFilePath", markdownFilePath);
@@ -156,7 +156,7 @@ export function registerIpc({
       const projectIdStore = getStore<string, string>("projectId");
       const connectionInstructionPayload = getConnectionInstructionByTaskId(
         String(result.task.id),
-        projectIdStore
+        projectIdStore,
       );
       const normalizedIde = connectionInstructionPayload?.ide?.trim();
       const isSkills = connectionInstructionPayload?.isSkills === true;
@@ -174,12 +174,13 @@ export function registerIpc({
           fileBlob: result.fileBlob,
           ide: normalizedIde,
           isSkills,
+          isSettings: connectionInstructionPayload?.isSettings,
           taskName: task.name,
           folderPaths: isSkills
-            ? getFoldersContentByTaskId(
+            ? (getFoldersContentByTaskId(
                 String(result.task.id),
-                projectIdStore
-              ) ?? []
+                projectIdStore,
+              ) ?? [])
             : undefined,
         });
       }
@@ -189,7 +190,7 @@ export function registerIpc({
       const projectIdStore = getStore<string, string>("projectId");
       const connectionInstructionPayload = getConnectionInstructionByTaskId(
         String(result.task.id),
-        projectIdStore
+        projectIdStore,
       );
 
       ipcWebContentsSend("updateTask", mainWindow.webContents, {
@@ -197,6 +198,7 @@ export function registerIpc({
           ...result.task,
           ide: connectionInstructionPayload?.ide,
           isSkills: connectionInstructionPayload?.isSkills,
+          isSettings: connectionInstructionPayload?.isSettings,
         },
       });
       taskWindow.hide();

@@ -6,7 +6,9 @@ export type TGetFoldersContentByProjectId = {
     | undefined;
   getConnectionInstructionByProjectId: (projectId?: string | undefined) =>
     | {
-        [key: string]: { ide?: string; isSkills?: boolean } | undefined;
+        [key: string]:
+          | { ide?: string; isSkills?: boolean; isSettings?: boolean }
+          | undefined;
       }
     | undefined;
 };

@@ -27,7 +27,7 @@ export function registerIpc({
     for (const key in projectMarkdown) {
       if (projectMarkdown[key] !== undefined) {
         content[key] = projectMarkdown[key].map(
-          (item: TMarkdownContent) => item.content
+          (item: TMarkdownContent) => item.content,
         );
       }
     }
@@ -44,6 +44,7 @@ export function registerIpc({
           : [],
       ide: connectionInstructions?.[task.id + ""]?.ide,
       isSkills: connectionInstructions?.[task.id + ""]?.isSkills,
+      isSettings: connectionInstructions?.[task.id + ""]?.isSettings,
     }));
   };
 
@@ -51,7 +52,7 @@ export function registerIpc({
     "tasks",
     async (
       event: Electron.IpcMainEvent,
-      payload: TEventPayloadSend["tasks"] | undefined
+      payload: TEventPayloadSend["tasks"] | undefined,
     ) => {
       const projectId = payload?.projectId;
 
@@ -63,6 +64,12 @@ export function registerIpc({
       }
 
       const tasksFromCache = cacheTasks(projectId);
+
+      //       foldersContentFiles?: string[];
+      // ide?: string;
+      // isSkills?: boolean;
+      // isSettings?: boolean;
+      // content?: string[];
 
       if (tasksFromCache !== undefined) {
         event.reply("tasks", {
@@ -96,6 +103,6 @@ export function registerIpc({
           });
         }
       }
-    }
+    },
   );
 }

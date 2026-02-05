@@ -26,6 +26,7 @@ export type TConnectionInstructionFiles = {
       | {
           ide?: string;
           isSkills?: boolean;
+          isSettings?: boolean;
         }
       | undefined;
   };
@@ -69,7 +70,7 @@ export function hasElectronStorage<K extends keyof TElectronStore>(name: K) {
 
 export function setElectronStorage<K extends keyof TElectronStore>(
   name: K,
-  value: TElectronStore[K]
+  value: TElectronStore[K],
 ) {
   electronStorage.set(name, value);
 }
@@ -79,7 +80,7 @@ export function clearElectronStorage() {
 }
 
 export function deleteFromElectronStorage<K extends keyof TElectronStore>(
-  name: K
+  name: K,
 ) {
   electronStorage.delete(name);
 }

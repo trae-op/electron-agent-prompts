@@ -105,7 +105,7 @@ app.on("ready", async () => {
       }
 
       return item;
-    })
+    }),
   );
 
   initMenu(mainWindow);

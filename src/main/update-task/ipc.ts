@@ -6,7 +6,7 @@ import { updateTask } from "./service.js";
 
 function removeTaskFromResponseCache(
   projectIdValue: number,
-  taskId: number
+  taskId: number,
 ): void {
   const projectIdStore = getStore<string, string>("projectId");
 
@@ -24,12 +24,12 @@ function removeTaskFromResponseCache(
 
       if (cachedCurrentProjectTasks !== undefined) {
         const tasksWithoutUpdated = cachedCurrentProjectTasks.filter(
-          (task) => String(task.id) !== String(taskId)
+          (task) => String(task.id) !== String(taskId),
         );
 
         setDataResponseElectronStorage(
           buildTasksEndpoint(parsedProjectIdStore),
-          tasksWithoutUpdated
+          tasksWithoutUpdated,
         );
       }
     }
@@ -66,7 +66,7 @@ export function registerIpc({
   }): Promise<void>;
   getFoldersContentByTaskId: (
     taskId: string,
-    projectId?: string | undefined
+    projectId?: string | undefined,
   ) => string[] | undefined;
   saveFoldersContent: (payload: {
     projectId: string;
@@ -79,16 +79,18 @@ export function registerIpc({
     taskId: string;
     ide?: string;
     isSkills?: boolean;
+    isSettings?: boolean;
   }) => void;
   deleteConnectionInstruction: (taskId: string, projectId?: string) => void;
   getConnectionInstructionByTaskId: (
     taskId: string,
-    projectId?: string | undefined
-  ) => { ide?: string; isSkills?: boolean } | undefined;
+    projectId?: string | undefined,
+  ) => { ide?: string; isSkills?: boolean; isSettings?: boolean } | undefined;
   connectionInstruction: (payload: {
     fileBlob?: Blob;
     ide?: string;
     isSkills?: boolean;
+    isSettings?: boolean;
     taskName?: string;
     folderPaths?: string[];
   }) => Promise<void>;
@@ -151,9 +153,8 @@ export function registerIpc({
     }
 
     if (resolvedFileBlob !== undefined) {
-      const markdownContents = await buildMarkdownContentsFromBlob(
-        resolvedFileBlob
-      );
+      const markdownContents =
+        await buildMarkdownContentsFromBlob(resolvedFileBlob);
 
       if (markdownContents.length > 0) {
         saveMarkdownContent({
@@ -175,23 +176,25 @@ export function registerIpc({
         taskId: String(result.task.id),
         ide: normalizedIde,
         isSkills: payload.isSkills,
+        isSettings: payload.isSettings,
       });
 
       if (resolvedFileBlob !== undefined) {
         const skillFolderPaths =
           payload.isSkills === true
-            ? payload.folderPaths ??
+            ? (payload.folderPaths ??
               getFoldersContentByTaskId(
                 String(result.task.id),
-                projectIdStore
+                projectIdStore,
               ) ??
-              []
+              [])
             : undefined;
 
         await connectionInstruction({
           fileBlob: resolvedFileBlob,
           ide: normalizedIde,
           isSkills: payload.isSkills,
+          isSettings: payload.isSettings,
           taskName: payload.name,
           folderPaths: skillFolderPaths,
         });
@@ -203,23 +206,24 @@ export function registerIpc({
 
     const connectionInstructionPayload = getConnectionInstructionByTaskId(
       String(result.task.id),
-      projectIdStore
+      projectIdStore,
     );
 
     return {
       ...result.task,
       content:
         projectMarkdownContent !== undefined
-          ? projectMarkdownContent[String(result.task.id)]?.map(
-              (task) => task.content
-            ) ?? []
+          ? (projectMarkdownContent[String(result.task.id)]?.map(
+              (task) => task.content,
+            ) ?? [])
           : undefined,
       foldersContentFiles: getFoldersContentByTaskId(
         String(result.task.id),
-        projectIdStore
+        projectIdStore,
       ),
       ide: connectionInstructionPayload?.ide,
       isSkills: connectionInstructionPayload?.isSkills,
+      isSettings: connectionInstructionPayload?.isSettings,
     };
   });
 }

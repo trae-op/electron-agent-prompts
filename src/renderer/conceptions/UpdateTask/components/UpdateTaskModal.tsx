@@ -16,6 +16,8 @@ import {
   useSetUpdateTaskModalIdeDispatch,
   useUpdateTaskModalIsSkillsSelector,
   useSetUpdateTaskModalIsSkillsDispatch,
+  useUpdateTaskModalIsSettingsSelector,
+  useSetUpdateTaskModalIsSettingsDispatch,
 } from "../context";
 import {
   TTaskAgentSkillsFieldProps,
@@ -107,12 +109,12 @@ const TaskIdeSelectField = memo(({ onChange, ide }: TTaskIdeFieldProps) => {
               value: unknown;
               name: string;
             };
-          })
+          }),
     ) => {
       const nextIde = String(event.target.value);
       onChange(nextIde);
     },
-    [onChange]
+    [onChange],
   );
 
   return (
@@ -142,16 +144,17 @@ const TaskAgentSkillsField = memo(
   ({ isVisible }: TTaskAgentSkillsFieldProps) => {
     const { pending } = useFormStatus();
     const isSkills = useUpdateTaskModalIsSkillsSelector();
+    const isSettings = useUpdateTaskModalIsSettingsSelector();
     const setIsSkills = useSetUpdateTaskModalIsSkillsDispatch();
 
     const handleChange = useCallback(
       (_event: unknown, checked: boolean) => {
         setIsSkills(checked);
       },
-      [setIsSkills]
+      [setIsSkills],
     );
 
-    if (!isVisible) {
+    if (!isVisible || isSettings) {
       return null;
     }
 
@@ -170,10 +173,50 @@ const TaskAgentSkillsField = memo(
         label="Agent Skills"
       />
     );
-  }
+  },
 );
 
 TaskAgentSkillsField.displayName = "TaskAgentSkillsField";
+
+const TaskAddToSettingsField = memo(() => {
+  const { pending } = useFormStatus();
+  const isSettings = useUpdateTaskModalIsSettingsSelector();
+  const isSkills = useUpdateTaskModalIsSkillsSelector();
+  const setIsSettings = useSetUpdateTaskModalIsSettingsDispatch();
+  const setIsSkills = useSetUpdateTaskModalIsSkillsDispatch();
+
+  const handleChange = useCallback(
+    (_event: unknown, checked: boolean) => {
+      setIsSettings(checked);
+      if (checked) {
+        setIsSkills(false);
+      }
+    },
+    [setIsSettings, setIsSkills],
+  );
+
+  if (isSkills) {
+    return null;
+  }
+
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          name="add-to-settings"
+          value="true"
+          disabled={pending}
+          data-testid="update-task-add-to-settings"
+          checked={isSettings}
+          onChange={handleChange}
+        />
+      }
+      label="Add to settings"
+    />
+  );
+});
+
+TaskAddToSettingsField.displayName = "TaskAddToSettingsField";
 
 const TaskUploadFileField = memo(() => {
   return <UploadFile />;
@@ -198,6 +241,7 @@ const UpdateTaskFields = () => {
   const ide = useUpdateTaskModalIdeSelector();
   const setIde = useSetUpdateTaskModalIdeDispatch();
   const setIsSkills = useSetUpdateTaskModalIsSkillsDispatch();
+  const setIsSettings = useSetUpdateTaskModalIsSettingsDispatch();
 
   const handleIdeChange = useCallback(
     (nextIde: string) => {
@@ -206,9 +250,10 @@ const UpdateTaskFields = () => {
 
       if (normalizedIde !== "vs-code") {
         setIsSkills(false);
+        setIsSettings(false);
       }
     },
-    [setIde, setIsSkills]
+    [setIde, setIsSkills, setIsSettings],
   );
 
   if (task === undefined) {
@@ -221,6 +266,7 @@ const UpdateTaskFields = () => {
       <TaskProjectField />
       <TaskIdeSelectField ide={ide} onChange={handleIdeChange} />
       <TaskAgentSkillsField isVisible={ide === "vs-code"} />
+      <TaskAddToSettingsField />
       <TaskUploadFileField />
       <TaskFoldersField />
     </Stack>
@@ -231,7 +277,7 @@ UpdateTaskFields.displayName = "UpdateTaskFields";
 
 const submitUpdateTask = async (
   { task, onSuccess, setUpdateTask }: TUpdateTaskActionArgs,
-  formData: FormData
+  formData: FormData,
 ): Promise<void> => {
   const rawName = formData.get("name");
   const rawProjectId = formData.get("projectId");
@@ -245,6 +291,7 @@ const submitUpdateTask = async (
 
   const folderPaths = parseFoldersFromFormData(formData);
   const isSkills = formData.get("agent-skills") !== null;
+  const isSettings = formData.get("add-to-settings") !== null;
 
   const response = await window.electron.invoke.updateTask({
     id: task.id,
@@ -256,6 +303,7 @@ const submitUpdateTask = async (
     folderPaths,
     ide,
     isSkills: isSkills ? true : undefined,
+    isSettings: isSettings,
   });
 
   if (response !== undefined) {
@@ -278,9 +326,9 @@ export const UpdateTaskModal = memo(({ onSuccess }: TUpdateTaskModalProps) => {
         await submitUpdateTask({ task, onSuccess, setUpdateTask }, formData);
         return undefined;
       },
-      [onSuccess, setUpdateTask, task]
+      [onSuccess, setUpdateTask, task],
     ),
-    undefined
+    undefined,
   );
 
   const handleClose = useCallback(() => {

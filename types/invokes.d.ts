@@ -31,6 +31,8 @@ type TEventSendInvoke = {
     projectId: string;
     folderPaths?: string[];
     ide?: string;
+    isSkills?: boolean;
+    isSettings?: boolean;
   };
   updateTask: {
     id: number;
@@ -41,6 +43,7 @@ type TEventSendInvoke = {
     folderPaths?: string[];
     ide?: string;
     isSkills?: boolean;
+    isSettings?: boolean;
   };
   deleteTask: {
     id: number;
@@ -59,28 +62,28 @@ type TEventSendInvoke = {
 type TInvoke = {
   getVersion: () => Promise<TEventSendInvoke["getVersion"]>;
   createProject: (
-    payload: TEventSendInvoke["createProject"]
+    payload: TEventSendInvoke["createProject"],
   ) => Promise<TEventPayloadInvoke["createProject"]>;
   updateProject: (
-    payload: TEventSendInvoke["updateProject"]
+    payload: TEventSendInvoke["updateProject"],
   ) => Promise<TEventPayloadInvoke["updateProject"]>;
   deleteProject: (
-    payload: TEventSendInvoke["deleteProject"]
+    payload: TEventSendInvoke["deleteProject"],
   ) => Promise<TEventPayloadInvoke["deleteProject"]>;
   createTask: (
-    payload: TEventSendInvoke["createTask"]
+    payload: TEventSendInvoke["createTask"],
   ) => Promise<TEventPayloadInvoke["createTask"]>;
   updateTask: (
-    payload: TEventSendInvoke["updateTask"]
+    payload: TEventSendInvoke["updateTask"],
   ) => Promise<TEventPayloadInvoke["updateTask"]>;
   deleteTask: (
-    payload: TEventSendInvoke["deleteTask"]
+    payload: TEventSendInvoke["deleteTask"],
   ) => Promise<TEventPayloadInvoke["deleteTask"]>;
   uploadFile: (
-    payload: TEventSendInvoke["uploadFile"]
+    payload: TEventSendInvoke["uploadFile"],
   ) => Promise<TEventPayloadInvoke["uploadFile"]>;
   markdownContent: (
-    payload: TEventSendInvoke["markdownContent"]
+    payload: TEventSendInvoke["markdownContent"],
   ) => Promise<TEventPayloadInvoke["markdownContent"]>;
   selectFolders: () => Promise<TEventPayloadInvoke["selectFolders"]>;
   resolveFilePath: (file: File) => string | undefined;
