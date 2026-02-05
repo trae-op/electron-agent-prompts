@@ -17,7 +17,7 @@ import { UpdateProjectModal } from "./UpdateProjectModal";
 
 const createProject = (
   id: string,
-  overrides?: Partial<TProject>
+  overrides?: Partial<TProject>,
 ): TProject => ({
   id,
   name: `Project ${id}`,
@@ -67,7 +67,7 @@ describe("UpdateProjectModal", () => {
     render(
       <Provider>
         <UpdateProjectModal onSuccess={vi.fn()} />
-      </Provider>
+      </Provider>,
     );
 
     expect(screen.queryByTestId("update-project-form")).toBeNull();
@@ -81,7 +81,7 @@ describe("UpdateProjectModal", () => {
         <OpenModalWithProjectOnMount project={project}>
           <UpdateProjectModal onSuccess={vi.fn()} />
         </OpenModalWithProjectOnMount>
-      </Provider>
+      </Provider>,
     );
 
     await waitFor(() => {
@@ -103,12 +103,12 @@ describe("UpdateProjectModal", () => {
         </OpenModalWithProjectOnMount>
         <ModalStateProbe />
         <ProjectProbe />
-      </Provider>
+      </Provider>,
     );
 
     const form = await screen.findByTestId("update-project-form");
     const nameField = within(
-      screen.getByTestId("update-project-name")
+      screen.getByTestId("update-project-name"),
     ).getByRole("textbox");
 
     fireEvent.change(nameField, { target: { value: "  Updated Name  " } });
@@ -118,7 +118,6 @@ describe("UpdateProjectModal", () => {
       expect(updateProjectMock).toHaveBeenCalledWith({
         id: initialProject.id,
         name: "Updated Name",
-        isGeneral: false,
       });
     });
 
@@ -129,10 +128,10 @@ describe("UpdateProjectModal", () => {
     await waitFor(() => {
       expect(screen.queryByTestId("update-project-form")).toBeNull();
       expect(
-        screen.getByTestId("update-project-modal-state")
+        screen.getByTestId("update-project-modal-state"),
       ).toHaveTextContent("false");
       expect(
-        screen.getByTestId("update-project-modal-project")
+        screen.getByTestId("update-project-modal-project"),
       ).toHaveTextContent("none");
     });
   });
@@ -148,12 +147,12 @@ describe("UpdateProjectModal", () => {
         <OpenModalWithProjectOnMount project={project}>
           <UpdateProjectModal onSuccess={onSuccess} />
         </OpenModalWithProjectOnMount>
-      </Provider>
+      </Provider>,
     );
 
     const form = await screen.findByTestId("update-project-form");
     const nameField = within(
-      screen.getByTestId("update-project-name")
+      screen.getByTestId("update-project-name"),
     ).getByRole("textbox");
 
     fireEvent.change(nameField, { target: { value: "New Name" } });
@@ -163,13 +162,12 @@ describe("UpdateProjectModal", () => {
       expect(updateProjectMock).toHaveBeenCalledWith({
         id: project.id,
         name: "New Name",
-        isGeneral: false,
       });
     });
 
     expect(onSuccess).not.toHaveBeenCalled();
     expect(
-      await screen.findByTestId("update-project-form")
+      await screen.findByTestId("update-project-form"),
     ).toBeInTheDocument();
   });
 
@@ -181,7 +179,7 @@ describe("UpdateProjectModal", () => {
         <OpenModalWithProjectOnMount project={project}>
           <UpdateProjectModal onSuccess={vi.fn()} />
         </OpenModalWithProjectOnMount>
-      </Provider>
+      </Provider>,
     );
 
     await waitFor(() => {

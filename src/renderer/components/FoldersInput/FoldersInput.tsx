@@ -53,7 +53,7 @@ export const FoldersInput = ({ defaultFolders }: TFoldersInputProps) => {
     (folder: string) => () => {
       setFolders((current) => current.filter((item) => item !== folder));
     },
-    []
+    [],
   );
 
   return (
@@ -98,12 +98,10 @@ export const FoldersInput = ({ defaultFolders }: TFoldersInputProps) => {
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={folderName}
-                  secondary={folder}
+                  primary={folder}
                   slotProps={{
-                    secondary: {
-                      noWrap: true,
-                      sx: { textOverflow: "ellipsis", overflow: "hidden" },
+                    primary: {
+                      sx: { wordBreak: "break-word" },
                     },
                   }}
                 />
